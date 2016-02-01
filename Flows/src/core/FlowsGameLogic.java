@@ -6,7 +6,6 @@ import server.Context;
 import server.core.GameLogic;
 import server.core.model.ClientInfo;
 
-import java.util.Objects;
 
 /**
  * Created by pezzati on 1/28/16.
@@ -17,6 +16,8 @@ public class FlowsGameLogic implements GameLogic {
 	
 	//Constants
 	final static int escapeNum = 1;
+    final static int increaseWithOwnership = 1;
+    final static int increaseWithEdge = 1;
 	final static double highCasualties = 1.0;
 	final static double mediumCasualties = 2.0 / 3.0;
 	final static double lowCasualties = 1.0 / 3.0;
@@ -25,7 +26,7 @@ public class FlowsGameLogic implements GameLogic {
 	int vertexNum;
 	int[] armyCount;
 	int[] ownership;
-	int[][] graph;
+	boolean[][] graph;
 	int[][] adjacencyList;
 
 	int[] movesDest;
@@ -41,9 +42,9 @@ public class FlowsGameLogic implements GameLogic {
         this.context = new Context(mapName);
         this.context.flush();
 		
-		vertexNum = Map.getVertexNum();
-		graph = map.getGraph();
-		adjacencyList = map.getAdjacencyList();
+		vertexNum = this.context.getMap().getVertexNum();
+		graph = this.context.getMap().getGraph();
+		adjacencyList = this.context.getMap().getAdjacencyList();
     }
 
     @Override
@@ -74,8 +75,8 @@ public class FlowsGameLogic implements GameLogic {
     @Override
     public void simulateEvents(Event[] terminalEvent, Event[] environmentEvent, Event[][] clientsEvent) {
 		
-		armyCount = map.getArmyCount();
-		ownership = map.getOwnership();
+		armyCount = this.context.getMap().getArmyCount();
+		ownership = this.context.getMap().getOwnership();
 		
 		movesDest = new int[vertexNum];
 		movesSize = new int[vertexNum];
@@ -95,27 +96,33 @@ public class FlowsGameLogic implements GameLogic {
 				int dst = -1;
 				int armySize = -1;
 				try{
-					src = (int)clientsEvent[j][i].args[0];
-					dst = (int)clientsEvent[j][i].args[1];
-					armySize = (int)clientsEvent[j][i].args[2];
+					src = Integer.valueOf(clientsEvent[j][i].getArgs()[0]);
+					dst = Integer.valueOf(clientsEvent[j][i].getArgs()[1]);
+					armySize = Integer.valueOf(clientsEvent[j][i].getArgs()[2]);
 				} catch (Exception e) {
-				
-				}
+                    System.out.println("Event is BBAADDDD :D");
+                }
 				if (movesDest[src] < 0 && isMoveValid(src, dst, armySize, j)) {
 					movesDest[src] = dst;
 					movesSize[src] = armySize;
 					armyInV[j][src] -= armySize;
-					if (movesDest[dst] == src) {
-						addBattle('e', dst, src, movesSize[dst], armySize);
-						doBattle('e', dst, src, movesSize[dst], armySize);
+					if (movesDest[dst] == src  && ownership[dst] != ownership[src]) {
+                        int[] battleInfo = doBattle('e', dst, src, movesSize[dst], armySize);
+                        if (ownership[src] == battleInfo[0]) {
+                            movesSize[src] = battleInfo[1];
+                        } else if (ownership[dst] == battleInfo[0]) {
+                            movesSize[dst] = battleInfo[1];
+                        } else {
+                            movesSize[src] = 0;
+                            movesSize[dst] = 0;
+                        }
 					}
 				}
 			}
 		}
 
-		for (int i = 0; i < vertexNum; i++) {
+		for (int i = 0; i < vertexNum; i++)
 			armyInV[ownership[i]][movesDest[i]] += movesSize[i];
-		}
 		
 		//escapes
 		for (int i = 0; i < vertexNum; i++) {
@@ -142,20 +149,40 @@ public class FlowsGameLogic implements GameLogic {
 		for (int i = 0; i < vertexNum; i++) {
 			if (armyInV[0][i] != 0 && armyInV[1][i] != 0) {
 				int[] battleInfo = doBattle('v', i, -1, armyInV[0][i], armyInV[1][i]);
-				ownership[i] = battleInfo[0];
-				armyCount[i] = battleInfo[1];
+				if (battleInfo[0] > -1) {
+                    if (ownership[i] != battleInfo[0])
+                        armyInV[battleInfo[0]][i] = battleInfo[1] + increaseWithOwnership;
+                    else
+                        armyInV[battleInfo[0]][i] = battleInfo[1];
+                    ownership[i] = battleInfo[0];
+                    armyInV[(ownership[i] - 1) * -1][i] = 0;
+                } else {
+                    armyInV[0][i] = 0;
+                    armyInV[1][i] = 0;
+                }
 			}
+            armyCount[i] = Math.max(armyInV[0][i], armyInV[1][i]);
 		}
+
+        //increase army
+        for (int i = 0; i < vertexNum; i++) {
+            if (ownership[i] == -1)
+                continue;
+            for (int j = 0; j < adjacencyList[i].length; j++) {
+                if (ownership[adjacencyList[i][j]] == ownership[i])
+                    armyCount[i] += increaseWithEdge;
+            }
+        }
     }
 	
-	bool isMoveValid(int src, int dst, int armySize, int clientNum) {
+	boolean isMoveValid(int src, int dst, int armySize, int clientNum) {
 		if (src < 0 || src > vertexNum - 1)
 			return false;
 		if (dst < 0 || dst > vertexNum - 1)
 			return false;
 		if (clientNum != ownership[src])
 			return false;
-		if (graph[src][dst] != 1)
+		if (!graph[src][dst])
 			return false;
 		if (armySize > armyCount[src])
 			return false;
@@ -179,11 +206,11 @@ public class FlowsGameLogic implements GameLogic {
 				less = armySize0 - output[2];
 			}
 			if (qualAmount(more) == qualAmount(less)) {
-				output[1] = more - Math.ceil(less * highCasulties);
+				output[1] = more - (int)Math.ceil(less * highCasualties);
 			} else if (qualAmount(more) - 1 == qualAmount(less)) {
-				output[1] = more - Math.ceil(less * mediumCasualties);
+				output[1] = more - (int)Math.ceil(less * mediumCasualties);
 			} else if (qualAmount(more) - 2 == qualAmount(less)) {
-				output[1] = more - Math.ceil(less * lowCasualties);
+				output[1] = more - (int)Math.ceil(less * lowCasualties);
 			}
 			return output;
 		}

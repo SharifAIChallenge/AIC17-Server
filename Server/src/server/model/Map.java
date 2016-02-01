@@ -107,18 +107,42 @@ public class Map {
         return true;
     }
 
-    public String getAdjacencyList(){
-        String out = "";
+//    public String getAdjacencyList(){
+//        String out = "";
+//        for(int i = 0; i < this.vertexNum; i++){
+//            out = out + String.valueOf(i) + ":";
+//            for(int j = i + 1; j < this.vertexNum; j++){
+//                if(this.graph[i][j])
+//                    out = out + String.valueOf(j) + ",";
+//            }
+//            out = out + "\n";
+//        }
+//        return out;
+//    }
+
+    public int[][] getAdjacencyList(){
+        int[][] out = new int[this.vertexNum][];
         for(int i = 0; i < this.vertexNum; i++){
-            out = out + String.valueOf(i) + ":";
-            for(int j = i + 1; j < this.vertexNum; j++){
+            int degree = 0;
+            for(int j = 0; j < this.vertexNum; j++){
                 if(this.graph[i][j])
-                    out = out + String.valueOf(j) + ",";
+                    degree++;
             }
-            out = out + "\n";
+            out[i] = new int[degree];
+        }
+        for(int i =0; i < this.vertexNum; i++){
+            int index = 0;
+            for(int j = 0; j < this.vertexNum; j++){
+                if(this.graph[i][j]){
+                    out[i][index] = j;
+                    index++;
+                }
+            }
         }
         return out;
     }
+
+
 
     public String getMapName() {
         return mapName;

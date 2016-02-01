@@ -1,4 +1,4 @@
-package server.model;
+package models;
 
 import java.util.ArrayList;
 
@@ -70,21 +70,9 @@ public class Diff {
                 diff.add(new Diff_report(i, this.prev_ownership[i], tempArmyCount));
             }
         }
+
         return diff;
     }
 
-    public boolean isFinished(){
-        int only_owner = -1;
-        for(int i = 0; i < this.prev_ownership.length; i++){
-            if(this.prev_ownership[i] == -1)
-                continue;
-            if(only_owner == -1){
-                only_owner = this.prev_ownership[i];
-                continue;
-            }
-            if(this.prev_ownership[i] != only_owner)
-                return false;
-        }
-        return true;
-    }
+
 }

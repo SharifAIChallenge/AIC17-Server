@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Common/Common.iml" filepath="$PROJECT_DIR$/Common/Common.iml" />
       <module fileurl="file://$PROJECT_DIR$/Flows/Flows.iml" filepath="$PROJECT_DIR$/Flows/Flows.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Server/Server.iml" filepath="$PROJECT_DIR$/Server/Server.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Terminal/Terminal.iml" filepath="$PROJECT_DIR$/Terminal/Terminal.iml" />
     </modules>
   </component>
 </project>

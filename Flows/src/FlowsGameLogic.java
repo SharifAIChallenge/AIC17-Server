@@ -1,8 +1,5 @@
-package core;
-
 import model.Event;
 import network.data.Message;
-import server.Context;
 import server.core.GameLogic;
 import server.core.model.ClientInfo;
 
@@ -12,6 +9,7 @@ import server.core.model.ClientInfo;
  */
 public class FlowsGameLogic implements GameLogic {
     private Context context;
+
     private String mapName;
 	
 	//Constants
@@ -21,6 +19,7 @@ public class FlowsGameLogic implements GameLogic {
 	final static double highCasualties = 1.0;
 	final static double mediumCasualties = 2.0 / 3.0;
 	final static double lowCasualties = 1.0 / 3.0;
+    final static int MAX_TURN = 100;
 	
 	//Temps
 	int vertexNum;
@@ -39,7 +38,7 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public void init() {
-        this.context = new Context(mapName);
+        this.context = new Context(mapName, null);
         this.context.flush();
 		
 		vertexNum = this.context.getMap().getVertexNum();
@@ -57,19 +56,19 @@ public class FlowsGameLogic implements GameLogic {
         Message[] msg = new Message[2];
         msg[0] = new Message();
         msg[0].setName(Message.NAME_INIT);
-        Object[] args0 = {this.context.getMap().getGraph(), this.context.getDiffer().getDiff(0)};
+        Object[] args0 = {0, this.context.getMap().getAdjacencyList(), this.context.getDiffList(0)};
         msg[0].setArgs(args0);
 
         msg[1] = new Message();
         msg[1].setName(Message.NAME_INIT);
-        Object[] args1 = {this.context.getMap().getGraph(), this.context.getDiffer().getDiff(1)};
+        Object[] args1 = {1, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1)};
         msg[1].setArgs(args1);
         return msg;
     }
 
     @Override
     public ClientInfo[] getClientInfo() {
-        return new ClientInfo[0];
+        return this.context.getClientsInfo();
     }
 
     @Override
@@ -228,7 +227,7 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public void generateOutputs() {
-
+        this.context.flush();
     }
 
     @Override
@@ -246,12 +245,12 @@ public class FlowsGameLogic implements GameLogic {
         Message[] messages = new Message[2];
         messages[0] = new Message();
 //        messages[0].setName(); TODO
-        Object[] args0 = {this.context.getDiffer().getDiff(0)};
+        Object[] args0 = {this.context.getTurn(), this.context.getDiffList(0)};
         messages[0].setArgs(args0);
 
         messages[1] = new Message();
 //        messages[1].setName(); TODO
-        Object[] args1 = {this.context.getDiffer().getDiff(1)};
+        Object[] args1 = {this.context.getTurn(), this.context.getDiffList(1)};
         messages[1].setArgs(args1);
 
         return messages;
@@ -264,7 +263,7 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public boolean isGameFinished() {
-        return this.context.getDiffer().isFinished();
+        return (this.context.getMap().isFinished() || this.context.getTurn() >= MAX_TURN);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package server.model;
+package models;
 
 /**
  * Created by pezzati on 1/28/16.
@@ -12,5 +12,17 @@ public class Diff_report {
         this.vertex = vertex;
         this.owner = owner;
         this.armyCount = armyCount;
+    }
+
+    public int getVertex() {
+        return vertex;
+    }
+
+    public int getOwner() {
+        return owner;
+    }
+
+    public int getArmyCount() {
+        return armyCount;
     }
 }

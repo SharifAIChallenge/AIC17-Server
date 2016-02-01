@@ -7,11 +7,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="Common" />
-    <orderEntry type="module" module-name="Server" />
-    <orderEntry type="module" module-name="Terminal" />
-    <orderEntry type="module" module-name="Server" />
-    <orderEntry type="module" module-name="Common" />
+    <orderEntry type="library" name="JGF" level="project" />
   </component>
 </module>
 

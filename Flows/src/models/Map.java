@@ -1,4 +1,4 @@
-package server.model;
+package models;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -152,5 +152,18 @@ public class Map {
         return nodes.get(index);
     }
 
-
+    public boolean isFinished(){
+        int only_owner = -1;
+        for(int i = 0; i < this.ownership.length; i++){
+            if(this.ownership[i] == -1)
+                continue;
+            if(only_owner == -1){
+                only_owner = this.ownership[i];
+                continue;
+            }
+            if(this.ownership[i] != only_owner)
+                return false;
+        }
+        return true;
+    }
 }

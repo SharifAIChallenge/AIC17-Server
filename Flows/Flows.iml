@@ -9,6 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Server" />
     <orderEntry type="library" name="gson-2.3.1" level="project" />
+    <orderEntry type="module" module-name="Common" />
   </component>
 </module>
-

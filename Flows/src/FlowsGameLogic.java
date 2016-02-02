@@ -115,42 +115,18 @@ public class FlowsGameLogic implements GameLogic {
         return this.context.getClientsInfo();
     }
 
-<<<<<<< HEAD
-    private void wait(String s, int mili){
+    private void wait(String s, long time){
         System.err.println(s);
         try {
-            Thread.sleep(mili);
+            Thread.sleep(time);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-=======
-    private void wait(String s){
-        System.err.println(s);
-//        try {
-//            Thread.sleep(2000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
->>>>>>> 8506792614d9096ed93845f10d641a9ae5ed29a9
-
     }
 
     @Override
     public void simulateEvents(Event[] terminalEvent, Event[] environmentEvent, Event[][] clientsEvent) {
-<<<<<<< HEAD
-		wait("simulate",0);
-        if(clientsEvent == null){
-            System.err.println("clientEvents is null");
-            return;
-        }
-
-=======
-		wait("simulate");
-        if(clientsEvent == null)
-            return;
-        if(clientsEvent[0] == null || clientsEvent[1] == null)
-            return;
->>>>>>> 8506792614d9096ed93845f10d641a9ae5ed29a9
+		wait("simulate", 1000);
         armyCount = this.context.getMap().getArmyCount();
 		ownership = this.context.getMap().getOwnership();
 		
@@ -324,11 +300,7 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message getStatusMessage() {
-<<<<<<< HEAD
         wait("status", 0);
-=======
-        wait("status");
->>>>>>> 8506792614d9096ed93845f10d641a9ae5ed29a9
         return null;
     }
 
@@ -358,21 +330,13 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Event[] makeEnvironmentEvents() {
-<<<<<<< HEAD
         wait("env", 0);
-=======
-        wait("env");
->>>>>>> 8506792614d9096ed93845f10d641a9ae5ed29a9
         return new Event[0];
     }
 
     @Override
     public boolean isGameFinished() {
-<<<<<<< HEAD
         wait("finish", 0);
-=======
-        wait("finish");
->>>>>>> 8506792614d9096ed93845f10d641a9ae5ed29a9
         return (this.context.getMap().isFinished() || this.context.getTurn() >= MAX_TURN);
     }
 

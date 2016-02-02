@@ -71,7 +71,7 @@ public final class Log {
     }
 
     public static void log(int priority, String tag, String msg) {
-//        System.out.printf("\tpriority=%d,%n\ttag=%s,%n\tmessage=%s%n", priority, tag, msg);
+        System.out.printf("\tpriority=%d,%n\ttag=%s,%n\tmessage=%s%n", priority, tag, msg);
     }
 
 }

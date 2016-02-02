@@ -12,7 +12,6 @@ import server.core.model.ClientInfo;
  */
 public interface GameLogic {
 
-
     /**
      * This method must send initial and necessary values to UI and clients.
      *

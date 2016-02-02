@@ -1,7 +1,15 @@
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import model.Event;
 import network.data.Message;
+import server.Server;
 import server.core.GameLogic;
 import server.core.model.ClientInfo;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 
 
 /**
@@ -32,13 +40,47 @@ public class FlowsGameLogic implements GameLogic {
 	int[] movesSize;
 	int[][] armyInV;
 
-    public FlowsGameLogic(String name) {
-        this.mapName = name;
+    private static final String RESOURCE_PATH_CLIENTS = "resources/mitosis/clients.conf";
+    private static final Charset CONFIG_ENCODING = Charset.forName("UTF-8");
+    private static final String RESOURCE_PATH_GAME = "resources/mitosis/game.conf";
+
+
+    private final long GAME_LONG_TIME_TURN;
+
+    public static void main(String[] args) {
+        Server server = new Server(options -> new FlowsGameLogic(options));
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                    server.newGame(new String[]{"save.txt"}, 10000, 10000);
+                    Thread.sleep(10000);
+                    server.getGameHandler().start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+        server.start();
+    }
+
+    public FlowsGameLogic(String[] options) throws IOException {
+        super();
+
+        String gameConfig = new String(Files.readAllBytes(new File(RESOURCE_PATH_GAME).toPath()), CONFIG_ENCODING);
+        GAME_LONG_TIME_TURN = new Gson().fromJson(gameConfig, JsonObject.class).get("turn").getAsLong();
+
+        this.context = new Context(options[0], RESOURCE_PATH_CLIENTS);
+
+        this.mapName = options[0];
     }
 
     @Override
     public void init() {
-        this.context = new Context(mapName, null);
+        //this.context = new Context(mapName, null);
         this.context.flush();
 		
 		vertexNum = this.context.getMap().getVertexNum();
@@ -56,25 +98,41 @@ public class FlowsGameLogic implements GameLogic {
         Message[] msg = new Message[2];
         msg[0] = new Message();
         msg[0].setName(Message.NAME_INIT);
-        Object[] args0 = {0, this.context.getMap().getAdjacencyList(), this.context.getDiffList(0)};
+        Integer id = 0;
+        Object[] args0 = {id, this.context.getMap().getAdjacencyList(), this.context.getDiffList(0)};
         msg[0].setArgs(args0);
 
         msg[1] = new Message();
         msg[1].setName(Message.NAME_INIT);
-        Object[] args1 = {1, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1)};
+        Object[] args1 = {++id, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1)};
         msg[1].setArgs(args1);
         return msg;
     }
 
     @Override
     public ClientInfo[] getClientInfo() {
+        System.err.println(this.context.getClientsInfo().length);
         return this.context.getClientsInfo();
+    }
+
+    private void wait(String s){
+        System.err.println(s);
+//        try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
     }
 
     @Override
     public void simulateEvents(Event[] terminalEvent, Event[] environmentEvent, Event[][] clientsEvent) {
-		
-		armyCount = this.context.getMap().getArmyCount();
+		wait("simulate");
+        if(clientsEvent == null)
+            return;
+        if(clientsEvent[0] == null || clientsEvent[1] == null)
+            return;
+        armyCount = this.context.getMap().getArmyCount();
 		ownership = this.context.getMap().getOwnership();
 		
 		movesDest = new int[vertexNum];
@@ -237,32 +295,43 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message getStatusMessage() {
+        wait("status");
         return null;
     }
 
     @Override
     public Message[] getClientMessages() {
+        System.err.println("injast");
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Message[] messages = new Message[2];
         messages[0] = new Message();
-//        messages[0].setName(); TODO
+        messages[0].setName(Message.NAME_TURN);
         Object[] args0 = {this.context.getTurn(), this.context.getDiffList(0)};
         messages[0].setArgs(args0);
 
         messages[1] = new Message();
-//        messages[1].setName(); TODO
+        messages[1].setName(Message.NAME_TURN);
         Object[] args1 = {this.context.getTurn(), this.context.getDiffList(1)};
         messages[1].setArgs(args1);
+
+        System.err.println("sent");
 
         return messages;
     }
 
     @Override
     public Event[] makeEnvironmentEvents() {
+        wait("env");
         return new Event[0];
     }
 
     @Override
     public boolean isGameFinished() {
+        wait("finish");
         return (this.context.getMap().isFinished() || this.context.getTurn() >= MAX_TURN);
     }
 

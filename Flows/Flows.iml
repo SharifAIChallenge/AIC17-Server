@@ -7,7 +7,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="JGF" level="project" />
+    <orderEntry type="module" module-name="Common" />
+    <orderEntry type="module" module-name="Server" />
+    <orderEntry type="library" name="gson-2.3.1" level="project" />
   </component>
 </module>
-

@@ -1,9 +1,11 @@
 package models;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by pezzati on 1/27/16.
@@ -27,7 +29,7 @@ public class Map {
 //        this.armyCount = new int[vertexNum];
 
         try {
-            FileReader fr = new FileReader(mapName + ".txt");
+            FileReader fr = new FileReader(mapName);
             BufferedReader br = new BufferedReader(fr);
 
             String line = br.readLine();
@@ -62,6 +64,7 @@ public class Map {
                     continue;
                 }
                 this.graph[nodeIndex][input] = true;
+                this.graph[input][nodeIndex] = true;
                 this.nodes.get(nodeIndex).addNeighbor(this.nodes.get(input));
             }
         } catch (IOException e) {
@@ -166,4 +169,6 @@ public class Map {
         }
         return true;
     }
+
+
 }

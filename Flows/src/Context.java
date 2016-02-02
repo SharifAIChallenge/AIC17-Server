@@ -19,11 +19,21 @@ public class Context {
     private Map map;
     private Diff differ;
     private int turn;
+    private UITest uiTest;
 
     private ClientInfo[] clientsInfo;
 
     public Context(String name, String clientIntoDir) {
+        super();
+
         this.map = new Map(name);
+//        System.err.println(this.map.getVertexNum());
+        int[][] xy = new int[2][this.map.getVertexNum()];
+        for(int i = 0; i < this.map.getVertexNum(); i++){
+            xy[0][i] = this.map.getNode(i).getX();
+            xy[1][i] = this.map.getNode(i).getY();
+        }
+        this.uiTest = new UITest(this.map.getVertexNum(), this.map.getAdjacencyList(), xy[0], xy[1]);
         this.differ = new Diff(this.map.getVertexNum());
         this.map_size = this.map.getVertexNum();
         this.turn = 0;
@@ -48,6 +58,7 @@ public class Context {
     public void flush(){
         this.differ.updateArmyCount(this.map.getArmyCount());
         this.differ.updateOwnership(this.map.getOwnership());
+        this.uiTest.update(this.map.getOwnership(), this.map.getArmyCount());
     }
 
     public int getTurn(){

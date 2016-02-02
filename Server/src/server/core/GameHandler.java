@@ -39,7 +39,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class GameHandler {
 
     private final long GAME_LOGIC_SIMULATE_TIMEOUT;
-    private final long GAME_LOGIC_TURN_TIMEOUT = 1000;
+    private final long GAME_LOGIC_TURN_TIMEOUT;
     private final long CLIENT_RESPONSE_TIME;
 
     private ClientNetwork mClientNetwork;
@@ -64,11 +64,12 @@ public class GameHandler {
     public GameHandler() {
         mClientNetwork = new ClientNetwork();
         mUINetwork = new UINetwork(Configs.getConfigs().ui.token);
-        terminalEventsQueue = new LinkedBlockingQueue<Event>();
+        terminalEventsQueue = new LinkedBlockingQueue<>();
 
         Configs.TimeConfig timeConfig = Configs.getConfigs().turnTimeout;
         GAME_LOGIC_SIMULATE_TIMEOUT = timeConfig.simulateTimeout;
         CLIENT_RESPONSE_TIME = timeConfig.clientResponseTime;
+        GAME_LOGIC_TURN_TIMEOUT = timeConfig.turnTimeout;
     }
 
     /**
@@ -188,7 +189,7 @@ public class GameHandler {
         private Event[] environmentEvents;
         private Event[] terminalEvents;
         private Event[][] clientEvents;
-        private final ArrayList<Event> terminalEventsQueue = new ArrayList<Event>();
+        private final ArrayList<Event> terminalEventsQueue = new ArrayList<>();
 
         /**
          * The run method of the {@link java.lang.Runnable Runnable} interface which will create a
@@ -198,6 +199,11 @@ public class GameHandler {
          */
         @Override
         public void run() {
+            clientEvents = new Event[mClientsInfo.length][];
+            for (int i = 0; i < clientEvents.length; i++) {
+                clientEvents[i] = new Event[0];
+            }
+
             Callable<Void> simulate = () -> {
                 mGameLogic.simulateEvents(terminalEvents, environmentEvents, clientEvents);
                 mGameLogic.generateOutputs();

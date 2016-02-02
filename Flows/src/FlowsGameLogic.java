@@ -96,16 +96,13 @@ public class FlowsGameLogic implements GameLogic {
     @Override
     public Message[] getClientInitialMessages() {
         Message[] msg = new Message[2];
-        msg[0] = new Message();
-        msg[0].setName(Message.NAME_INIT);
-        Integer id = 0;
-        Object[] args0 = {id, this.context.getMap().getAdjacencyList(), this.context.getDiffList(0)};
-        msg[0].setArgs(args0);
+        String name0 = Message.NAME_INIT;
+        Object[] args0 = {0, this.context.getMap().getAdjacencyList(), this.context.getDiffList(0)};
+        msg[0] = new Message(name0, args0);
 
-        msg[1] = new Message();
-        msg[1].setName(Message.NAME_INIT);
-        Object[] args1 = {++id, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1)};
-        msg[1].setArgs(args1);
+        String name1 = Message.NAME_INIT;
+        Object[] args1 = {1, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1)};
+        msg[1] = new Message(name1, args1);
         return msg;
     }
 
@@ -313,15 +310,13 @@ public class FlowsGameLogic implements GameLogic {
             e.printStackTrace();
         }
         Message[] messages = new Message[2];
-        messages[0] = new Message();
-        messages[0].setName(Message.NAME_TURN);
+        String name0 = Message.NAME_TURN;
         Object[] args0 = {this.context.getTurn(), this.context.getDiffList(0)};
-        messages[0].setArgs(args0);
+        messages[0] = new Message(name0, args0);
 
-        messages[1] = new Message();
-        messages[1].setName(Message.NAME_TURN);
+        String name1 = Message.NAME_TURN;
         Object[] args1 = {this.context.getTurn(), this.context.getDiffList(1)};
-        messages[1].setArgs(args1);
+        messages[1] = new Message(name1, args1);
 
         System.err.println("sent");
 

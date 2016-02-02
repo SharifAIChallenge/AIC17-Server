@@ -1,5 +1,8 @@
 package network.data;
 
+import com.google.gson.JsonArray;
+import network.Json;
+
 /**
  * Created by rajabzz on 12/27/14.
  */
@@ -11,23 +14,27 @@ public class Message {
     public static final String NAME_SHUTDOWN = "shutdown";
     public static final String NAME_WRONG_TOKEN = "wrong token";
 
-    public String name;
-    public Object[] args;
+    public final String name;
+    public final JsonArray args;
 
-    public Message() {
+//    public Message() {
+//    }
+
+    public Message(String name, JsonArray args) {
+        this.name = name;
+        this.args = args;
     }
 
     public Message(String name, Object[] args) {
-        this.name = name;
-        this.args = args;
+        this(name, Json.GSON.toJsonTree(args).getAsJsonArray());
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+//    public void setName(String name) {
+//        this.name = name;
+//    }
 
-    public void setArgs(Object[] args) {
-        this.args = args;
-    }
+//    public void setArgs(Object[] args) {
+//        this.args = args;
+//    }
 
 }

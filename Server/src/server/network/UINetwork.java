@@ -143,7 +143,7 @@ public final class UINetwork extends NetServer {
                 = executor.submit(() -> client.get(Message.class));
         Message token = futureMessage.get(1000, TimeUnit.SECONDS);
         return token != null && "token".equals(token.name) && token.args != null
-                && token.args.length >= 1 && mToken.equals(token.args[0]);
+                && token.args.size() >= 1 && mToken.equals(token.args.get(0).getAsString());
     }
 
     /**

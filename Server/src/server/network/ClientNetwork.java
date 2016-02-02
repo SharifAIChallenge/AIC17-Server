@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import model.Event;
 import network.JsonSocket;
 import network.data.Message;
-import network.data.ReceivedMessage;
 import util.Log;
 
 import java.util.ArrayList;
@@ -204,7 +203,7 @@ public class ClientNetwork extends NetServer {
      * @return last valid message or <code>null</code> if there is no valid msg
      * @see {@link #defineClient}
      */
-    public ReceivedMessage getReceivedMessage(int clientID) {
+    public Message getReceivedMessage(int clientID) {
         return mClients.get(clientID).getLastValidatedMessage();
     }
 
@@ -216,7 +215,7 @@ public class ClientNetwork extends NetServer {
      * @see {@link #getReceivedMessage}
      */
     public Event[] getReceivedEvent(int clientID) {
-        ReceivedMessage msg = getReceivedMessage(clientID);
+        Message msg = getReceivedMessage(clientID);
         Event[] events = new Event[0];
         try {
             /*JsonArray eventArray = ((JsonElement)msg.args[0]).getAsJsonArray();
@@ -239,7 +238,7 @@ public class ClientNetwork extends NetServer {
             try {
                 verifyClient(client);
             } catch (Exception e) {
-                // if anything was wrong close the client!
+                // if anything went wrong reject the client!
                 Log.i(TAG, "client rejected", e);
                 try {
                     client.close();
@@ -256,8 +255,8 @@ public class ClientNetwork extends NetServer {
         Message token = futureMessage.get(1000, TimeUnit.SECONDS);
         // check the token
         if (token != null && "token".equals(token.name) && token.args != null
-                && token.args.length >= 1 && token.args[0] instanceof String) {
-            String clientToken = (String) token.args[0];
+                && token.args.size() >= 1) {
+            String clientToken = token.args.get(0).getAsString();
             int clientID = mTokens.getOrDefault(clientToken, -1);
             if (clientID != -1) {
                 mClients.get(clientID).bind(client);

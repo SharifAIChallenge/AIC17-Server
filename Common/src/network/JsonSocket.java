@@ -80,7 +80,7 @@ public class JsonSocket {
      *                     input or output stream of the socket.
      */
     public JsonSocket(Socket socket) throws IOException {
-        mGson = new Gson();
+        mGson = Json.GSON;
         mSocket = socket;
         mIn = mSocket.getInputStream();
         mOut = mSocket.getOutputStream();

@@ -1,6 +1,7 @@
 package server.network;
 
 import model.Event;
+import network.Json;
 import network.JsonSocket;
 import network.data.Message;
 
@@ -108,7 +109,7 @@ public class TerminalNetwork extends NetServer {
             try {
                 Message msg = client.get(Message.class);
 
-                if (msg != null && "token".equals(msg.name) && msg.args != null && msg.args.length >= 1 && token.equals(msg.args[0])) {
+                if (msg != null && "token".equals(msg.name) && msg.args != null && msg.args.size() >= 1 && token.equals(msg.args.get(0).getAsString())) {
                     valid = true;
                     Object[] args = new Object[1];
                     args[0] = new ArrayList<String>();
@@ -158,12 +159,12 @@ public class TerminalNetwork extends NetServer {
                 return;
             switch (msg.name) {
                 case "command":
-                    Message command = new Message((String) msg.args[0], ((ArrayList<String>) msg.args[1]).toArray());
+                    Message command = new Message(msg.args.get(0).getAsString(), msg.args.get(1).getAsJsonArray());
                     Message report = handler.runCommand(command);
                     client.send(report);
                     break;
                 case Event.EVENT:
-                    handler.putEvent((Event) msg.args[0]);
+                    handler.putEvent(Json.GSON.fromJson(msg.args.get(0), Event.class));
                     break;
                 default:
                     client.send(new Message(REPORT_NAME, new Object[]{

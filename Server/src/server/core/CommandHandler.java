@@ -60,9 +60,9 @@ public class CommandHandler implements TerminalNetwork.TerminalInterface {
     public Message cmdNewGame(Message cmd) {
         String args[] = null;
         if (cmd.args != null) {
-            args = new String[cmd.args.length];
+            args = new String[cmd.args.size()];
             for (int i = 0; i < args.length; i++)
-                args[i] = (String) cmd.args[i];
+                args[i] = cmd.args.get(i).getAsString();
         }
         try {
             mServer.newGame(args, 5 * 60 * 1000, 5 * 60 * 1000); // todo: change static timeouts

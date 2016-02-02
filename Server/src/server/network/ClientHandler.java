@@ -2,7 +2,6 @@ package server.network;
 
 import network.JsonSocket;
 import network.data.Message;
-import network.data.ReceivedMessage;
 import util.Log;
 
 import java.io.IOException;
@@ -52,12 +51,12 @@ public class ClientHandler {
     /**
      * Last valid message which is arrived on time.
      */
-    private ReceivedMessage lastValidatedMessage;
+    private Message lastValidatedMessage;
 
     /**
      * Last message received from client.
      */
-    private ReceivedMessage lastReceivedMessage;
+    private Message lastReceivedMessage;
 
     /**
      * This object is notified when a message is received.
@@ -142,7 +141,7 @@ public class ClientHandler {
      * @return last validated message.
      * @see #getReceiver
      */
-    public ReceivedMessage getLastValidatedMessage() {
+    public Message getLastValidatedMessage() {
         return lastValidatedMessage;
     }
 
@@ -208,7 +207,7 @@ public class ClientHandler {
     private void receive() throws IOException {
         if (terminateFlag)
             return;
-        lastReceivedMessage = client.get(ReceivedMessage.class);
+        lastReceivedMessage = client.get(Message.class);
         synchronized (messageNotifier) {
             messageNotifier.notifyAll();
         }

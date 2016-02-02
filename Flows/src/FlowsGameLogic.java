@@ -123,21 +123,19 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public void simulateEvents(Event[] terminalEvent, Event[] environmentEvent, Event[][] clientsEvent) {
-		wait("simulate", 1000);
+		wait("simulate", 0);
         armyCount = this.context.getMap().getArmyCount();
 		ownership = this.context.getMap().getOwnership();
 		
 		movesDest = new int[vertexNum];
 		movesSize = new int[vertexNum];
 		armyInV = new int[2][vertexNum];
-		wait("here1", 2000);
 		for (int i = 0; i < vertexNum; i++) {
 			movesDest[i] = -1;
 			if (ownership[i] > -1) {
 				armyInV[ownership[i]][i] = armyCount[i];
 			}
 		}
-        wait("here2", 2000);
 		// args0: source, args1: destination, args2: army size		
 		for (int j = 0; j < 2; j++) {
             if (clientsEvent[j] == null)

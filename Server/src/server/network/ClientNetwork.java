@@ -217,7 +217,7 @@ public class ClientNetwork extends NetServer {
      */
     public Event[] getReceivedEvent(int clientID) {
         ReceivedMessage msg = getReceivedMessage(clientID);
-        Event[] events = null;
+        Event[] events = new Event[0];
         try {
             /*JsonArray eventArray = ((JsonElement)msg.args[0]).getAsJsonArray();
             events = new Event[eventArray.size()];

@@ -10,8 +10,8 @@ import util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -204,17 +204,29 @@ public class GameHandler {
                 clientEvents[i] = new Event[0];
             }
 
-            Callable<Void> simulate = () -> {
-                mGameLogic.simulateEvents(terminalEvents, environmentEvents, clientEvents);
-                mGameLogic.generateOutputs();
-                if (mGameLogic.isGameFinished()) {
-                    mGameLogic.terminate();
-                    Message shutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
-                    for (int i = 0; i < mClientsInfo.length; i++) {
-                        mClientNetwork.queue(i, shutdown);
+            Runnable simulate = () -> {
+                try {
+                    mGameLogic.simulateEvents(terminalEvents, environmentEvents, clientEvents);
+                } catch (Exception e) {
+                    err("Simulation", e);
+                }
+                try {
+                    mGameLogic.generateOutputs();
+                } catch (Exception e) {
+                    err("Generating outputs", e);
+                }
+                try {
+                    if (mGameLogic.isGameFinished()) {
+                        mGameLogic.terminate();
+                        Message shutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
+                        for (int i = 0; i < mClientsInfo.length; i++) {
+                            mClientNetwork.queue(i, shutdown);
+                        }
+                        mLoop.shutdown();
+                        mOutputController.shutdown();
                     }
-                    mLoop.shutdown();
-                    mOutputController.shutdown();
+                } catch (Exception e) {
+                    err("Finishing game", e);
                 }
 
                 mOutputController.putMessage(mGameLogic.getUIMessage());
@@ -241,9 +253,7 @@ public class GameHandler {
 
                 clientEvents = new Event[mClientsInfo.length][];
                 for (int i = 0; i < mClientsInfo.length; ++i) {
-                    if (mClientNetwork.getReceivedEvent(i) != null) {
-                        clientEvents[i] = mClientNetwork.getReceivedEvent(i);
-                    }
+                    clientEvents[i] = mClientNetwork.getReceivedEvent(i);
                 }
 
                 BlockingQueue<Event> terminalEventsQueue = new LinkedBlockingQueue<>();
@@ -252,14 +262,12 @@ public class GameHandler {
                     terminalEvents = terminalEventsQueue.toArray(new Event[terminalEventsQueue.size()]);
                     terminalEventsQueue.clear();
                 }
-
-                return null;
             };
 
             while (!shutdownRequest) {
                 long start = System.currentTimeMillis();
                 try {
-                    simulate.call();
+                    simulate.run();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -297,6 +305,10 @@ public class GameHandler {
             synchronized (loop) {
                 loop.wait();
             }
+    }
+
+    private void err(String title, Throwable exception) {
+        System.err.println(title + " failed with message " + exception.getMessage() + ", stack: " + Arrays.toString(exception.getStackTrace()));
     }
 
 }

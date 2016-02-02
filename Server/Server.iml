@@ -8,11 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Common" />
-    <orderEntry type="module" module-name="common" />
-    <orderEntry type="module" module-name="Test" />
-    <orderEntry type="module" module-name="Mitosis" />
-    <orderEntry type="module" module-name="Common" />
-    <orderEntry type="library" name="gson-2.3.1" level="project" />
-    <orderEntry type="module" module-name="Common" />
   </component>
 </module>
+

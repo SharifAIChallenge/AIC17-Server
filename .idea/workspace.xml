@@ -67,8 +67,20 @@
       <file leaf-file-name="Map.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Flows/src/models/Map.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="30" column="13" selection-start="772" selection-end="772" vertical-scroll-proportion="0.0" vertical-offset="450" max-vertical-offset="2700">
-              <folding />
+            <state line="30" column="13" selection-start="772" selection-end="772" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2475">
+              <folding>
+                <element signature="imports" expanded="false" />
+                <element signature="e#2571#2572#0" expanded="false" />
+                <element signature="e#2603#2604#0" expanded="false" />
+                <element signature="e#2640#2641#0" expanded="false" />
+                <element signature="e#2668#2669#0" expanded="false" />
+                <element signature="e#2703#2704#0" expanded="false" />
+                <element signature="e#2735#2736#0" expanded="false" />
+                <element signature="e#2770#2771#0" expanded="false" />
+                <element signature="e#2802#2803#0" expanded="false" />
+                <element signature="e#4602#4603#0" expanded="false" />
+                <element signature="e#4632#4633#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -76,7 +88,7 @@
       <file leaf-file-name="UITest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Flows/src/UITest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="69" column="29" selection-start="2201" selection-end="2201" vertical-scroll-proportion="0.0" vertical-offset="1035" max-vertical-offset="2415">
+            <state line="70" column="29" selection-start="2214" selection-end="2214" vertical-scroll-proportion="0.0" vertical-offset="1050" max-vertical-offset="4785">
               <folding />
             </state>
           </provider>
@@ -85,18 +97,7 @@
       <file leaf-file-name="FlowsGameLogic.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Flows/src/FlowsGameLogic.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="258" column="4" selection-start="8218" selection-end="8218" vertical-scroll-proportion="0.03875969" vertical-offset="3810" max-vertical-offset="5340">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="clients.conf" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Flows/resources/mitosis/clients.conf">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="225">
+            <state line="3" column="11" selection-start="95" selection-end="95" vertical-scroll-proportion="0.11627907" vertical-offset="0" max-vertical-offset="5790">
               <folding />
             </state>
           </provider>
@@ -155,14 +156,16 @@
         <option value="$PROJECT_DIR$/Flows/src/core/FlowsGameLogic.java" />
         <option value="$PROJECT_DIR$/Flows/src/models/Diff.java" />
         <option value="$PROJECT_DIR$/Flows/src/UITest.java" />
-        <option value="$PROJECT_DIR$/Flows/resources/mitosis/game.conf" />
         <option value="$PROJECT_DIR$/Flows/src/models/Map.java" />
         <option value="$PROJECT_DIR$/Flows/src/Context.java" />
         <option value="$PROJECT_DIR$/Flows/src/models/ClientDiffMessage.java" />
         <option value="$PROJECT_DIR$/Flows/src/models/ClientInitMessage.java" />
-        <option value="$PROJECT_DIR$/Flows/resources/server/server.conf" />
-        <option value="$PROJECT_DIR$/save.txt" />
         <option value="$PROJECT_DIR$/Flows/src/FlowsGameLogic.java" />
+        <option value="$PROJECT_DIR$/save.txt" />
+        <option value="$PROJECT_DIR$/Flows/resources/mitosis/game.conf" />
+        <option value="$PROJECT_DIR$/Flows/resources/mitosis/clients.conf" />
+        <option value="$PROJECT_DIR$/Flows/resources/client/connection.conf" />
+        <option value="$PROJECT_DIR$/Flows/resources/server/server.conf" />
       </list>
     </option>
   </component>
@@ -215,7 +218,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="Flows" />
+              <option name="myItemId" value="Server" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -225,7 +228,35 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="Flows" />
+              <option name="myItemId" value="Server" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="AIC16" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="AIC16" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Common" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -239,7 +270,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="Flows" />
+              <option name="myItemId" value="Common" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -247,57 +278,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="models" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="AIC16" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Flows" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="resources" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="AIC16" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Flows" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="resources" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="server" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="AIC16" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Flows" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="resources" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mitosis" />
+              <option name="myItemId" value="model" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -317,7 +298,7 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/libs/JGF.jar!/" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Server" />
     <property name="recentsLimit" value="5" />
     <property name="dynamic.classpath" value="false" />
     <property name="SearchEverywhereHistory" value="" />
@@ -634,16 +615,16 @@
       <workItem from="1454331197536" duration="297000" />
       <workItem from="1454331496150" duration="7721000" />
       <workItem from="1454364120594" duration="1837000" />
-      <workItem from="1454409268743" duration="3029000" />
+      <workItem from="1454409268743" duration="4019000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="61710000" />
+    <option name="totallyTimeSpent" value="62700000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1" y="27" width="1368" height="742" extended-state="6" />
-    <editor active="true" />
+    <frame x="-1" y="27" width="1368" height="742" extended-state="7" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -659,7 +640,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24924472" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24924472" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -697,17 +678,22 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Flows/src/Context.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="54" selection-start="765" selection-end="765" vertical-scroll-proportion="0.0" vertical-offset="450" max-vertical-offset="1560">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Flows/src/models/Map.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="14" column="28" selection-start="308" selection-end="308" vertical-scroll-proportion="0.0" vertical-offset="210" max-vertical-offset="2670">
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#2571#2572#0" expanded="false" />
+            <element signature="e#2603#2604#0" expanded="false" />
+            <element signature="e#2640#2641#0" expanded="false" />
+            <element signature="e#2668#2669#0" expanded="false" />
+            <element signature="e#2703#2704#0" expanded="false" />
+            <element signature="e#2735#2736#0" expanded="false" />
+            <element signature="e#2770#2771#0" expanded="false" />
+            <element signature="e#2802#2803#0" expanded="false" />
+            <element signature="e#4602#4603#0" expanded="false" />
+            <element signature="e#4632#4633#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -721,9 +707,7 @@
     <entry file="file://$PROJECT_DIR$/Flows/src/FlowsGameLogic.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="94" column="29" selection-start="2521" selection-end="2521" vertical-scroll-proportion="0.0" vertical-offset="1410" max-vertical-offset="4185">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -758,9 +742,7 @@
     <entry file="file://$PROJECT_DIR$/Flows/src/FlowsGameLogic.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="15" column="24" selection-start="316" selection-end="316" vertical-scroll-proportion="0.0" vertical-offset="225" max-vertical-offset="1200">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -788,16 +770,26 @@
     <entry file="file://$PROJECT_DIR$/Flows/src/models/Map.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="22" column="0" selection-start="514" selection-end="514" vertical-scroll-proportion="0.0" vertical-offset="330" max-vertical-offset="1335">
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#2571#2572#0" expanded="false" />
+            <element signature="e#2603#2604#0" expanded="false" />
+            <element signature="e#2640#2641#0" expanded="false" />
+            <element signature="e#2668#2669#0" expanded="false" />
+            <element signature="e#2703#2704#0" expanded="false" />
+            <element signature="e#2735#2736#0" expanded="false" />
+            <element signature="e#2770#2771#0" expanded="false" />
+            <element signature="e#2802#2803#0" expanded="false" />
+            <element signature="e#4602#4603#0" expanded="false" />
+            <element signature="e#4632#4633#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Flows/src/FlowsGameLogic.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="12" column="28" selection-start="276" selection-end="276" vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="1200">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -830,16 +822,26 @@
     <entry file="file://$PROJECT_DIR$/Flows/src/models/Map.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="22" column="0" selection-start="514" selection-end="514" vertical-scroll-proportion="0.0" vertical-offset="330" max-vertical-offset="1335">
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#2571#2572#0" expanded="false" />
+            <element signature="e#2603#2604#0" expanded="false" />
+            <element signature="e#2640#2641#0" expanded="false" />
+            <element signature="e#2668#2669#0" expanded="false" />
+            <element signature="e#2703#2704#0" expanded="false" />
+            <element signature="e#2735#2736#0" expanded="false" />
+            <element signature="e#2770#2771#0" expanded="false" />
+            <element signature="e#2802#2803#0" expanded="false" />
+            <element signature="e#4602#4603#0" expanded="false" />
+            <element signature="e#4632#4633#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Flows/src/FlowsGameLogic.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="12" column="28" selection-start="276" selection-end="276" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1200">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -872,16 +874,26 @@
     <entry file="file://$PROJECT_DIR$/Flows/src/models/Map.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="22" column="0" selection-start="514" selection-end="514" vertical-scroll-proportion="0.0" vertical-offset="330" max-vertical-offset="1335">
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#2571#2572#0" expanded="false" />
+            <element signature="e#2603#2604#0" expanded="false" />
+            <element signature="e#2640#2641#0" expanded="false" />
+            <element signature="e#2668#2669#0" expanded="false" />
+            <element signature="e#2703#2704#0" expanded="false" />
+            <element signature="e#2735#2736#0" expanded="false" />
+            <element signature="e#2770#2771#0" expanded="false" />
+            <element signature="e#2802#2803#0" expanded="false" />
+            <element signature="e#4602#4603#0" expanded="false" />
+            <element signature="e#4632#4633#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Flows/src/FlowsGameLogic.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="12" column="28" selection-start="276" selection-end="276" vertical-scroll-proportion="0.0" vertical-offset="60" max-vertical-offset="1200">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -914,7 +926,19 @@
     <entry file="file://$PROJECT_DIR$/Flows/src/models/Map.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="71" column="5" selection-start="1809" selection-end="1809" vertical-scroll-proportion="0.0" vertical-offset="615" max-vertical-offset="1305">
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#2571#2572#0" expanded="false" />
+            <element signature="e#2603#2604#0" expanded="false" />
+            <element signature="e#2640#2641#0" expanded="false" />
+            <element signature="e#2668#2669#0" expanded="false" />
+            <element signature="e#2703#2704#0" expanded="false" />
+            <element signature="e#2735#2736#0" expanded="false" />
+            <element signature="e#2770#2771#0" expanded="false" />
+            <element signature="e#2802#2803#0" expanded="false" />
+            <element signature="e#4602#4603#0" expanded="false" />
+            <element signature="e#4632#4633#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -970,7 +994,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Flows/src/UITest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="69" column="29" selection-start="2201" selection-end="2201" vertical-scroll-proportion="0.0" vertical-offset="840" max-vertical-offset="2370">
+        <state line="70" column="29" selection-start="2214" selection-end="2214" vertical-scroll-proportion="0.0" vertical-offset="1050" max-vertical-offset="4785">
           <folding />
         </state>
       </provider>
@@ -978,18 +1002,6 @@
     <entry file="file://$PROJECT_DIR$/JGFramework.iml">
       <provider selected="true" editor-type-id="text-editor">
         <state line="9" column="67" selection-start="466" selection-end="466" vertical-scroll-proportion="0.23767605" vertical-offset="0" max-vertical-offset="568" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Flows/resources/client/connection.conf">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="568" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Flows/src/models/Map.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="13" selection-start="772" selection-end="772" vertical-scroll-proportion="0.0" vertical-offset="194" max-vertical-offset="2475">
-          <folding />
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Flows/src/Context.java">
@@ -1004,9 +1016,16 @@
         <state line="28" column="127" selection-start="1235" selection-end="1235" vertical-scroll-proportion="0.35779816" vertical-offset="288" max-vertical-offset="990" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Flows/resources/save.txt">
+    <entry file="file://$PROJECT_DIR$/save.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="91" selection-start="91" selection-end="91" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="90">
+        <state line="0" column="6" selection-start="6" selection-end="6" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="365">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Flows/resources/client/connection.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="365">
           <folding />
         </state>
       </provider>
@@ -1016,38 +1035,62 @@
         <state />
       </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="28" selection-start="203" selection-end="203" vertical-scroll-proportion="0.39823008" vertical-offset="0" max-vertical-offset="450">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Flows/resources/mitosis/game.conf">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="11" selection-start="13" selection-end="13" vertical-scroll-proportion="0.04109589" vertical-offset="0" max-vertical-offset="365">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="450">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Flows/resources/mitosis/clients.conf">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="225">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="365">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/save.txt">
+    <entry file="file://$PROJECT_DIR$/Flows/resources/mitosis/game.conf">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="6" selection-start="6" selection-end="6" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="365">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="365">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Flows/resources/terminal/ip-port.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="387">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Flows/resources/save.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="91" selection-start="91" selection-end="91" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="90">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Flows/src/models/Map.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="30" column="13" selection-start="772" selection-end="772" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2475">
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#2571#2572#0" expanded="false" />
+            <element signature="e#2603#2604#0" expanded="false" />
+            <element signature="e#2640#2641#0" expanded="false" />
+            <element signature="e#2668#2669#0" expanded="false" />
+            <element signature="e#2703#2704#0" expanded="false" />
+            <element signature="e#2735#2736#0" expanded="false" />
+            <element signature="e#2770#2771#0" expanded="false" />
+            <element signature="e#2802#2803#0" expanded="false" />
+            <element signature="e#4602#4603#0" expanded="false" />
+            <element signature="e#4632#4633#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Flows/src/FlowsGameLogic.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="258" column="4" selection-start="8218" selection-end="8218" vertical-scroll-proportion="0.03875969" vertical-offset="3810" max-vertical-offset="5340">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state line="3" column="11" selection-start="95" selection-end="95" vertical-scroll-proportion="0.11627907" vertical-offset="0" max-vertical-offset="5790">
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1108,7 +1151,6 @@
             <option name="proportions">
               <list>
                 <option value="0.2" />
-                <option value="0.6" />
               </list>
             </option>
           </splitter-proportions>
@@ -1128,7 +1170,7 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
-          <last-edited>JGF</last-edited>
+          <last-edited>gson-2.3.1</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>

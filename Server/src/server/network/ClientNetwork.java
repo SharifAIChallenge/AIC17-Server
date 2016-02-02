@@ -222,7 +222,8 @@ public class ClientNetwork extends NetServer {
             events = new Event[eventArray.size()];
             for (int i = 0; i < events.length; i++)
                 events[i] = gson.fromJson(eventArray.get(i), Event.class);*/
-            events = new Event[msg.args.size()];
+            if (msg != null)
+                events = new Event[msg.args.size()];
             for (int i = 0; i < events.length; i++) {
                 events[i] = gson.fromJson(msg.args.get(i), Event.class);
             }

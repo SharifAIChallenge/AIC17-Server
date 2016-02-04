@@ -1,11 +1,12 @@
 package server.config;
 
+import javax.swing.*;
 import java.io.File;
 
 /**
  * Copyright (C) 2016 Hadi
  */
-public class FileParam extends ConfigParam<File> {
+public class FileParam extends Param<File> {
     public FileParam(String paramName, File defaultValue) {
         super(paramName, defaultValue);
     }
@@ -18,7 +19,16 @@ public class FileParam extends ConfigParam<File> {
 
     @Override
     public File getValueFromUser() {
-        // todo
-        return super.getValueFromUser();
+        File file = null;
+        while (file == null) {
+            String path = null;
+            JFileChooser fileChooser = new JFileChooser(path);
+            fileChooser.showOpenDialog(null);
+            String result = JOptionPane.showInputDialog("Parameter '" + getParamName() + "' is not specified. Please enter a value to continue.");
+            file = new File(result);
+            if (!file.exists())
+                file = null;
+        }
+        return file;
     }
 }

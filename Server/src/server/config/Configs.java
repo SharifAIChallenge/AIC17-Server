@@ -15,6 +15,9 @@ public class Configs {
     public static String DEFAULT_CONFIG_PATH = "game.conf";
     private static JsonObject configFile = null;
 
+    // General Configs
+    public static final BooleanParam PARAM_AIC_DEPLOY = new BooleanParam("Deploy", false);
+
     // Client Configs
     public static final IntegerParam PARAM_CLIENTS_PORT = new IntegerParam("ClientsPort", 7099);
     public static final IntegerParam PARAM_CLIENTS_CONNECTIONS_TIMEOUT = new IntegerParam("ClientsConnectionTimeout", Integer.MAX_VALUE);

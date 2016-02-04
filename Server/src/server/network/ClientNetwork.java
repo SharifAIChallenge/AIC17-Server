@@ -2,8 +2,10 @@ package server.network;
 
 import com.google.gson.Gson;
 import model.Event;
+import network.Json;
 import network.JsonSocket;
 import network.data.Message;
+import server.config.Configs;
 import util.Log;
 
 import java.util.ArrayList;
@@ -31,7 +33,6 @@ import java.util.concurrent.*;
  * ignored by the server.
  */
 public class ClientNetwork extends NetServer {
-
     // Log tag
     private static String TAG = "ClientNetwork";
 
@@ -39,7 +40,7 @@ public class ClientNetwork extends NetServer {
     private volatile boolean receiveTimeFlag;
 
     // Mapping of tokens to IDs
-    private HashMap<String, Integer> mTokens;
+    private HashMap<String, ArrayList<Integer>> mTokens;
 
     // Client handlers
     private ArrayList<ClientHandler> mClients;
@@ -53,14 +54,10 @@ public class ClientNetwork extends NetServer {
     // A thread pool used to accept and verify clients
     private ExecutorService acceptExecutor;
 
-    // Gson used to extract event from a message
-    private Gson gson;
-
     /**
      * Constructor
      */
     public ClientNetwork() {
-        gson = new Gson();
         mTokens = new HashMap<>();
         mClients = new ArrayList<>();
         sendExecutor = Executors.newCachedThreadPool();
@@ -78,11 +75,22 @@ public class ClientNetwork extends NetServer {
     public int defineClient(String token) {
         if (!isTerminated())
             throw new RuntimeException("Server is not terminated when defineClient() is called.");
-        if (mTokens.containsKey(token))
-            throw new RuntimeException("Duplicate token. " + token);
         int id = mClients.size();
-        mTokens.put(token, id);
-        mClients.add(newClient());
+        if (Configs.PARAM_AIC_DEPLOY.getValue()) {
+            if (mTokens.containsKey(token))
+                throw new RuntimeException("Duplicate token. " + token);
+            ArrayList<Integer> arr = new ArrayList<>();
+            arr.add(id);
+            mTokens.put(token, arr);
+            mClients.add(newClient());
+        } else {
+            ArrayList<Integer> arr = mTokens.get(token);
+            if (arr == null)
+                arr = new ArrayList<>();
+            arr.add(id);
+            mTokens.put(token, arr);
+            mClients.add(newClient());
+        }
         return id;
     }
 
@@ -209,7 +217,7 @@ public class ClientNetwork extends NetServer {
             if (msg != null)
                 events = new Event[msg.args.size()];
             for (int i = 0; i < events.length; i++) {
-                events[i] = gson.fromJson(msg.args.get(i), Event.class);
+                events[i] = Json.GSON.fromJson(msg.args.get(i), Event.class);
             }
         } catch (Exception e) {
             Log.e(TAG, "Error getting received messages.", e);
@@ -242,10 +250,15 @@ public class ClientNetwork extends NetServer {
         if (token != null && "token".equals(token.name) && token.args != null
                 && token.args.size() >= 1) {
             String clientToken = token.args.get(0).getAsString();
-            int clientID = mTokens.getOrDefault(clientToken, -1);
-            if (clientID != -1) {
-                mClients.get(clientID).bind(client);
-                return true;
+            ArrayList<Integer> ids = mTokens.get(clientToken);
+            if (ids != null) {
+                for (int clientID : ids) {
+                    ClientHandler ch = mClients.get(clientID);
+                    if (!ch.isConnected()) {
+                        ch.bind(client);
+                        return true;
+                    }
+                }
             }
         }
         return false;

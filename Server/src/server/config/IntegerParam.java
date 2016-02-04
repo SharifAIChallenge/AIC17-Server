@@ -3,7 +3,7 @@ package server.config;
 /**
  * Copyright (C) 2016 Hadi
  */
-public class IntegerParam extends ConfigParam<Integer> {
+public class IntegerParam extends Param<Integer> {
     public IntegerParam(String paramName, Integer defaultValue) {
         super(paramName, defaultValue);
     }

@@ -2,16 +2,17 @@ package server.config;
 
 import com.google.gson.JsonObject;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 /**
  * Copyright (C) 2016 Hadi
  */
-public abstract class ConfigParam<T> {
-    private static ArrayList<ConfigParam> allParameters = new ArrayList<>();
+public abstract class Param<T> {
+    private static ArrayList<Param> allParameters = new ArrayList<>();
 
-    public static ConfigParam[] getAllParameters() {
-        return allParameters.toArray(new ConfigParam[allParameters.size()]);
+    public static Param[] getAllParameters() {
+        return allParameters.toArray(new Param[allParameters.size()]);
     }
 
     private String paramName;
@@ -19,9 +20,13 @@ public abstract class ConfigParam<T> {
     private T value;
     private boolean cached = false;
 
-    public ConfigParam(String paramName, T defaultValue) {
+    public Param(String paramName, T defaultValue) {
         this.paramName = paramName;
         this.defaultValue = defaultValue;
+    }
+
+    public String getParamName() {
+        return paramName;
     }
 
     public T getValue() {
@@ -62,8 +67,14 @@ public abstract class ConfigParam<T> {
     }
 
     public T getValueFromUser() {
-        // todo
-        return null;
+        while (value == null) {
+            try {
+                String result = JOptionPane.showInputDialog("Parameter '" + paramName + "' is not specified. Please enter a value to continue.");
+                value = getValueFromString(result);
+            } catch (Exception ignore) {
+            }
+        }
+        return value;
     }
 
     public abstract T getValueFromString(String value);

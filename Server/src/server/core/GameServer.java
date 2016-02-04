@@ -61,6 +61,7 @@ public class GameServer {
     public GameServer(GameLogic gameLogic, String[] cmdArgs) throws IOException {
         Configs.handleCMDArgs(cmdArgs);
         mGameLogic = gameLogic;
+        mGameLogic.init();
         mClientsNum = mGameLogic.getClientsNum();
         setClientConfigs();
         mClientNetwork = new ClientNetwork();
@@ -71,9 +72,8 @@ public class GameServer {
     }
 
     private void setClientConfigs() {
-        int clientsNum = mGameLogic.getClientsNum();
-        mClientConfigs = new ClientConfig[clientsNum];
-        for (int i = 0; i < clientsNum; i++) {
+        mClientConfigs = new ClientConfig[mClientsNum];
+        for (int i = 0; i < mClientsNum; i++) {
             mClientConfigs[i] = new ClientConfig();
             Configs.CLIENT_CONFIGS.add(mClientConfigs[i]);
         }

@@ -12,7 +12,7 @@ public class ClientConfig {
 
     public ClientConfig() {
         int num = clientCount++;
-        name = new StringParam("Client" + num + "Name", "");
+        name = new StringParam("Client" + num + "Name", "Client" + num);
         token = new StringParam("Client" + num + "Token", "00000000000000000000000000000000");
     }
 

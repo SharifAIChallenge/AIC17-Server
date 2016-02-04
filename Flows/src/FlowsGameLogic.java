@@ -4,8 +4,8 @@ import server.config.FileParam;
 import server.config.IntegerParam;
 import server.core.GameLogic;
 import server.core.GameServer;
+import util.Log;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -13,26 +13,28 @@ import java.util.ArrayList;
  * Created by pezzati on 1/28/16.
  */
 public class FlowsGameLogic implements GameLogic {
+    private static final String TAG = "Flows";
+
     private Context context;
 
     //Constants
     final static int escapeNum = 1;
     final static int increaseWithOwnership = 1;
     final static int increaseWithEdge = 1;
-	final static double highCasualties = 1.0;
-	final static double mediumCasualties = 2.0 / 3.0;
-	final static double lowCasualties = 1.0 / 3.0;
-	
-	//Temps
-	private int vertexNum;
-	private int[] armyCount;
-	private int[] ownership;
-	private boolean[][] graph;
-	private int[][] adjacencyList;
+    final static double highCasualties = 1.0;
+    final static double mediumCasualties = 2.0 / 3.0;
+    final static double lowCasualties = 1.0 / 3.0;
 
-	private int[] movesDest;
-	private int[] movesSize;
-	private int[][] armyInV;
+    //Temps
+    private int vertexNum;
+    private int[] armyCount;
+    private int[] ownership;
+    private boolean[][] graph;
+    private int[][] adjacencyList;
+
+    private int[] movesDest;
+    private int[] movesSize;
+    private int[][] armyInV;
 
     private ArrayList<Message> uiMessages;
 
@@ -41,8 +43,11 @@ public class FlowsGameLogic implements GameLogic {
     public static final IntegerParam PARAM_TURN_TIMEOUT = new IntegerParam("turnTimeout", 1000);
     public static final FileParam PARAM_MAP = new FileParam("map", null);
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws InterruptedException {
         GameServer gameServer = new GameServer(new FlowsGameLogic(), args);
+        gameServer.waitForClients();
+        gameServer.start();
+        gameServer.waitForFinish();
     }
 
     @Override
@@ -89,20 +94,8 @@ public class FlowsGameLogic implements GameLogic {
         return msg;
     }
 
-    private void wait(String s, long time){
-        System.err.println(s);
-//        try {
-//            Thread.sleep(time);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-    }
-
     @Override
     public void simulateEvents(Event[] terminalEvent, Event[] environmentEvent, Event[][] clientsEvent) {
-        System.err.println("FUCK YOUR MOTHER BITCH " + clientsEvent[0].length);
-        System.err.println("FUCK YOUR FATHER BITCH " + clientsEvent[1].length);
-        wait("simulate", 0);
         armyCount = this.context.getMap().getArmyCount();
         ownership = this.context.getMap().getOwnership();
 
@@ -130,12 +123,12 @@ public class FlowsGameLogic implements GameLogic {
                 int src = -1;
                 int dst = -1;
                 int armySize = -1;
-                try{
+                try {
                     src = Integer.valueOf(clientsEvent[j][i].getArgs()[0]);
                     dst = Integer.valueOf(clientsEvent[j][i].getArgs()[1]);
                     armySize = Integer.valueOf(clientsEvent[j][i].getArgs()[2]);
                 } catch (Exception e) {
-                    System.out.println("Event is BBAADDDD :D");
+                    Log.w(TAG, "Bad event received.", e);
                 }
                 if (movesDest[src] < 0 && isMoveValid(src, dst, armySize, j)) {
 
@@ -147,7 +140,7 @@ public class FlowsGameLogic implements GameLogic {
                     // args in order: node id, size after army exit, player of move
                     addUIMessage("0", new Object[]{src, armyCount[src] - armySize, j});
 
-                    if (movesDest[dst] == src  && ownership[dst] != ownership[src]) {
+                    if (movesDest[dst] == src && ownership[dst] != ownership[src]) {
                         int[] battleInfo = doBattle('e', dst, src, movesSize[dst], armySize);
 
                         conflictedMoves[src] = 1;
@@ -172,8 +165,7 @@ public class FlowsGameLogic implements GameLogic {
                 }
             }
         }
-        System.err.println("FUCK YOUR MOTHER BITCH " + clientsEvent[0].length);
-        System.err.println("FUCK YOUR FATHER BITCH " + clientsEvent[1].length);
+
         for (int i = 0; i < vertexNum; i++) {
             if (ownership[i] > -1 && movesDest[i] > -1) {
                 armyInV[ownership[i]][movesDest[i]] += movesSize[i];
@@ -250,7 +242,7 @@ public class FlowsGameLogic implements GameLogic {
                 ownership[i] = 1;
             }
             armyCount[i] = Math.max(armyInV[0][i], armyInV[1][i]);
-            if (ownership[i] ==  -1) {
+            if (ownership[i] == -1) {
                 if (armyInV[0][i] != 0) {
                     ownership[i] = 0;
                     armyCount[i] += increaseWithOwnership;
@@ -313,11 +305,11 @@ public class FlowsGameLogic implements GameLogic {
                 less = armySize0;
             }
             if (qualAmount(more) == qualAmount(less)) {
-                output[1] = more - (int)Math.ceil(less * highCasualties);
+                output[1] = more - (int) Math.ceil(less * highCasualties);
             } else if (qualAmount(more) - 1 == qualAmount(less)) {
-                output[1] = more - (int)Math.ceil(less * mediumCasualties);
+                output[1] = more - (int) Math.ceil(less * mediumCasualties);
             } else if (qualAmount(more) - 2 == qualAmount(less)) {
-                output[1] = more - (int)Math.ceil(less * lowCasualties);
+                output[1] = more - (int) Math.ceil(less * lowCasualties);
             }
             return output;
         }
@@ -345,18 +337,11 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message getStatusMessage() {
-        wait("status", 0);
         return null;
     }
 
     @Override
     public Message[] getClientMessages() {
-        System.err.println("injast");
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         Message[] messages = new Message[2];
         String name0 = Message.NAME_TURN;
         Object[] args0 = {this.context.getTurn(), this.context.getDiffList(0)};
@@ -366,20 +351,16 @@ public class FlowsGameLogic implements GameLogic {
         Object[] args1 = {this.context.getTurn(), this.context.getDiffList(1)};
         messages[1] = new Message(name1, args1);
 
-        System.err.println("sent");
-
         return messages;
     }
 
     @Override
     public Event[] makeEnvironmentEvents() {
-        wait("env", 0);
         return new Event[0];
     }
 
     @Override
     public boolean isGameFinished() {
-        wait("finish", 0);
         return (this.context.getMap().isFinished() || this.context.getTurn() >= PARAM_NUM_TURNS.getValue());
     }
 

@@ -24,8 +24,9 @@ public class FileParam extends Param<File> {
             String path = null;
             JFileChooser fileChooser = new JFileChooser(path);
             fileChooser.showOpenDialog(null);
-            String result = JOptionPane.showInputDialog("Parameter '" + getParamName() + "' is not specified. Please enter a value to continue.");
-            file = new File(result);
+            file = fileChooser.getSelectedFile();
+            if (file == null)
+                continue;
             if (!file.exists())
                 file = null;
         }

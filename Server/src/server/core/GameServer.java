@@ -58,7 +58,7 @@ public class GameServer {
      * within the "turn_timeout.conf" file ({@see https://github.com/JavaChallenge/JGFramework/wiki wiki}).
      * </p>
      */
-    public GameServer(GameLogic gameLogic, String[] cmdArgs) throws IOException {
+    public GameServer(GameLogic gameLogic, String[] cmdArgs) {
         Configs.handleCMDArgs(cmdArgs);
         mGameLogic = gameLogic;
         mGameLogic.init();
@@ -79,7 +79,7 @@ public class GameServer {
         }
     }
 
-    private void initGame() throws IOException {
+    private void initGame() {
         for (int i = 0; i < mClientsNum; ++i) {
             int id = mClientNetwork.defineClient(mClientConfigs[i].getToken());
             if (id != i) {
@@ -127,6 +127,10 @@ public class GameServer {
             }
             mClientNetwork.sendAllBlocking();
         }
+    }
+
+    public void waitForClients() throws InterruptedException {
+        mClientNetwork.waitForAllClients();
     }
 
     /**

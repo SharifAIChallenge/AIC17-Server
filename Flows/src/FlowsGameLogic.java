@@ -78,6 +78,7 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message getUIInitialMessage() {
+        // todo: send army levels (low, medium, high)
         Object[] args = {this.context.getMap().getAdjacencyList(), this.context.getUIDiffList()};
         String name = Message.NAME_INIT;
         return new Message(name, args);

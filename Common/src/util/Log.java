@@ -14,6 +14,9 @@ public final class Log {
     public static final int WARN = 5;
     public static final int ERROR = 6;
 
+    public static final boolean DEV_MODE = System.getenv("AICDev") != null;
+    public static final int LOG_LEVEL = DEV_MODE ? VERBOSE : WARN;
+
     private Log() {
     }
 
@@ -22,7 +25,7 @@ public final class Log {
     }
 
     public static void v(String tag, String msg, Throwable tr) {
-        log(VERBOSE, tag, msg + '\n' + getStackTraceString(tr));
+        log(VERBOSE, tag, msg, tr);
     }
 
     public static void d(String tag, String msg) {
@@ -30,7 +33,7 @@ public final class Log {
     }
 
     public static void d(String tag, String msg, Throwable tr) {
-        log(DEBUG, tag, msg + '\n' + getStackTraceString(tr));
+        log(DEBUG, tag, msg, tr);
     }
 
     public static void i(String tag, String msg) {
@@ -38,7 +41,7 @@ public final class Log {
     }
 
     public static void i(String tag, String msg, Throwable tr) {
-        log(INFO, tag, msg + '\n' + getStackTraceString(tr));
+        log(INFO, tag, msg, tr);
     }
 
     public static void w(String tag, String msg) {
@@ -46,11 +49,7 @@ public final class Log {
     }
 
     public static void w(String tag, String msg, Throwable tr) {
-        log(WARN, tag, msg + '\n' + getStackTraceString(tr));
-    }
-
-    public static void w(String tag, Throwable tr) {
-        log(WARN, tag, getStackTraceString(tr));
+        log(WARN, tag, msg, tr);
     }
 
     public static void e(String tag, String msg) {
@@ -58,7 +57,7 @@ public final class Log {
     }
 
     public static void e(String tag, String msg, Throwable tr) {
-        log(ERROR, tag, msg + '\n' + getStackTraceString(tr));
+        log(ERROR, tag, msg, tr);
     }
 
     public static String getStackTraceString(Throwable tr) {
@@ -71,7 +70,23 @@ public final class Log {
     }
 
     public static void log(int priority, String tag, String msg) {
-        System.out.printf("\tpriority=%d,%n\ttag=%s,%n\tmessage=%s%n", priority, tag, msg);
+        if (priority < LOG_LEVEL)
+            return;
+        if (DEV_MODE) {
+            System.err.printf("\tpriority=%d,%n\ttag=%s,%n\tmessage=%s%n", priority, tag, msg);
+        } else {
+            System.err.println(msg);
+        }
+    }
+
+    public static void log(int priority, String tag, String msg, Throwable tr) {
+        if (priority < LOG_LEVEL)
+            return;
+        if (DEV_MODE) {
+            System.err.printf("\tpriority=%d,%n\ttag=%s,%n\tmessage=%s%n", priority, tag, msg + '\n' + getStackTraceString(tr));
+        } else {
+            System.err.println(msg);
+        }
     }
 
 }

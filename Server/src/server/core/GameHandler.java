@@ -85,10 +85,8 @@ public class GameHandler {
         Configs.OutputHandlerConfig outputHandlerConfig = Configs.getConfigs().outputHandler;
         mOutputController = new OutputController(outputHandlerConfig.sendToUI,
                 mUINetwork,
-                outputHandlerConfig.timeInterval,
                 outputHandlerConfig.sendToFile,
-                new File(outputHandlerConfig.filePath),
-                outputHandlerConfig.bufferSize);
+                new File(outputHandlerConfig.filePath));
     }
 
     /**
@@ -236,9 +234,18 @@ public class GameHandler {
                 for (int i = 0; i < output.length; ++i) {
                     mClientNetwork.queue(i, output[i]);
                 }
-                mClientNetwork.sendAllBlocking();
+
+                if (mGameLogic.isGameFinished()) {
+                    mClientNetwork.sendAllBlocking();
+                    mGameLogic.terminate();
+                    mClientNetwork.shutdownAll();
+                    mLoop.shutdown();
+                    mOutputController.shutdown();
+                    return;
+                }
 
                 mClientNetwork.startReceivingAll();
+                mClientNetwork.sendAllBlocking();
                 long elapsedTime = System.currentTimeMillis();
                 environmentEvents = mGameLogic.makeEnvironmentEvents();
                 elapsedTime = System.currentTimeMillis() - elapsedTime;
@@ -253,7 +260,8 @@ public class GameHandler {
 
                 clientEvents = new Event[mClientsInfo.length][];
                 for (int i = 0; i < mClientsInfo.length; ++i) {
-                    clientEvents[i] = mClientNetwork.getReceivedEvent(i);
+                    Event[] events = mClientNetwork.getReceivedEvents(i);
+                    clientEvents[i] = events;
                 }
 
                 BlockingQueue<Event> terminalEventsQueue = new LinkedBlockingQueue<>();

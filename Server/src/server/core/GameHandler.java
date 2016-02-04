@@ -2,8 +2,8 @@ package server.core;
 
 import model.Event;
 import network.data.Message;
-import server.core.model.ClientInfo;
-import server.core.model.Configs;
+import server.config.ClientConfig;
+import server.config.Configs;
 import server.network.ClientNetwork;
 import server.network.UINetwork;
 import util.Log;
@@ -38,15 +38,15 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class GameHandler {
 
-    private final long GAME_LOGIC_SIMULATE_TIMEOUT;
-    private final long GAME_LOGIC_TURN_TIMEOUT;
-    private final long CLIENT_RESPONSE_TIME;
+//    private final long GAME_LOGIC_SIMULATE_TIMEOUT;
+//    private final long GAME_LOGIC_TURN_TIMEOUT;
+//    private final long CLIENT_RESPONSE_TIME;
 
     private ClientNetwork mClientNetwork;
     private UINetwork mUINetwork;
     private GameLogic mGameLogic;
     private OutputController mOutputController;
-    private ClientInfo[] mClientsInfo;
+    private ClientConfig[] mClientConfigs;
 
     private Loop mLoop;
     BlockingQueue<Event> terminalEventsQueue;
@@ -63,13 +63,13 @@ public class GameHandler {
      */
     public GameHandler() {
         mClientNetwork = new ClientNetwork();
-        mUINetwork = new UINetwork(Configs.getConfigs().ui.token);
+        mUINetwork = new UINetwork(Configs.PARAM_UI_TOKEN.getValue());
         terminalEventsQueue = new LinkedBlockingQueue<>();
 
-        Configs.TimeConfig timeConfig = Configs.getConfigs().turnTimeout;
-        GAME_LOGIC_SIMULATE_TIMEOUT = timeConfig.simulateTimeout;
-        CLIENT_RESPONSE_TIME = timeConfig.clientResponseTime;
-        GAME_LOGIC_TURN_TIMEOUT = timeConfig.turnTimeout;
+//        Configs.TimeConfig timeConfig = Configs.getConfigs().turnTimeout;
+//        GAME_LOGIC_SIMULATE_TIMEOUT = timeConfig.simulateTimeout;
+//        CLIENT_RESPONSE_TIME = timeConfig.clientResponseTime;
+//        GAME_LOGIC_TURN_TIMEOUT = timeConfig.turnTimeout;
     }
 
     /**

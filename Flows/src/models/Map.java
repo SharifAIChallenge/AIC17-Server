@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by pezzati on 1/27/16.
@@ -19,8 +18,8 @@ public class Map {
     private String mapName;
     private ArrayList<Node> nodes;
 
-    public Map(String mapName) {
-        this.mapName = mapName;
+    public Map(File mapFile) {
+        this.mapName = mapFile.getName();
 //        this.vertexNum = vertexNum;
 //        this.graph = new boolean[vertexNum][vertexNum];
 //        this.ownership = new int[vertexNum];
@@ -29,7 +28,7 @@ public class Map {
 //        this.armyCount = new int[vertexNum];
 
         try {
-            FileReader fr = new FileReader(mapName);
+            FileReader fr = new FileReader(mapFile);
             BufferedReader br = new BufferedReader(fr);
 
             String line = br.readLine();
@@ -37,14 +36,14 @@ public class Map {
 
             this.vertexNum = Integer.valueOf(inputs[0]);
 
-            this.nodes = new ArrayList<Node>();
+            this.nodes = new ArrayList<>();
             this.graph = new boolean[this.vertexNum][this.vertexNum];
             this.ownership = new int[this.vertexNum];
-            for(int i = 0; i < this.vertexNum; i++)
+            for (int i = 0; i < this.vertexNum; i++)
                 this.ownership[i] = -1;
             this.armyCount = new int[this.vertexNum];
 
-            for(int i = 0; i < this.vertexNum; i++){
+            for (int i = 0; i < this.vertexNum; i++) {
                 String[] args = new String[4];
                 System.arraycopy(inputs, 1 + (i * 4), args, 0, 4);
                 Node node = new Node(Integer.valueOf(args[2]), Integer.valueOf(args[3]), i);
@@ -57,9 +56,9 @@ public class Map {
             }
             int beginIndex = this.vertexNum * 4 + 1;
             int nodeIndex = 0;
-            for(int i = beginIndex; i < inputs.length && nodeIndex < this.vertexNum; i++){
+            for (int i = beginIndex; i < inputs.length && nodeIndex < this.vertexNum; i++) {
                 int input = Integer.valueOf(inputs[i]);
-                if(input == -1){
+                if (input == -1) {
                     nodeIndex++;
                     continue;
                 }
@@ -88,23 +87,23 @@ public class Map {
         return armyCount;
     }
 
-    public boolean setGraph(int x, int y, boolean bool){
-        if(x >= this.vertexNum || x < 0 || y >= this.vertexNum || y < 0)
+    public boolean setGraph(int x, int y, boolean bool) {
+        if (x >= this.vertexNum || x < 0 || y >= this.vertexNum || y < 0)
             return false;
         this.graph[x][y] = bool;
         this.nodes.get(x).addNeighbor(this.nodes.get(y));
         return true;
     }
 
-    public boolean setOwnership(int index, int owner){
-        if(index >= this.vertexNum || index < 0 || owner > 1 || owner < -1)
+    public boolean setOwnership(int index, int owner) {
+        if (index >= this.vertexNum || index < 0 || owner > 1 || owner < -1)
             return false;
         this.ownership[index] = owner;
         return true;
     }
 
-    public boolean setArmyCount(int index, int count){
-        if(index >= this.vertexNum || index < 0 )
+    public boolean setArmyCount(int index, int count) {
+        if (index >= this.vertexNum || index < 0)
             return false;
         this.armyCount[index] = count;
         return true;
@@ -123,20 +122,20 @@ public class Map {
 //        return out;
 //    }
 
-    public int[][] getAdjacencyList(){
+    public int[][] getAdjacencyList() {
         int[][] out = new int[this.vertexNum][];
-        for(int i = 0; i < this.vertexNum; i++){
+        for (int i = 0; i < this.vertexNum; i++) {
             int degree = 0;
-            for(int j = 0; j < this.vertexNum; j++){
-                if(this.graph[i][j])
+            for (int j = 0; j < this.vertexNum; j++) {
+                if (this.graph[i][j])
                     degree++;
             }
             out[i] = new int[degree];
         }
-        for(int i =0; i < this.vertexNum; i++){
+        for (int i = 0; i < this.vertexNum; i++) {
             int index = 0;
-            for(int j = 0; j < this.vertexNum; j++){
-                if(this.graph[i][j]){
+            for (int j = 0; j < this.vertexNum; j++) {
+                if (this.graph[i][j]) {
                     out[i][index] = j;
                     index++;
                 }
@@ -144,7 +143,6 @@ public class Map {
         }
         return out;
     }
-
 
 
     public String getMapName() {
@@ -155,16 +153,16 @@ public class Map {
         return nodes.get(index);
     }
 
-    public boolean isFinished(){
+    public boolean isFinished() {
         int only_owner = -1;
-        for(int i = 0; i < this.ownership.length; i++){
-            if(this.ownership[i] == -1)
+        for (int i = 0; i < this.ownership.length; i++) {
+            if (this.ownership[i] == -1)
                 continue;
-            if(only_owner == -1){
+            if (only_owner == -1) {
                 only_owner = this.ownership[i];
                 continue;
             }
-            if(this.ownership[i] != only_owner)
+            if (this.ownership[i] != only_owner)
                 return false;
         }
         return true;

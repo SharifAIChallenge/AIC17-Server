@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import model.Event;
 import network.JsonSocket;
 import network.data.Message;
+import server.config.IntegerParam;
+import server.config.Param;
 import util.Log;
 
 import java.util.ArrayList;
@@ -32,48 +34,32 @@ import java.util.concurrent.*;
  */
 public class ClientNetwork extends NetServer {
 
-    /**
-     * Logging tag.
-     */
+    // Log tag
     private static String TAG = "ClientNetwork";
 
-    /**
-     * Indicates that receive time is valid or not.
-     */
+    // Indicates that receive time is valid or not
     private volatile boolean receiveTimeFlag;
 
-    /**
-     * Tokens of clients.
-     */
+    // Mapping of tokens to IDs
     private HashMap<String, Integer> mTokens;
 
-    /**
-     * Client handlers.
-     */
+    // Client handlers
     private ArrayList<ClientHandler> mClients;
 
-    /**
-     * A thread pool used to send all messages.
-     */
+    // A thread pool used to send all messages
     private ExecutorService sendExecutor;
 
-    /**
-     * A thread pool used to receive messages from clients.
-     */
+    // A thread pool used to receive messages from clients
     private ExecutorService receiveExecutor;
 
-    /**
-     * A thread pool used to accept and verify clients.
-     */
+    // A thread pool used to accept and verify clients
     private ExecutorService acceptExecutor;
 
-    /**
-     * Gson used to extract event from a message.
-     */
+    // Gson used to extract event from a message
     private Gson gson;
 
     /**
-     * Constructor.
+     * Constructor
      */
     public ClientNetwork() {
         gson = new Gson();
@@ -228,7 +214,7 @@ public class ClientNetwork extends NetServer {
                 events[i] = gson.fromJson(msg.args.get(i), Event.class);
             }
         } catch (Exception e) {
-            Log.i(TAG, "Error getting received messages.", e);
+            Log.e(TAG, "Error getting received messages.", e);
         }
         return events;
     }
@@ -240,7 +226,7 @@ public class ClientNetwork extends NetServer {
                 verifyClient(client);
             } catch (Exception e) {
                 // if anything went wrong reject the client!
-                Log.i(TAG, "client rejected", e);
+                Log.w(TAG, "Client rejected.", e);
                 try {
                     client.close();
                 } catch (Exception ignored) {
@@ -250,10 +236,10 @@ public class ClientNetwork extends NetServer {
     }
 
     private boolean verifyClient(JsonSocket client) throws Exception {
-        // get the token, timeout is 1000 seconds
+        // get the token, timeout is 2000 seconds
         Future<Message> futureMessage
                 = acceptExecutor.submit(() -> client.get(Message.class));
-        Message token = futureMessage.get(1000, TimeUnit.SECONDS);
+        Message token = futureMessage.get(2000, TimeUnit.SECONDS);
         // check the token
         if (token != null && "token".equals(token.name) && token.args != null
                 && token.args.size() >= 1) {

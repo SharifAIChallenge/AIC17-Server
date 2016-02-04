@@ -2,6 +2,7 @@ package server.network;
 
 import network.JsonSocket;
 import network.data.Message;
+import server.config.*;
 import util.Log;
 
 import java.io.IOException;
@@ -26,39 +27,25 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class UINetwork extends NetServer {
 
-    /**
-     * Logging tag
-     */
+    // Logging tag
     private static String TAG = "UINetwork";
 
-    /**
-     * token of the server
-     */
+    // UI token
     private final String mToken;
 
-    /**
-     * current client of the server
-     */
+    // Current connection to UI
     private JsonSocket mClient;
 
-    /**
-     * Lock for {@link #mClient}
-     */
+    // Lock for {@link #mClient}
     private final Lock mClientLock;
 
-    /**
-     * Notifies waiters when a new client is connected.
-     */
+    // Notifies waiters when a new client is connected
     private final Object clientNotifier;
 
-    /**
-     * thread executor which is used to accept clients
-     */
+    // Thread executor which is used to accept clients
     private ExecutorService executor;
 
-    /**
-     * Thread executor which is used to send messages.
-     */
+    // Thread executor which is used to send messages
     private ExecutorService sendExecutor;
 
     /**
@@ -66,15 +53,14 @@ public final class UINetwork extends NetServer {
      * If there is no client at the time of sending, the message will be
      * thrown away.
      *
-     * @param token token of the server
      * @see #sendBlocking
      * @see #sendNonBlocking
      * @see #hasClient
      * @see #waitForClient
      * @see #waitForNewClient
      */
-    public UINetwork(String token) {
-        mToken = token;
+    public UINetwork() {
+        mToken = Configs.PARAM_UI_TOKEN.getValue();
         clientNotifier = new Object();
         mClientLock = new ReentrantLock(true);
     }

@@ -2,7 +2,10 @@ package server.core;
 
 import model.Event;
 import network.data.Message;
+import server.config.Param;
 import server.core.model.ClientInfo;
+
+import java.util.function.Function;
 
 /**
  * The abstract class representing the main game logic of the user's game.
@@ -11,6 +14,23 @@ import server.core.model.ClientInfo;
  * </p>
  */
 public interface GameLogic {
+
+    /**
+     * Returns essential dynamic game parameters like map, number of players (if dynamic), etc.
+     * Framework will assign appropriate values in the runtime and you
+     * can get values by calling .getValue() method on each of these
+     * parameters.
+     *
+     * @return list of game parameters
+     */
+    public Param[] getGameParameters();
+
+    /**
+     * Returns number of players.
+     *
+     * @return number of players
+     */
+    public int getClientsNum();
 
     /**
      * This method must send initial and necessary values to UI and clients.
@@ -29,11 +49,6 @@ public interface GameLogic {
      * @return
      */
     public Message[] getClientInitialMessages();
-
-    /**
-     * @return
-     */
-    public ClientInfo[] getClientInfo();
 
     /**
      * Simulate events based on the current turn event and calculate the changes in game.

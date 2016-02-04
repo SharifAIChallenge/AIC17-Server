@@ -3,12 +3,13 @@ import com.google.gson.JsonObject;
 import model.Event;
 import network.data.Message;
 import server.Server;
+import server.config.FileParam;
+import server.config.IntegerParam;
+import server.config.Param;
 import server.core.GameLogic;
-import server.core.model.ClientInfo;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 
 
@@ -40,46 +41,44 @@ public class FlowsGameLogic implements GameLogic {
 	int[] movesSize;
 	int[][] armyInV;
 
-    private static final String RESOURCE_PATH_CLIENTS = "resources/mitosis/clients.conf";
-    private static final Charset CONFIG_ENCODING = Charset.forName("UTF-8");
-    private static final String RESOURCE_PATH_GAME = "resources/mitosis/game.conf";
+//    private static final String RESOURCE_PATH_CLIENTS = "resources/mitosis/clients.conf";
+//    private static final Charset CONFIG_ENCODING = Charset.forName("UTF-8");
+//    private static final String RESOURCE_PATH_GAME = "resources/mitosis/game.conf";
 
+    public static final IntegerParam PARAM_NUM_TURNS = new IntegerParam("turns", 100);
+    public static final IntegerParam PARAM_CLIENT_TIMEOUT = new IntegerParam("clientTimeout", 500);
+    public static final IntegerParam PARAM_TURN_TIMEOUT = new IntegerParam("turnTimeout", 1000);
+    public static final FileParam PARAM_MAP = new FileParam("map", null);
 
-    private final long GAME_LONG_TIME_TURN;
+    private static final Param[] GAME_PARAMETERS = {PARAM_NUM_TURNS, PARAM_CLIENT_TIMEOUT, PARAM_TURN_TIMEOUT, PARAM_MAP};
 
     public static void main(String[] args) {
-        Server server = new Server(options -> new FlowsGameLogic(options));
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                    server.newGame(new String[]{"save.txt"}, 10000, 10000);
-                    Thread.sleep(10000);
-                    server.getGameHandler().start();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-        server.start();
+        Server server = new Server(FlowsGameLogic::new, args);
+        try {
+            Thread.sleep(1000);
+            server.newGame(new String[]{"save.txt"}, 10000, Integer.MAX_VALUE);
+            server.getGameHandler().getClientNetwork().waitForClient(0);
+//            server.getGameHandler().start();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    public FlowsGameLogic(String[] options) throws IOException {
-        super();
+    @Override
+    public int getClientsNum() {
+        return 2;
+    }
 
-        String gameConfig = new String(Files.readAllBytes(new File(RESOURCE_PATH_GAME).toPath()), CONFIG_ENCODING);
-        GAME_LONG_TIME_TURN = new Gson().fromJson(gameConfig, JsonObject.class).get("turn").getAsLong();
-
-        this.context = new Context(options[0], RESOURCE_PATH_CLIENTS);
-
-        this.mapName = options[0];
+    @Override
+    public Param[] getGameParameters() {
+        return GAME_PARAMETERS;
     }
 
     @Override
     public void init() {
+        this.context = new Context(PARAM_MAP.getValue());
+        this.mapName = PARAM_MAP.getValue().getName();
+
         //this.context = new Context(mapName, null);
         this.context.flush();
 		

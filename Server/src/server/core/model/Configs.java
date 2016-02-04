@@ -10,7 +10,7 @@ import java.nio.file.Files;
 /**
  * Created by Hadi on 2/21/2015 10:58 AM.
  */
-public class Configs {
+/*public class Configs {
 
     public static class OutputHandlerConfig {
         public final boolean sendToUI;
@@ -108,3 +108,4 @@ public class Configs {
     }
 
 }
+*/

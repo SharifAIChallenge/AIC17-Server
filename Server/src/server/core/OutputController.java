@@ -131,7 +131,7 @@ public class OutputController implements Runnable {
      * <p>
      * In this method, the given message will be putted in the message queue, only if there's a place on the
      * queue. Otherwise the cleaning and caching processes will be done (through the
-     * {@link #hanldeOverflow() hanldeOverflow} method).
+     * {@link #handleOverflow() handleOverflow} method).
      * Also if the buffer size condition is met, then the file writer method will be called with an
      * alternative thread, to save the contents on the file.
      * </p>
@@ -146,7 +146,7 @@ public class OutputController implements Runnable {
                 messagesQueue = new LinkedList<>();
             }
         } else {
-            if (hanldeOverflow()) {
+            if (handleOverflow()) {
                 messagesQueue.addLast(message);
             } else {
                 throw new OutputControllerQueueOverflowException("Could not handle message queue overflow");
@@ -158,14 +158,14 @@ public class OutputController implements Runnable {
     }
 
     /**
-     * Method created to handle the possible overflows occurance in the message queue.
+     * Method created to handle the possible overflows occurrence in the message queue.
      * <p>
      * TODO: INCOMPLETE - Must be implemented to cache the queue to file.
      * </p>
      *
      * @return True if the queue unblocked, false if any error occur during this operation
      */
-    private boolean hanldeOverflow() {
+    private boolean handleOverflow() {
         messagesQueue.clear();
         return true;
     }

@@ -52,8 +52,8 @@ public class Diff {
         return diff_armyCount;
     }
 
-    public ArrayList<Diff_report> getDiff(int owner){
-        ArrayList<Diff_report> diff = new ArrayList<Diff_report>();
+    public ArrayList<DiffReport> getDiff(int owner){
+        ArrayList<DiffReport> diff = new ArrayList<DiffReport>();
         for(int i = 0; i < this.length; i++){
             if(this.diff_armyCount[i] || this.diff_ownership[i]){
                 int tempArmyCount = 0;
@@ -67,7 +67,7 @@ public class Diff {
                     else if(this.prev_armyCount[i] <= max_huge)
                         tempArmyCount = 3;
                 }
-                diff.add(new Diff_report(i, this.prev_ownership[i], tempArmyCount));
+                diff.add(new DiffReport(i, this.prev_ownership[i], tempArmyCount));
             }
         }
 

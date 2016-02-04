@@ -218,12 +218,14 @@ public class ClientNetwork extends NetServer {
         Message msg = getReceivedMessage(clientID);
         Event[] events = new Event[0];
         try {
+
             /*JsonArray eventArray = ((JsonElement)msg.args[0]).getAsJsonArray();
             events = new Event[eventArray.size()];
             for (int i = 0; i < events.length; i++)
                 events[i] = gson.fromJson(eventArray.get(i), Event.class);*/
             if (msg != null)
                 events = new Event[msg.args.size()];
+            System.err.println("We are so cool " + events.length);
             for (int i = 0; i < events.length; i++) {
                 events[i] = gson.fromJson(msg.args.get(i), Event.class);
             }

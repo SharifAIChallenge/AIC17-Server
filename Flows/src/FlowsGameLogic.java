@@ -117,15 +117,17 @@ public class FlowsGameLogic implements GameLogic {
 
     private void wait(String s, long time){
         System.err.println(s);
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(time);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
     public void simulateEvents(Event[] terminalEvent, Event[] environmentEvent, Event[][] clientsEvent) {
+        System.err.println("FUCK YOUR MOTHER BITCH " + clientsEvent[0].length);
+        System.err.println("FUCK YOUR FATHER BITCH " + clientsEvent[1].length);
         wait("simulate", 0);
         armyCount = this.context.getMap().getArmyCount();
         ownership = this.context.getMap().getOwnership();
@@ -145,8 +147,10 @@ public class FlowsGameLogic implements GameLogic {
             }
         }
         // args0: source, args1: destination, args2: army size
+        if ((clientsEvent[0] == null || clientsEvent[0].length == 0) && (clientsEvent[1] == null || clientsEvent[1].length == 0))
+            return;
         for (int j = 0; j < 2; j++) {
-            if (clientsEvent[j] == null)
+            if (clientsEvent[j] == null || clientsEvent[j].length == 0)
                 continue;
             for (int i = clientsEvent[j].length - 1; i > -1; i--) {
                 int src = -1;
@@ -160,6 +164,7 @@ public class FlowsGameLogic implements GameLogic {
                     System.out.println("Event is BBAADDDD :D");
                 }
                 if (movesDest[src] < 0 && isMoveValid(src, dst, armySize, j)) {
+
                     movesDest[src] = dst;
                     movesSize[src] = armySize;
                     armyInV[j][src] -= armySize;
@@ -193,7 +198,8 @@ public class FlowsGameLogic implements GameLogic {
                 }
             }
         }
-
+        System.err.println("FUCK YOUR MOTHER BITCH " + clientsEvent[0].length);
+        System.err.println("FUCK YOUR FATHER BITCH " + clientsEvent[1].length);
         for (int i = 0; i < vertexNum; i++) {
             if (ownership[i] > -1 && movesDest[i] > -1) {
                 armyInV[ownership[i]][movesDest[i]] += movesSize[i];
@@ -260,6 +266,14 @@ public class FlowsGameLogic implements GameLogic {
                     armyInV[0][i] = 0;
                     armyInV[1][i] = 0;
                 }
+            } else if (armyInV[0][i] != 0) {
+                if (ownership[i] != 0)
+                    armyInV[0][i] += increaseWithOwnership;
+                ownership[i] = 0;
+            } else if (armyInV[1][i] != 0) {
+                if (ownership[i] != 1)
+                    armyInV[1][i] += increaseWithOwnership;
+                ownership[i] = 1;
             }
             armyCount[i] = Math.max(armyInV[0][i], armyInV[1][i]);
             if (ownership[i] ==  -1) {
@@ -335,13 +349,13 @@ public class FlowsGameLogic implements GameLogic {
 		}
 	}
 
-	char qualAmount(int amount) {
+	int qualAmount(int amount) {
 		if (amount < 10) {
-			return 'l';
+			return 0;
 		} else if (amount < 20) {
-			return 'm';
+			return 1;
 		} else {
-			return 'h';
+			return 2;
 		}
 	}
 

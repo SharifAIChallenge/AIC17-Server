@@ -19,7 +19,7 @@ public class Node {
         this.y = y;
         this.ownership = 0;
         this.armyCount = 0;
-        this.neighbors = new ArrayList<Node>();
+        this.neighbors = new ArrayList<>();
         this.range = 0;
     }
 

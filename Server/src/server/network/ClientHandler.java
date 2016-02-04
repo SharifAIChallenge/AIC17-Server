@@ -31,7 +31,7 @@ public class ClientHandler {
     /**
      * Logging tag.
      */
-    private static String TAG = "ClientHandler";
+    private static final String TAG = "ClientHandler";
 
     /**
      * Socket of the client.
@@ -287,7 +287,7 @@ public class ClientHandler {
      *
      * @param e exception
      */
-    public void handleIOE(IOException e) {
+    private void handleIOE(IOException e) {
         numOfExceptions++;
         if (numOfExceptions > MAX_NUM_EXCEPTIONS)
             terminate();

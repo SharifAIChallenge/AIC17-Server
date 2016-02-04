@@ -36,12 +36,12 @@ public class FlowsGameLogic implements GameLogic {
     private int[] movesSize;
     private int[][] armyInV;
 
-    private ArrayList<Message> uiMessages;
+    private Message uiMessage;
 
-    public static final IntegerParam PARAM_NUM_TURNS = new IntegerParam("turns", 100);
-    public static final IntegerParam PARAM_CLIENT_TIMEOUT = new IntegerParam("clientTimeout", 500);
-    public static final IntegerParam PARAM_TURN_TIMEOUT = new IntegerParam("turnTimeout", 1000);
-    public static final FileParam PARAM_MAP = new FileParam("map", null);
+    public static final IntegerParam PARAM_NUM_TURNS = new IntegerParam("Turns", 100);
+    public static final IntegerParam PARAM_CLIENT_TIMEOUT = new IntegerParam("ClientTimeout", 500);
+    public static final IntegerParam PARAM_TURN_TIMEOUT = new IntegerParam("TurnTimeout", 1000);
+    public static final FileParam PARAM_MAP = new FileParam("Map", null);
 
     public static void main(String[] args) throws InterruptedException {
         GameServer gameServer = new GameServer(new FlowsGameLogic(), args);
@@ -78,7 +78,9 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message getUIInitialMessage() {
-        return null;
+        Object[] args = {this.context.getMap().getAdjacencyList(), this.context.getUIDiffList()};
+        String name = Message.NAME_INIT;
+        return new Message(name, args);
     }
 
     @Override
@@ -105,7 +107,7 @@ public class FlowsGameLogic implements GameLogic {
 
         int[] conflictedMoves = new int[vertexNum];
 
-        uiMessages = new ArrayList<>();
+        ArrayList<Message> uiMessages = new ArrayList<>();
 
         for (int i = 0; i < vertexNum; i++) {
             movesDest[i] = -1;
@@ -138,7 +140,7 @@ public class FlowsGameLogic implements GameLogic {
 
                     // type: exitArmy
                     // args in order: node id, size after army exit, player of move
-                    addUIMessage("0", new Object[]{src, armyCount[src] - armySize, j});
+                    uiMessages.add(new Message("0", new Object[]{src, armyCount[src] - armySize, j}));
 
                     if (movesDest[dst] == src && ownership[dst] != ownership[src]) {
                         int[] battleInfo = doBattle('e', dst, src, movesSize[dst], armySize);
@@ -149,9 +151,10 @@ public class FlowsGameLogic implements GameLogic {
                         // type: edgeBattle
                         // args in order: winner node, looser node, winner initial army, size of alive army of winner after battle, casualties of looser
                         if (ownership[src] == battleInfo[0])
-                            addUIMessage("1", new Object[]{src, dst, movesSize[src], battleInfo[1], movesSize[dst]});
-                        else if (ownership[dst] == battleInfo[0])
-                            addUIMessage("1", new Object[]{dst, src, movesSize[dst], battleInfo[1], movesSize[src]});
+                            uiMessages.add(new Message("1", new Object[]{src, dst, movesSize[src], battleInfo[1], movesSize[dst]}));
+                        //else if (ownership[dst] == battleInfo[0])
+                        else
+                            uiMessages.add(new Message("1", new Object[]{dst, src, movesSize[dst], battleInfo[1], movesSize[src]}));
 
                         if (ownership[src] == battleInfo[0]) {
                             movesSize[src] = battleInfo[1];
@@ -173,7 +176,7 @@ public class FlowsGameLogic implements GameLogic {
                 if (conflictedMoves[i] == 0) {
                     // type: nonConflictedMove
                     // args in order: source node, destination node, owner, army size
-                    addUIMessage("2", new Object[]{i, movesDest[i], ownership[i], movesSize[i]});
+                    uiMessages.add(new Message("2", new Object[]{i, movesDest[i], ownership[i], movesSize[i]}));
                 }
 
             }
@@ -197,8 +200,8 @@ public class FlowsGameLogic implements GameLogic {
                         armyInV[escaper][adjacencyList[i][j]] += escapeNum;
 
                         // type: escape
-                        // args in order: source node, destination node, owner, escape army size
-                        addUIMessage("3", new Object[]{i, adjacencyList[i][j], escapeNum});
+                        // args in order: source node, destination node, escape army size
+                        uiMessages.add(new Message("3", new Object[]{i, adjacencyList[i][j], escapeNum}));
 
                     }
                 }
@@ -212,8 +215,9 @@ public class FlowsGameLogic implements GameLogic {
 
                 // need talk to pooya
                 // type: nodeBattle
-                // args in order: node battle, final owner, final size of army, size of casualties
-                addUIMessage("4", new Object[]{i, battleInfo[0], battleInfo[1], armyInV[1][i] - battleInfo[1]});
+                // args in order: node battle, final owner, final size of winner army, size of winner casualties, size of looser casualties
+                if (battleInfo[0] != -1)
+                    uiMessages.add(new Message("4", new Object[]{i, battleInfo[0], battleInfo[1], armyInV[battleInfo[0]][i] - battleInfo[1], armyInV[(battleInfo[0] - 1) * -1][i]}));
 
                 if (battleInfo[0] > -1) {
                     if (ownership[i] != battleInfo[0]) {
@@ -221,7 +225,7 @@ public class FlowsGameLogic implements GameLogic {
 
                         // type: increaseWithOwnership
                         // args in order: node, amount
-                        addUIMessage("5", new Object[]{i, increaseWithOwnership});
+                        uiMessages.add(new Message("5", new Object[]{i, increaseWithOwnership}));
 
                     } else {
                         armyInV[battleInfo[0]][i] = battleInfo[1];
@@ -246,11 +250,11 @@ public class FlowsGameLogic implements GameLogic {
                 if (armyInV[0][i] != 0) {
                     ownership[i] = 0;
                     armyCount[i] += increaseWithOwnership;
-                    addUIMessage("5", new Object[]{i, increaseWithOwnership});
+                    uiMessages.add(new Message("5", new Object[]{i, increaseWithOwnership}));
                 } else if (armyInV[1][i] != 0) {
                     ownership[i] = 1;
                     armyCount[i] += increaseWithOwnership;
-                    addUIMessage("5", new Object[]{i, increaseWithOwnership});
+                    uiMessages.add(new Message("5", new Object[]{i, increaseWithOwnership}));
                 }
             }
         }
@@ -262,19 +266,15 @@ public class FlowsGameLogic implements GameLogic {
             for (int j = 0; j < adjacencyList[i].length; j++) {
                 if (ownership[adjacencyList[i][j]] == ownership[i]) {
                     armyCount[i] += increaseWithEdge;
-                    addUIMessage("6", new Object[]{i, increaseWithEdge});
+                    uiMessages.add(new Message("6", new Object[]{i, increaseWithEdge}));
                 }
             }
         }
 
-        Message uiMessage = new Message(Message.NAME_TURN, uiMessages.toArray());
+        uiMessage = new Message(Message.NAME_TURN, uiMessages.toArray());
     }
 
-    private void addUIMessage(String name, Object[] args) {
-        uiMessages.add(new Message(name, args));
-    }
-
-    boolean isMoveValid(int src, int dst, int armySize, int clientNum) {
+    private boolean isMoveValid(int src, int dst, int armySize, int clientNum) {
         if (src < 0 || src > vertexNum - 1)
             return false;
         if (dst < 0 || dst > vertexNum - 1)
@@ -289,7 +289,7 @@ public class FlowsGameLogic implements GameLogic {
     }
 
     // an array with size three, first member is winner, second one is number of alive soldiers of winner
-    int[] doBattle(char type, int endp0, int endp1, int armySize0, int armySize1) {
+    private int[] doBattle(char type, int endp0, int endp1, int armySize0, int armySize1) {
         if (armySize0 == armySize1) {
             return new int[]{-1, 0};
         } else {
@@ -315,7 +315,7 @@ public class FlowsGameLogic implements GameLogic {
         }
     }
 
-    int qualAmount(int amount) {
+    private int qualAmount(int amount) {
         if (amount < 10) {
             return 0;
         } else if (amount < 20) {
@@ -332,7 +332,7 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message getUIMessage() {
-        return null;
+        return uiMessage;
     }
 
     @Override

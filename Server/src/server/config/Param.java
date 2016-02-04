@@ -9,18 +9,19 @@ import java.util.ArrayList;
  * Copyright (C) 2016 Hadi
  */
 public abstract class Param<T> {
-    private static ArrayList<Param> allParameters = new ArrayList<>();
+    private static final ArrayList<Param> allParameters = new ArrayList<>();
 
     public static Param[] getAllParameters() {
         return allParameters.toArray(new Param[allParameters.size()]);
     }
 
-    private String paramName;
-    private T defaultValue;
+    private final String paramName;
+    private final T defaultValue;
     private T value;
     private boolean cached = false;
 
     public Param(String paramName, T defaultValue) {
+        allParameters.add(this);
         this.paramName = paramName;
         this.defaultValue = defaultValue;
     }
@@ -38,6 +39,8 @@ public abstract class Param<T> {
             return value;
         if ((value = getDefaultValue()) != null)
             return value;
+        if (Configs.PARAM_AIC_DEPLOY.getValue() == Boolean.TRUE)
+            throw new RuntimeException("Config '" + paramName + "' not found.");
         while (value == null)
             value = getValueFromUser();
         cached = true;
@@ -78,4 +81,9 @@ public abstract class Param<T> {
     }
 
     public abstract T getValueFromString(String value);
+
+    @Override
+    public String toString() {
+        return String.format("%s[%s]", paramName, getClass().getSimpleName());
+    }
 }

@@ -23,7 +23,6 @@ import network.JsonSocket;
  * the client is fake it doesn't affect the behavior of the server.
  *
  * @see server.network.NetServerThread
- * @see server.network.TerminalNetwork
  * @see ClientNetwork
  * @see UINetwork
  */
@@ -67,10 +66,10 @@ public abstract class NetServer {
     /**
      * Returns the state of the server.
      *
-     * @return true if listening is terminated.
+     * @return true if server is currently listening.
      */
-    public boolean isTerminated() {
-        return listener == null;
+    public boolean isListening() {
+        return listener != null;
     }
 
     /**

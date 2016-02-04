@@ -24,19 +24,16 @@ public interface GameLogic {
 
     /**
      * This method must send initial and necessary values to UI and clients.
-     *
-     * @return A hashmap that has <code>Token</code> as <strong>key</strong> and a <code>Message</code> as <strong>value</strong>.
-     * <code>Token</code> is used for specifying if the <code>Message</code> is for UI or Client.
      */
     public void init();
 
     /**
-     * @return
+     * @return UI initial message
      */
     public Message getUIInitialMessage();
 
     /**
-     * @return
+     * @return Client initial message
      */
     public Message[] getClientInitialMessages();
 
@@ -53,9 +50,6 @@ public interface GameLogic {
     /**
      * This method generates the output based on the changes that were calculated in
      * {@link #simulateEvents}.
-     *
-     * @return A hashmap that has <code>Token</code> as <strong>key</strong> and a <code>Message</code> as <strong>value</strong>.
-     * <code>Token</code> is used for specifying if the <code>Message</code> is for UI or Client.
      */
     public void generateOutputs();
 

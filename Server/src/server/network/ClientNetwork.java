@@ -1,6 +1,5 @@
 package server.network;
 
-import com.google.gson.Gson;
 import model.Event;
 import network.Json;
 import network.JsonSocket;
@@ -34,7 +33,7 @@ import java.util.concurrent.*;
  */
 public class ClientNetwork extends NetServer {
     // Log tag
-    private static String TAG = "ClientNetwork";
+    private static final String TAG = "ClientNetwork";
 
     // Indicates that receive time is valid or not
     private volatile boolean receiveTimeFlag;
@@ -73,7 +72,7 @@ public class ClientNetwork extends NetServer {
      * @see {@link #omitAllClients}
      */
     public int defineClient(String token) {
-        if (!isTerminated())
+        if (isListening())
             throw new RuntimeException("Server is not terminated when defineClient() is called.");
         int id = mClients.size();
         if (Configs.PARAM_AIC_DEPLOY.getValue()) {
@@ -115,7 +114,7 @@ public class ClientNetwork extends NetServer {
      * @see {@link #defineClient}
      */
     public void omitAllClients() {
-        if (!isTerminated())
+        if (isListening())
             throw new RuntimeException("Server is not terminated when omitAllClients() is called.");
         mClients.forEach(server.network.ClientHandler::terminate);
         mTokens.clear();
@@ -243,7 +242,7 @@ public class ClientNetwork extends NetServer {
         });
     }
 
-    private boolean verifyClient(JsonSocket client) throws Exception {
+    private void verifyClient(JsonSocket client) throws Exception {
         // get the token, timeout is 2000 seconds
         Future<Message> futureMessage
                 = acceptExecutor.submit(() -> client.get(Message.class));
@@ -260,12 +259,11 @@ public class ClientNetwork extends NetServer {
                         clientHandler.bind(client);
                         Runnable receiver = clientHandler.getReceiver(() -> receiveTimeFlag);
                         receiveExecutor.submit(receiver);
-                        return true;
+                        return;
                     }
                 }
             }
         }
-        return false;
     }
 
     /**

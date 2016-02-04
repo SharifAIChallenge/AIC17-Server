@@ -92,7 +92,7 @@ public class UITest {
         panel.setMaximumSize(new Dimension(width, height));
         frame.getContentPane().add(panel);
         frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);

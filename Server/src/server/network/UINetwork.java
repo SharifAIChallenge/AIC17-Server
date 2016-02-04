@@ -28,7 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class UINetwork extends NetServer {
 
     // Logging tag
-    private static String TAG = "UINetwork";
+    private static final String TAG = "UINetwork";
 
     // UI token
     private final String mToken;

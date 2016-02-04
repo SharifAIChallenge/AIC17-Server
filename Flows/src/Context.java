@@ -67,4 +67,16 @@ public class Context {
         }
         return intDiff;
     }
+
+    public int[][] getUIDiffList() {
+        ArrayList<DiffReport> diffs = this.differ.getUIDiff();
+        int[][] intDiff = new int[diffs.size()][3];
+        for (int i = 0; i < diffs.size(); i++) {
+            intDiff[i][0] = diffs.get(i).getVertex();
+            intDiff[i][1] = diffs.get(i).getOwner();
+            intDiff[i][2] = diffs.get(i).getArmyCount();
+        }
+        return intDiff;
+    }
+
 }

@@ -37,7 +37,7 @@ public class Configs {
     // The given {@link java.io.File java.io.File} to save data within
     public static final StringParam PARAM_OC_FILE_PATH = new StringParam("OCFilePath", "./game.log");
 
-    public static void setConfigFile(File file) {
+    private static void setConfigFile(File file) {
         try {
             byte[] bytes = Files.readAllBytes(file.toPath());
             String content = new String(bytes, Charset.forName("UTF-8"));

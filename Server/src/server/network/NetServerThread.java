@@ -34,7 +34,7 @@ public class NetServerThread extends Thread {
     /**
      * Logging tag.
      */
-    private static String TAG = "NetServerThread";
+    private static final String TAG = "NetServerThread";
 
     /**
      * The port to listen on.
@@ -54,7 +54,7 @@ public class NetServerThread extends Thread {
      * Actually, <code>clientAcceptor.accept(JsonSocket)</code> is called when
      * a client is connected to the port.
      */
-    private Consumer<JsonSocket> clientAcceptor;
+    private final Consumer<JsonSocket> clientAcceptor;
 
     /**
      * Constructor.

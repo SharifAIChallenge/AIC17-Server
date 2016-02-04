@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import network.Json;
 
 /**
- * Created by rajabzz on 12/27/14.
+ * Message class
  */
 public class Message {
 
@@ -16,9 +16,6 @@ public class Message {
 
     public final String name;
     public final JsonArray args;
-
-//    public Message() {
-//    }
 
     public Message(String name, JsonArray args) {
         this.name = name;

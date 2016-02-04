@@ -40,21 +40,13 @@ public class JsonSocket {
 
     public static final Charset ENCODING = Charset.forName("UTF-8");
 
-    /**
-     * The <code>Gson</code> object is used to convert between java and json.
-     */
-    private Gson mGson;
-    /**
-     * The underlying <code>Socket</code>.
-     */
+    // The underlying <code>Socket</code>
     private Socket mSocket;
-    /**
-     * Input stream of the socket.
-     */
+
+    // Input stream of the socket
     private InputStream mIn;
-    /**
-     * Output stream of the socket.
-     */
+
+    // Output stream of the socket
     private OutputStream mOut;
 
     /**
@@ -80,7 +72,6 @@ public class JsonSocket {
      *                     input or output stream of the socket.
      */
     public JsonSocket(Socket socket) throws IOException {
-        mGson = Json.GSON;
         mSocket = socket;
         mIn = mSocket.getInputStream();
         mOut = mSocket.getOutputStream();
@@ -117,7 +108,7 @@ public class JsonSocket {
      * @see com.google.gson.Gson#toJson(Object)
      */
     public void send(Object obj) throws IOException {
-        String json = mGson.toJson(obj);
+        String json = Json.GSON.toJson(obj);
 //        System.out.println("send : " + json);
         byte buffer[] = json.getBytes(ENCODING);
         mOut.write(buffer, 0, buffer.length);
@@ -171,7 +162,7 @@ public class JsonSocket {
         System.out.println("mehrdad horny received : " + json);
         T result = null;
         try {
-            result = mGson.fromJson(json, classOfInput);
+            result = Json.GSON.fromJson(json, classOfInput);
         } catch (Exception e) {
             Log.i(TAG, "Parse error.", e);
         }

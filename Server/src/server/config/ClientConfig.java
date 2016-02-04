@@ -7,8 +7,8 @@ public class ClientConfig {
     private static int clientCount = 0;
 
     private int id;
-    private StringParam name;
-    private StringParam token;
+    private final StringParam name;
+    private final StringParam token;
 
     public ClientConfig() {
         int num = clientCount++;

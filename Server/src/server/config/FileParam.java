@@ -21,8 +21,7 @@ public class FileParam extends Param<File> {
     public File getValueFromUser() {
         File file = null;
         while (file == null) {
-            String path = null;
-            JFileChooser fileChooser = new JFileChooser(path);
+            JFileChooser fileChooser = new JFileChooser((String) null);
             fileChooser.showOpenDialog(null);
             file = fileChooser.getSelectedFile();
             if (file == null)

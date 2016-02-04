@@ -21,8 +21,11 @@ public class FileParam extends Param<File> {
     public File getValueFromUser() {
         File file = null;
         while (file == null) {
+            JOptionPane.showMessageDialog(null, "Parameter '" + getParamName() + "' is not specified or invalid.\nPlease select a file to continue.", "Game Parameters", JOptionPane.INFORMATION_MESSAGE);
             JFileChooser fileChooser = new JFileChooser((String) null);
-            fileChooser.showOpenDialog(null);
+            int result = fileChooser.showOpenDialog(null);
+            if (result != JOptionPane.YES_OPTION)
+                continue;
             file = fileChooser.getSelectedFile();
             if (file == null)
                 continue;

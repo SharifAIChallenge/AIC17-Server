@@ -72,7 +72,7 @@ public abstract class Param<T> {
     public T getValueFromUser() {
         while (value == null) {
             try {
-                String result = JOptionPane.showInputDialog("Parameter '" + paramName + "' is not specified. Please enter a value to continue.");
+                String result = JOptionPane.showInputDialog(null, "Parameter '" + paramName + "' is not specified. Please enter a value to continue.", "Game Parameters", JOptionPane.INFORMATION_MESSAGE);
                 value = getValueFromString(result);
             } catch (Exception ignore) {
             }

@@ -4,6 +4,9 @@ import com.google.gson.JsonObject;
 import network.Json;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -55,11 +58,33 @@ public class Configs {
         if (args.length != 1)
             return;
         String[] split = args[0].split("=");
-        if (split.length != 2 || !split[0].equals("--config"))
+        if (split.length != 2)
             return;
-        File configFile = new File(split[1]);
-        if (!configFile.exists())
-            configFile = new File(DEFAULT_CONFIG_PATH);
-        setConfigFile(configFile);
+        switch (split[0]) {
+            case "--config": {
+                File configFile = new File(split[1]);
+                if (!configFile.exists())
+                    configFile = new File(DEFAULT_CONFIG_PATH);
+                setConfigFile(configFile);
+                break;
+            }
+            case "--generate-config": {
+                try {
+                    File configFile = new File(split[1]);
+                    Param[] params = Param.getAllParameters();
+                    PrintWriter out = new PrintWriter(new FileOutputStream(configFile));
+                    out.println("{");
+                    for (int i = 0; i < params.length; i++) {
+                        out.printf("\t\"%s\": \"%s\"%s\n", params[i].getParamName(), params[i].getDefaultValue() == null ? "" : params[i].getDefaultValue().toString(), i == params.length - 1 ? "" : ",");
+                    }
+                    out.println("}");
+                    out.close();
+                    System.exit(0);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
     }
 }

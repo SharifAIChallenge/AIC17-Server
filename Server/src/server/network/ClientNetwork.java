@@ -218,7 +218,7 @@ public class ClientNetwork extends NetServer {
                 events[i] = gson.fromJson(eventArray.get(i), Event.class);*/
                 int size = msg.args.size();
                 for (int i = 0; i < size; i++) {
-                    allEvents.add(gson.fromJson(msg.args.get(i), Event.class));
+                    allEvents.add(Json.GSON.fromJson(msg.args.get(i), Event.class));
                 }
             } catch (Exception e) {
                 Log.i(TAG, "Error getting received messages.", e);
@@ -255,9 +255,11 @@ public class ClientNetwork extends NetServer {
             ArrayList<Integer> ids = mTokens.get(clientToken);
             if (ids != null) {
                 for (int clientID : ids) {
-                    ClientHandler ch = mClients.get(clientID);
-                    if (!ch.isConnected()) {
-                        ch.bind(client);
+                    ClientHandler clientHandler = mClients.get(clientID);
+                    if (!clientHandler.isConnected()) {
+                        clientHandler.bind(client);
+                        Runnable receiver = clientHandler.getReceiver(() -> receiveTimeFlag);
+                        receiveExecutor.submit(receiver);
                         return true;
                     }
                 }

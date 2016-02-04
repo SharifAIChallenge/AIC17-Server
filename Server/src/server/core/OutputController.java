@@ -13,7 +13,7 @@ import java.util.TimerTask;
 import java.util.concurrent.*;
 
 /**
- * Class created as a part of {@link GameHandler GameHandler} class for controlling the output.
+ * Class created as a part of {@link GameServer GameServer} class for controlling the output.
  * <p>
  *     This class gathers all output taken from "GameLogic" into a queue, and the process them as the user
  *     wishes. <i>Currently passing to {@link server.network.UINetwork UINetwork} and saving in a
@@ -55,16 +55,10 @@ public class OutputController implements Runnable {
      *     appropriate instance values.
      *     Note that this will raise a runtime exception, in the case of invalid arguments.
      * </p>
-     * @param sendToUI Indicates that data will be sent to given {@link server.network.UINetwork UINetwork} instance
-     *                 or not
      * @param uiNetwork The given instance of {@link server.network.UINetwork UINetwork} class to send data to
-     * @param sendToFile Indicates that a log of output will be saved in the given {@link java.io.File java.io.File} or
-     *                   not
-     * @param outputFile The given {@link java.io.File java.io.File} to save data within
      */
-    public OutputController(boolean sendToUI, UINetwork uiNetwork,
-                            boolean sendToFile, File outputFile) {
-        this.sendToUI = sendToUI;
+    public OutputController(UINetwork uiNetwork) {
+        this.sendToUI = Configs.PARAM_OC_SEND_TO_UI.getValue();
         if (sendToUI) {
             this.uiNetwork = uiNetwork;
             if (uiNetwork == null) {
@@ -72,9 +66,9 @@ public class OutputController implements Runnable {
                 Log.i(TAG, "UINetwork parameter is null.");
             }
         }
-        this.sendToFile = sendToFile;
+        this.sendToFile = Configs.PARAM_OC_SEND_TO_FILE.getValue();
         if (sendToFile) {
-            this.outputFile = outputFile;
+            this.outputFile = new File(Configs.PARAM_OC_FILE_PATH.getValue());
         }
     }
 

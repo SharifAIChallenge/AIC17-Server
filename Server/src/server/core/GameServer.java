@@ -71,21 +71,6 @@ public class GameServer {
         initGame();
     }
 
-    /**
-     * Initializes the game handler module based on the given game.
-     * <p>
-     * This method creates needed instance of module {@link server.core.OutputController OutputController} based on
-     * configurations located in the "output_handler.conf" file
-     * ({@see https://github.com/JavaChallenge/JGFramework/wiki wiki}).
-     * Any problem in loading or parsing the configuration JSON files, will result in rising a runtime exception.
-     * </p>
-     */
-    public void init() {
-        Configs.OutputHandlerConfig outputHandlerConfig = Configs.getConfigs().outputHandler;
-        mOutputController = new OutputController(outputHandlerConfig.sendToUI,
-                mUINetwork,
-                outputHandlerConfig.sendToFile,
-                new File(outputHandlerConfig.filePath));
     private void setClientConfigs() {
         mClientConfigs = new ClientConfig[mClientsNum];
         for (int i = 0; i < mClientsNum; i++) {
@@ -264,8 +249,8 @@ public class GameServer {
                 }
                 mClientNetwork.stopReceivingAll();
 
-                clientEvents = new Event[mClientsInfo.length][];
-                for (int i = 0; i < mClientsInfo.length; ++i) {
+                clientEvents = new Event[mClientsNum][];
+                for (int i = 0; i < mClientsNum; ++i) {
                     Event[] events = mClientNetwork.getReceivedEvents(i);
                     clientEvents[i] = events;
                 }

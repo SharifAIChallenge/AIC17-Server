@@ -32,14 +32,10 @@ public class Configs {
     // Output Controller Configs
     // Indicates that data will be sent to given {@link server.network.UINetwork UINetwork} instance or not
     public static final BooleanParam PARAM_OC_SEND_TO_UI = new BooleanParam("OCSendToUI", false);
-    // The indicated timer tick which triggers {@link server.core.OutputController.UINetworkSender#sendToUINetwork(network.data.Message) sendToUINetwork(Message)} method
-    public static final IntegerParam PARAM_OC_TIME_INTERVAL = new IntegerParam("OCTimeInterval", 500);
     // Indicates that a log of output will be saved in the given {@link java.io.File java.io.File} or not
     public static final BooleanParam PARAM_OC_SEND_TO_FILE = new BooleanParam("OCSendToFile", false);
     // The given {@link java.io.File java.io.File} to save data within
     public static final StringParam PARAM_OC_FILE_PATH = new StringParam("OCFilePath", "./game.log");
-    // The preferred number of message elements to be held on memory before writing to file
-    public static final IntegerParam PARAM_OC_BUFFER_SIZE = new IntegerParam("OCBufferSize", 100);
 
     public static void setConfigFile(File file) {
         try {

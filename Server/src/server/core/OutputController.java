@@ -11,7 +11,7 @@ import java.util.TimerTask;
 import java.util.concurrent.*;
 
 /**
- * Class created as a part of {@link server.core.GameHandler GameHandler} class for controlling the output.
+ * Class created as a part of {@link GameServer GameServer} class for controlling the output.
  * <p>
  * This class gathers all output taken from "GameLogic" into a queue, and the process them as the user
  * wishes. <i>Currently passing to {@link server.network.UINetwork UINetwork} and saving in a

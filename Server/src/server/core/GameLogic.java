@@ -32,6 +32,10 @@ public interface GameLogic {
      */
     public int getClientsNum();
 
+    public long getClientResponseTimeout();
+
+    public long getTurnTimeout();
+
     /**
      * This method must send initial and necessary values to UI and clients.
      *

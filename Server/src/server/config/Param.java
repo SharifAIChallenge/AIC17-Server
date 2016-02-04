@@ -31,6 +31,8 @@ public abstract class Param<T> {
 
     private String paramName;
     private T defaultValue;
+    private T value;
+    private boolean cached = false;
 
     public Param(String paramName, T defaultValue) {
         this.paramName = paramName;
@@ -38,7 +40,8 @@ public abstract class Param<T> {
     }
 
     public T getValue() {
-        T value;
+        if (value != null || cached)
+            return value;
         if ((value = getValueFromEnv()) != null)
             return value;
         if ((value = getValueFromJsonObject(configFile)) != null)
@@ -47,6 +50,7 @@ public abstract class Param<T> {
             return value;
         while (value == null)
             value = getValueFromUser();
+        cached = true;
         return value;
     }
 

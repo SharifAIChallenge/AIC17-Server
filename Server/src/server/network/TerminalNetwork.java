@@ -31,9 +31,9 @@ public class TerminalNetwork extends NetServer {
 
     /**
      * This interface is used for transfer <code>Commands</code> and <code>Events</code>.
-     * This interface is implemented in {@link server.core.GameHandler}.
+     * This interface is implemented in {@link server.core.GameServer}.
      * <code>TerminalInterface</code> has two methods called <code>putEvent</code> and <code>runCommand</code>
-     * that will be used for sending essential data to {@link server.core.GameHandler}.
+     * that will be used for sending essential data to {@link server.core.GameServer}.
      */
     public interface TerminalInterface {
         void putEvent(Event event);

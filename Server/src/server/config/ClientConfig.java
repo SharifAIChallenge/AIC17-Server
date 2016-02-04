@@ -6,14 +6,29 @@ package server.config;
 public class ClientConfig {
     private static int clientCount = 0;
 
-    public final IntegerParam id;
-    public final StringParam name;
-    public final StringParam token;
+    private int id;
+    private StringParam name;
+    private StringParam token;
 
     public ClientConfig() {
         int num = clientCount++;
-        id = new IntegerParam("Client" + num + "ID", num);
         name = new StringParam("Client" + num + "Name", "");
         token = new StringParam("Client" + num + "Token", "00000000000000000000000000000000");
+    }
+
+    public int getID() {
+        return id;
+    }
+
+    public void setID(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name.getValue();
+    }
+
+    public String getToken() {
+        return token.getValue();
     }
 }

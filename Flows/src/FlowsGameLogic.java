@@ -7,6 +7,7 @@ import server.config.FileParam;
 import server.config.IntegerParam;
 import server.config.Param;
 import server.core.GameLogic;
+import server.core.GameServer;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,21 +53,23 @@ public class FlowsGameLogic implements GameLogic {
 
     private static final Param[] GAME_PARAMETERS = {PARAM_NUM_TURNS, PARAM_CLIENT_TIMEOUT, PARAM_TURN_TIMEOUT, PARAM_MAP};
 
-    public static void main(String[] args) {
-        Server server = new Server(FlowsGameLogic::new, args);
-        try {
-            Thread.sleep(1000);
-            server.newGame(new String[]{"save.txt"}, 10000, Integer.MAX_VALUE);
-            server.getGameHandler().getClientNetwork().waitForClient(0);
-//            server.getGameHandler().start();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+    public static void main(String[] args) throws IOException {
+        GameServer gameServer = new GameServer(new FlowsGameLogic(), args);
     }
 
     @Override
     public int getClientsNum() {
         return 2;
+    }
+
+    @Override
+    public long getClientResponseTimeout() {
+        return PARAM_CLIENT_TIMEOUT.getValue();
+    }
+
+    @Override
+    public long getTurnTimeout() {
+        return PARAM_TURN_TIMEOUT.getValue();
     }
 
     @Override
@@ -103,12 +106,6 @@ public class FlowsGameLogic implements GameLogic {
         Object[] args1 = {1, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1)};
         msg[1] = new Message(name1, args1);
         return msg;
-    }
-
-    @Override
-    public ClientInfo[] getClientInfo() {
-        System.err.println(this.context.getClientsInfo().length);
-        return this.context.getClientsInfo();
     }
 
     private void wait(String s, long time){

@@ -9,6 +9,7 @@ import server.network.UINetwork;
 import util.Log;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
@@ -27,49 +28,53 @@ import java.util.concurrent.LinkedBlockingQueue;
  * (OutputController).
  * The sequence of the creation and running the operations of this class will be through the call of the following
  * methods.
- * {@link server.core.GameHandler#init() init()}, {@link server.core.GameHandler#start() start()} and then at the
+ * {@link GameServer#init() init()}, {@link GameServer#start() start()} and then at the
  * moment the external terminal user wants to shut down the games loop (except than waiting for the
  * {@link server.core.GameLogic GameLogic} to flag the end of the game), the
- * {@link server.core.GameHandler#shutdown() shutdown()} method would be called.
- * Note that shutting down the {@link server.core.GameHandler GameHandler} will not immediately stop the threads,
+ * {@link GameServer#shutdown() shutdown()} method would be called.
+ * Note that shutting down the {@link GameServer GameServer} will not immediately stop the threads,
  * actually it will set a shut down request flag in the class, which will closes the thread in the aspect of
  * accepting more inputs, and the terminate the threads as soon as the operation queue got empty.
  * </p>
  */
-public class GameHandler {
-
-//    private final long GAME_LOGIC_SIMULATE_TIMEOUT;
-//    private final long GAME_LOGIC_TURN_TIMEOUT;
-//    private final long CLIENT_RESPONSE_TIME;
-
+public class GameServer {
     private ClientNetwork mClientNetwork;
     private UINetwork mUINetwork;
     private GameLogic mGameLogic;
     private OutputController mOutputController;
+    private final int mClientsNum;
     private ClientConfig[] mClientConfigs;
 
     private Loop mLoop;
     BlockingQueue<Event> terminalEventsQueue;
 
     /**
-     * Constructor of the {@link server.core.GameHandler GameHandler}, connects the handler to the Clients through
+     * Constructor of the {@link GameServer GameServer}, connects the handler to the Clients through
      * {@link server.network.ClientNetwork ClientNetwork} and to the UI through
      * {@link server.network.UINetwork UINetwork}.
      * <p>
-     * The constructor accepts the instances of {@link server.core.GameHandler GameHandler} and
+     * The constructor accepts the instances of {@link GameServer GameServer} and
      * {@link server.network.ClientNetwork ClientNetwork} classes. Then sets some configurations of the loops
      * within the "turn_timeout.conf" file ({@see https://github.com/JavaChallenge/JGFramework/wiki wiki}).
      * </p>
      */
-    public GameHandler() {
+    public GameServer(GameLogic gameLogic, String[] cmdArgs) throws IOException {
+        Configs.handleCMDArgs(cmdArgs);
+        mGameLogic = gameLogic;
+        mClientsNum = mGameLogic.getClientsNum();
+        setClientConfigs();
         mClientNetwork = new ClientNetwork();
-        mUINetwork = new UINetwork(Configs.PARAM_UI_TOKEN.getValue());
+        mUINetwork = new UINetwork();
         terminalEventsQueue = new LinkedBlockingQueue<>();
+        init();
+        initGame();
+    }
 
-//        Configs.TimeConfig timeConfig = Configs.getConfigs().turnTimeout;
-//        GAME_LOGIC_SIMULATE_TIMEOUT = timeConfig.simulateTimeout;
-//        CLIENT_RESPONSE_TIME = timeConfig.clientResponseTime;
-//        GAME_LOGIC_TURN_TIMEOUT = timeConfig.turnTimeout;
+    private void setClientConfigs() {
+        int clientsNum = mGameLogic.getClientsNum();
+        for (int i = 0; i < clientsNum; i++) {
+            Configs.CLIENT_CONFIGS.add(new ClientConfig());
+        }
     }
 
     /**
@@ -91,54 +96,54 @@ public class GameHandler {
                 outputHandlerConfig.bufferSize);
     }
 
-    /**
-     * Setter of the game logic, will set the main game engine of the {@link server.core.GameHandler GameHandler} to
-     * the given instance of {@link server.core.GameLogic GameLogic}.
-     *
-     * @param gameLogic The given instance of the {@link server.core.GameLogic GameLogic} to set in the object.
-     */
+    private void initGame() throws IOException {
+        for (int i = 0; i < mClientsNum; ++i) {
+            int id = mClientNetwork.defineClient(mClientConfigs[i].getToken());
+            if (id != i) {
+                throw new RuntimeException("Client ID and client order does not match");
+            }
+            mClientConfigs[i].setID(id);
+        }
 
-    public void setGameLogic(GameLogic gameLogic) {
-        mGameLogic = gameLogic;
-    }
+        if (Configs.PARAM_UI_ENABLE.getValue()) {
+            mUINetwork.listen(Configs.PARAM_UI_PORT.getValue());
+            mClientNetwork.listen(Configs.PARAM_CLIENTS_PORT.getValue());
 
-    /**
-     * Getter of the {@link server.network.ClientNetwork ClientNetwork} class which is used to contact to the clients
-     * through it.
-     *
-     * @return The {@link server.network.ClientNetwork ClientNetwork} instance used to connect to clients
-     */
-    public ClientNetwork getClientNetwork() {
-        return mClientNetwork;
-    }
+            try {
+                mUINetwork.waitForClient(Configs.PARAM_UI_CONNECTIONS_TIMEOUT.getValue());
+            } catch (InterruptedException e) {
+                throw new RuntimeException("Waiting for ui clients interrupted");
+            }
 
-    /**
-     * Getter of the {@link server.network.UINetwork UINetwork} class instance, which is used in order to connect to
-     * the UI.
-     *
-     * @return Instance of {@link server.network.UINetwork UINetwork} class, used to send messages to user interface
-     */
-    public UINetwork getUINetwork() {
-        return mUINetwork;
-    }
+            try {
+                mClientNetwork.waitForAllClients(Configs.PARAM_CLIENTS_CONNECTIONS_TIMEOUT.getValue());
+            } catch (InterruptedException e) {
+                throw new RuntimeException("Waiting for clients interrupted");
+            }
 
-    /**
-     * Getter of the {@link server.core.OutputController} class instance.
-     *
-     * @return output controller
-     */
-    public OutputController getOutputController() {
-        return mOutputController;
-    }
+            Message initialMessage = mGameLogic.getUIInitialMessage();
+            mUINetwork.sendBlocking(initialMessage);
 
-    /**
-     * Setter of the {@link server.core.model.ClientInfo ClientInfo} instance stored in the class in order to recognize
-     * the clients from each other
-     *
-     * @param clientsInfo Array of information of the clients held in the class
-     */
-    public void setClientsInfo(ClientInfo[] clientsInfo) {
-        mClientsInfo = clientsInfo;
+            Message[] initialMessages = mGameLogic.getClientInitialMessages();
+            for (int i = 0; i < initialMessages.length; ++i) {
+                mClientNetwork.queue(i, initialMessages[i]);
+            }
+            mClientNetwork.sendAllBlocking();
+        } else {
+            mClientNetwork.listen(Configs.PARAM_CLIENTS_PORT.getValue());
+
+            try {
+                mClientNetwork.waitForAllClients(Configs.PARAM_CLIENTS_CONNECTIONS_TIMEOUT.getValue());
+            } catch (InterruptedException e) {
+                throw new RuntimeException("Waiting for clients interrupted");
+            }
+
+            Message[] initialMessages = mGameLogic.getClientInitialMessages();
+            for (int i = 0; i < initialMessages.length; ++i) {
+                mClientNetwork.queue(i, initialMessages[i]);
+            }
+            mClientNetwork.sendAllBlocking();
+        }
     }
 
     /**
@@ -195,11 +200,11 @@ public class GameHandler {
          * The run method of the {@link java.lang.Runnable Runnable} interface which will create a
          * {@link java.util.concurrent.Callable Callable} instance and call it in a while until the finish flag if the
          * game had been raised or the shutdown request sent to the class (through
-         * {@link server.core.GameHandler.Loop#shutdown() shutdown()} method)
+         * {@link GameServer.Loop#shutdown() shutdown()} method)
          */
         @Override
         public void run() {
-            clientEvents = new Event[mClientsInfo.length][];
+            clientEvents = new Event[mClientsNum][];
             for (int i = 0; i < clientEvents.length; i++) {
                 clientEvents[i] = new Event[0];
             }
@@ -219,7 +224,7 @@ public class GameHandler {
                     if (mGameLogic.isGameFinished()) {
                         mGameLogic.terminate();
                         Message shutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
-                        for (int i = 0; i < mClientsInfo.length; i++) {
+                        for (int i = 0; i < mClientsNum; i++) {
                             mClientNetwork.queue(i, shutdown);
                         }
                         mLoop.shutdown();
@@ -242,17 +247,18 @@ public class GameHandler {
                 long elapsedTime = System.currentTimeMillis();
                 environmentEvents = mGameLogic.makeEnvironmentEvents();
                 elapsedTime = System.currentTimeMillis() - elapsedTime;
-                if (CLIENT_RESPONSE_TIME - elapsedTime > 0) {
+                long timeout = mGameLogic.getClientResponseTimeout();
+                if (timeout - elapsedTime > 0) {
                     try {
-                        Thread.sleep(CLIENT_RESPONSE_TIME - elapsedTime);
+                        Thread.sleep(timeout - elapsedTime);
                     } catch (InterruptedException e) {
                         throw new RuntimeException("Waiting for clients interrupted");
                     }
                 }
                 mClientNetwork.stopReceivingAll();
 
-                clientEvents = new Event[mClientsInfo.length][];
-                for (int i = 0; i < mClientsInfo.length; ++i) {
+                clientEvents = new Event[mClientsNum][];
+                for (int i = 0; i < mClientsNum; ++i) {
                     clientEvents[i] = mClientNetwork.getReceivedEvent(i);
                 }
 
@@ -272,14 +278,14 @@ public class GameHandler {
                     e.printStackTrace();
                 }
                 long end = System.currentTimeMillis();
-                long remaining = GAME_LOGIC_TURN_TIMEOUT - (end - start);
+                long remaining = mGameLogic.getTurnTimeout() - (end - start);
                 if (remaining <= 0) {
-                    Log.i("GameHandler", "Simulation timeout passed!");
+                    Log.i("GameServer", "Simulation timeout passed!");
                 } else {
                     try {
                         Thread.sleep(remaining);
                     } catch (InterruptedException e) {
-                        Log.i("GameHandler", "Loop interrupted!");
+                        Log.i("GameServer", "Loop interrupted!");
                         break;
                     }
                 }
@@ -291,7 +297,7 @@ public class GameHandler {
         }
 
         /**
-         * Will set the shutdown request flag in order to finish the main {@link server.core.GameHandler.Loop Loop} at
+         * Will set the shutdown request flag in order to finish the main {@link GameServer.Loop Loop} at
          * the first possible turn
          */
         public void shutdown() {

@@ -51,7 +51,7 @@ public class ClientHandler {
     /**
      * Last valid message which is arrived on time.
      */
-    private Message lastValidatedMessage;
+    private final ArrayList<Message> receivedMessages;
 
     /**
      * Last message received from client.
@@ -84,6 +84,7 @@ public class ClientHandler {
      */
     public ClientHandler() {
         messagesToSend = new LinkedBlockingDeque<>();
+        receivedMessages = new ArrayList<>();
         messagesQueued = new ArrayList<>();
         clientLock = new Object();
         messageNotifier = new Object();
@@ -102,7 +103,7 @@ public class ClientHandler {
     }
 
     /**
-     * Sends last queued message.
+     * Sends all queued messages (non-blocking).
      */
     public void send() {
         synchronized (messagesQueued) {
@@ -119,6 +120,10 @@ public class ClientHandler {
             while (!terminateFlag) {
                 try {
                     Message msg = messagesToSend.take();
+                    if (terminateFlag)
+                        return;
+                    if (msg == null)
+                        continue;
                     client.send(msg);
                 } catch (Exception e) {
                     Log.i(TAG, "Message sending failure", e);
@@ -128,21 +133,19 @@ public class ClientHandler {
     }
 
     /**
-     * Removes last validated message.
-     */
-    public void clearLastValidatedMessage() {
-        lastValidatedMessage = null;
-    }
-
-    /**
      * A message is valid if it is arrived in a valid time, which is determined
      * by the server.
      *
      * @return last validated message.
      * @see #getReceiver
      */
-    public Message getLastValidatedMessage() {
-        return lastValidatedMessage;
+    public Message[] getReceivedMessages() {
+        Message[] messages;
+        synchronized (receivedMessages) {
+            messages = receivedMessages.toArray(new Message[receivedMessages.size()]);
+            receivedMessages.clear();
+        }
+        return messages;
     }
 
     /**
@@ -170,7 +173,7 @@ public class ClientHandler {
      * The result of method is a {@link Runnable} object. When this
      * runnable is called it receives a new message from the client and if it
      * arrives in a valid time (which is checked using <code>timeValidator</code>)
-     * stores it in {@link #lastValidatedMessage}.
+     * stores it in {@link #receivedMessages}.
      *
      * @param timeValidator <code>get</code> method of this object returns
      *                      true if and only if it is called in a valid time.
@@ -183,12 +186,11 @@ public class ClientHandler {
         return () -> {
             while (!terminateFlag) {
                 try {
-                    waitForClient();
                     receive();
-                    if (timeValidator.get())
-                        lastValidatedMessage = lastReceivedMessage;
-                } catch (InterruptedException e) {
-                    Log.i(TAG, "waiting for client interrupted", e);
+                    if (timeValidator.get() && lastReceivedMessage != null)
+                        synchronized (receivedMessages) {
+                            receivedMessages.add(lastReceivedMessage);
+                        }
                 } catch (IOException e) {
                     Log.i(TAG, "message receiving failure", e);
                     handleIOE(e);
@@ -205,6 +207,7 @@ public class ClientHandler {
      * @throws java.io.IOException if an I/O error occurs.
      */
     private void receive() throws IOException {
+        lastReceivedMessage = null;
         if (terminateFlag)
             return;
         lastReceivedMessage = client.get(Message.class);
@@ -276,13 +279,7 @@ public class ClientHandler {
      * changes a flag.
      */
     public void terminate() {
-        try {
-            terminateFlag = true;
-            if (client != null)
-                client.close();
-        } catch (IOException e) {
-            Log.i(TAG, "Socket closing failure.", e);
-        }
+        terminateFlag = true;
     }
 
     /**

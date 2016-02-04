@@ -101,10 +101,12 @@ public class ClientNetwork extends NetServer {
      */
     private ClientHandler newClient() {
         ClientHandler client = new ClientHandler();
-        Runnable receiver = client.getReceiver(() -> receiveTimeFlag);
-        receiveExecutor.submit(receiver);
         sendExecutor.submit(client.getSender());
         return client;
+    }
+
+    public boolean timeValidator() {
+        return receiveTimeFlag;
     }
 
     /**
@@ -184,7 +186,6 @@ public class ClientNetwork extends NetServer {
      * @see {@link #stopReceivingAll}
      */
     public void startReceivingAll() {
-        mClients.forEach(server.network.ClientHandler::clearLastValidatedMessage);
         receiveTimeFlag = true;
     }
 
@@ -195,8 +196,8 @@ public class ClientNetwork extends NetServer {
      * @return last valid message or <code>null</code> if there is no valid msg
      * @see {@link #defineClient}
      */
-    public Message getReceivedMessage(int clientID) {
-        return mClients.get(clientID).getLastValidatedMessage();
+    public Message[] getReceivedMessages(int clientID) {
+        return mClients.get(clientID).getReceivedMessages();
     }
 
     /**
@@ -204,25 +205,26 @@ public class ClientNetwork extends NetServer {
      *
      * @param clientID ID of the client
      * @return last valid event or <code>null</code> if there is no valid event
-     * @see {@link #getReceivedMessage}
+     * @see {@link #getReceivedMessages}
      */
-    public Event[] getReceivedEvent(int clientID) {
-        Message msg = getReceivedMessage(clientID);
-        Event[] events = new Event[0];
-        try {
+    public Event[] getReceivedEvents(int clientID) {
+        Message[] messages = getReceivedMessages(clientID);
+        ArrayList<Event> allEvents = new ArrayList<>();
+        for (Message msg : messages) {
+            try {
             /*JsonArray eventArray = ((JsonElement)msg.args[0]).getAsJsonArray();
             events = new Event[eventArray.size()];
             for (int i = 0; i < events.length; i++)
                 events[i] = gson.fromJson(eventArray.get(i), Event.class);*/
-            if (msg != null)
-                events = new Event[msg.args.size()];
-            for (int i = 0; i < events.length; i++) {
-                events[i] = Json.GSON.fromJson(msg.args.get(i), Event.class);
+                int size = msg.args.size();
+                for (int i = 0; i < size; i++) {
+                    allEvents.add(gson.fromJson(msg.args.get(i), Event.class));
+                }
+            } catch (Exception e) {
+                Log.i(TAG, "Error getting received messages.", e);
             }
-        } catch (Exception e) {
-            Log.e(TAG, "Error getting received messages.", e);
         }
-        return events;
+        return allEvents.toArray(new Event[allEvents.size()]);
     }
 
     @Override
@@ -373,6 +375,13 @@ public class ClientNetwork extends NetServer {
     public void terminate() {
         super.terminate();
         acceptExecutor.shutdownNow();
+    }
+
+    public void shutdownAll() {
+        Message shutdown = new Message(Message.NAME_SHUTDOWN, new Object[] {});
+        mClients.forEach(c -> c.queue(shutdown));
+        sendAllBlocking();
+        mClients.forEach(ClientHandler::terminate);
     }
 
 }

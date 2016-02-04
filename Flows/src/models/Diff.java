@@ -64,7 +64,7 @@ public class Diff {
                         tempArmyCount = 1;
                     else if(this.prev_armyCount[i] <= max_normal)
                         tempArmyCount = 2;
-                    else if(this.prev_armyCount[i] <= max_huge)
+                    else if(this.prev_armyCount[i] > max_normal)
                         tempArmyCount = 3;
                 }
                 diff.add(new DiffReport(i, this.prev_ownership[i], tempArmyCount));

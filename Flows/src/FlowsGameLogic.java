@@ -18,21 +18,27 @@ public class FlowsGameLogic implements GameLogic {
     final static int escapeNum = 1;
     final static int increaseWithOwnership = 1;
     final static int increaseWithEdge = 1;
-    final static double highCasualties = 1.0;
-    final static double mediumCasualties = 2.0 / 3.0;
-    final static double lowCasualties = 1.0 / 3.0;
+	final static double highCasualties = 1.0;
+	final static double mediumCasualties = 2.0 / 3.0;
+	final static double lowCasualties = 1.0 / 3.0;
     final static int MAX_TURN = 100;
+	
+	//Temps
+	int vertexNum;
+	int[] armyCount;
+	int[] ownership;
+	boolean[][] graph;
+	int[][] adjacencyList;
 
-    //Temps
-    int vertexNum;
-    int[] armyCount;
-    int[] ownership;
-    boolean[][] graph;
-    int[][] adjacencyList;
+	int[] movesDest;
+	int[] movesSize;
+	int[][] armyInV;
 
-    int[] movesDest;
-    int[] movesSize;
-    int[][] armyInV;
+    private ArrayList<Message> uiMessages;
+
+    private static final String RESOURCE_PATH_CLIENTS = "resources/mitosis/clients.conf";
+    private static final Charset CONFIG_ENCODING = Charset.forName("UTF-8");
+    private static final String RESOURCE_PATH_GAME = "resources/mitosis/game.conf";
 
     public static final IntegerParam PARAM_NUM_TURNS = new IntegerParam("turns", 100);
     public static final IntegerParam PARAM_CLIENT_TIMEOUT = new IntegerParam("clientTimeout", 500);
@@ -90,49 +96,60 @@ public class FlowsGameLogic implements GameLogic {
 
     private void wait(String s, long time) {
         System.err.println(s);
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(time);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
     public void simulateEvents(Event[] terminalEvent, Event[] environmentEvent, Event[][] clientsEvent) {
         wait("simulate", 0);
         armyCount = this.context.getMap().getArmyCount();
-        ownership = this.context.getMap().getOwnership();
-
-        movesDest = new int[vertexNum];
-        movesSize = new int[vertexNum];
-        armyInV = new int[2][vertexNum];
-        for (int i = 0; i < vertexNum; i++) {
-            movesDest[i] = -1;
-            if (ownership[i] > -1) {
-                armyInV[ownership[i]][i] = armyCount[i];
-            }
-        }
-        // args0: source, args1: destination, args2: army size
-        for (int j = 0; j < 2; j++) {
+		ownership = this.context.getMap().getOwnership();
+		
+		movesDest = new int[vertexNum];
+		movesSize = new int[vertexNum];
+		armyInV = new int[2][vertexNum];
+		for (int i = 0; i < vertexNum; i++) {
+			movesDest[i] = -1;
+			if (ownership[i] > -1) {
+				armyInV[ownership[i]][i] = armyCount[i];
+			}
+		}
+		// args0: source, args1: destination, args2: army size		
+		for (int j = 0; j < 2; j++) {
             if (clientsEvent[j] == null)
                 continue;
-            for (int i = clientsEvent[j].length - 1; i > -1; i--) {
-                int src = -1;
-                int dst = -1;
-                int armySize = -1;
-                try {
-                    src = Integer.valueOf(clientsEvent[j][i].getArgs()[0]);
-                    dst = Integer.valueOf(clientsEvent[j][i].getArgs()[1]);
-                    armySize = Integer.valueOf(clientsEvent[j][i].getArgs()[2]);
-                } catch (Exception e) {
+			for (int i = clientsEvent[j].length - 1; i > -1; i--) {
+				int src = -1;
+				int dst = -1;
+				int armySize = -1;
+				try{
+					src = Integer.valueOf(clientsEvent[j][i].getArgs()[0]);
+					dst = Integer.valueOf(clientsEvent[j][i].getArgs()[1]);
+					armySize = Integer.valueOf(clientsEvent[j][i].getArgs()[2]);
+				} catch (Exception e) {
                     System.out.println("Event is BBAADDDD :D");
                 }
-                if (movesDest[src] < 0 && isMoveValid(src, dst, armySize, j)) {
-                    movesDest[src] = dst;
-                    movesSize[src] = armySize;
-                    armyInV[j][src] -= armySize;
-                    if (movesDest[dst] == src && ownership[dst] != ownership[src]) {
+				if (movesDest[src] < 0 && isMoveValid(src, dst, armySize, j)) {
+					movesDest[src] = dst;
+					movesSize[src] = armySize;
+					armyInV[j][src] -= armySize;
+					if (movesDest[dst] == src  && ownership[dst] != ownership[src]) {
                         int[] battleInfo = doBattle('e', dst, src, movesSize[dst], armySize);
+
+                        conflictedMoves[src] = 1;
+                        conflictedMoves[dst] = 1;
+
+                        // type: edgeBattle
+                        // args in order: winner node, looser node, winner initial army, size of alive army of winner after battle, casualties of looser
+                        if (ownership[src] == battleInfo[0])
+                            addUIMessage("1", new Object[]{src, dst, movesSize[src], battleInfo[1], movesSize[dst]});
+                        else if (ownership[dst] == battleInfo[0])
+                            addUIMessage("1", new Object[]{dst, src, movesSize[dst], battleInfo[1], movesSize[src]});
+
                         if (ownership[src] == battleInfo[0]) {
                             movesSize[src] = battleInfo[1];
                         } else if (ownership[dst] == battleInfo[0]) {
@@ -141,123 +158,146 @@ public class FlowsGameLogic implements GameLogic {
                             movesSize[src] = 0;
                             movesSize[dst] = 0;
                         }
-                    }
-                }
-            }
-        }
+					}
+				}
+			}
+		}
 
-        for (int i = 0; i < vertexNum; i++) {
-            if (ownership[i] > -1 && movesDest[i] > -1)
+		for (int i = 0; i < vertexNum; i++) {
+			if (ownership[i] > -1 && movesDest[i] > -1)
                 armyInV[ownership[i]][movesDest[i]] += movesSize[i];
-        }
 
-        //escapes
-        for (int i = 0; i < vertexNum; i++) {
-            if (armyInV[0][i] != 0 && armyInV[1][i] != 0) {
-                if (armyInV[0][i] < armyInV[1][i]) {
-                    for (int j = 0; j < adjacencyList[i].length; j++) {
-                        if (ownership[adjacencyList[i][j]] == 0 && armyInV[0][i] >= escapeNum) {
-                            armyInV[0][i] -= escapeNum;
-                            armyInV[0][adjacencyList[i][j]] += escapeNum;
-                        }
-                    }
-                } else if (armyInV[0][i] > armyInV[1][i]) {
-                    for (int j = 0; j < adjacencyList[i].length; j++) {
-                        if (ownership[adjacencyList[i][j]] == 1 && armyInV[1][i] >= escapeNum) {
-                            armyInV[1][i] -= escapeNum;
-                            armyInV[1][adjacencyList[i][j]] += escapeNum;
-                        }
-                    }
+                if (conflictedMoves[i] == 0) {
+                    // type: nonConflictedMove
+                    // args in order: source node, destination node, owner, army size
+                    addUIMessage("2", new Object[]{i, movesDest[i], ownership[i], movesSize[i]});
                 }
+
             }
         }
+		
+		//escapes
+		for (int i = 0; i < vertexNum; i++) {
+			if (armyInV[0][i] != 0 && armyInV[1][i] != 0) {
+				if (armyInV[0][i] < armyInV[1][i]) {
+					for (int j = 0; j < adjacencyList[i].length; j++) {
+						if (ownership[adjacencyList[i][j]] == 0 && armyInV[0][i] >= escapeNum) {
+							armyInV[0][i] -= escapeNum;
+							armyInV[0][adjacencyList[i][j]] += escapeNum;
+						}
+					}
+				} else if (armyInV[0][i] > armyInV[1][i]) {
+					for (int j = 0; j < adjacencyList[i].length; j++) {
+						if (ownership[adjacencyList[i][j]] == 1 && armyInV[1][i] >= escapeNum) {
+							armyInV[1][i] -= escapeNum;
+							armyInV[1][adjacencyList[i][j]] += escapeNum;
+						}
+					}
+				}
+			}
+		}
 
-        //battles
-        for (int i = 0; i < vertexNum; i++) {
-            if (armyInV[0][i] != 0 && armyInV[1][i] != 0) {
-                int[] battleInfo = doBattle('v', i, -1, armyInV[0][i], armyInV[1][i]);
-                if (battleInfo[0] > -1) {
+		//battles
+		for (int i = 0; i < vertexNum; i++) {
+			if (armyInV[0][i] != 0 && armyInV[1][i] != 0) {
+				int[] battleInfo = doBattle('v', i, -1, armyInV[0][i], armyInV[1][i]);
+				if (battleInfo[0] > -1) {
                     if (ownership[i] != battleInfo[0])
                         armyInV[battleInfo[0]][i] = battleInfo[1] + increaseWithOwnership;
-                    else
+
+                        // type: increaseWithOwnership
+                        // args in order: node, amount
+                        addUIMessage("5", new Object[]{i, increaseWithOwnership});
+
+                    } else {
                         armyInV[battleInfo[0]][i] = battleInfo[1];
+                    }
                     ownership[i] = battleInfo[0];
                     armyInV[(ownership[i] - 1) * -1][i] = 0;
                 } else {
                     armyInV[0][i] = 0;
                     armyInV[1][i] = 0;
                 }
-            }
+			}
             armyCount[i] = Math.max(armyInV[0][i], armyInV[1][i]);
-            if (ownership[i] == -1) {
+            if (ownership[i] ==  -1) {
                 if (armyInV[0][i] != 0)
                     ownership[i] = 0;
-                else if (armyInV[1][i] != 0)
+                    armyCount[i] += increaseWithOwnership;
+                    addUIMessage("5", new Object[]{i, increaseWithOwnership});
+                } else if (armyInV[1][i] != 0) {
                     ownership[i] = 1;
+                    armyCount[i] += increaseWithOwnership;
+                    addUIMessage("5", new Object[]{i, increaseWithOwnership});
+                }
             }
-        }
+		}
 
         //increase army
         for (int i = 0; i < vertexNum; i++) {
             if (ownership[i] == -1)
                 continue;
             for (int j = 0; j < adjacencyList[i].length; j++) {
-                if (ownership[adjacencyList[i][j]] == ownership[i])
+                if (ownership[adjacencyList[i][j]] == ownership[i]) {
                     armyCount[i] += increaseWithEdge;
+                    addUIMessage("6", new Object[]{i, increaseWithEdge});
+                }
             }
         }
-    }
 
-    boolean isMoveValid(int src, int dst, int armySize, int clientNum) {
-        if (src < 0 || src > vertexNum - 1)
-            return false;
-        if (dst < 0 || dst > vertexNum - 1)
-            return false;
-        if (clientNum != ownership[src])
-            return false;
-        if (!graph[src][dst])
-            return false;
-        if (armySize > armyCount[src])
-            return false;
-        return true;
+        Message uiMessage = new Message(Message.NAME_TURN, uiMessages.toArray());
     }
+	
+	boolean isMoveValid(int src, int dst, int armySize, int clientNum) {
+		if (src < 0 || src > vertexNum - 1)
+			return false;
+		if (dst < 0 || dst > vertexNum - 1)
+			return false;
+		if (clientNum != ownership[src])
+			return false;
+		if (!graph[src][dst])
+			return false;
+		if (armySize > armyCount[src])
+			return false;
+		return true;
+	}
+	
+	// an array with size three, first member is winner, second one is number of alive soldiers of winner
+	int[] doBattle(char type, int endp0, int endp1, int armySize0, int armySize1) {
+		if (armySize0 == armySize1) {
+			return new int[]{-1, 0};
+		} else {
+			int[] output = new int[2];
+			int more, less;
+			if (armySize0 > armySize1) {
+				output[0] = 0;
+				more = armySize0;
+				less = armySize1;
+			} else {
+				output[0] = 1;
+				more = armySize1;
+				less = armySize0;
+			}
+			if (qualAmount(more) == qualAmount(less)) {
+				output[1] = more - (int)Math.ceil(less * highCasualties);
+			} else if (qualAmount(more) - 1 == qualAmount(less)) {
+				output[1] = more - (int)Math.ceil(less * mediumCasualties);
+			} else if (qualAmount(more) - 2 == qualAmount(less)) {
+				output[1] = more - (int)Math.ceil(less * lowCasualties);
+			}
+			return output;
+		}
+	}
 
-    // an array with size three, first member is winner, second one is number of alive soldiers of winner
-    int[] doBattle(char type, int endp0, int endp1, int armySize0, int armySize1) {
-        if (armySize0 == armySize1) {
-            return new int[]{-1, 0};
-        } else {
-            int[] output = new int[2];
-            int more, less;
-            if (armySize0 > armySize1) {
-                output[0] = 0;
-                more = armySize0;
-                less = armySize1;
-            } else {
-                output[0] = 1;
-                more = armySize1;
-                less = armySize0;
-            }
-            if (qualAmount(more) == qualAmount(less)) {
-                output[1] = more - (int) Math.ceil(less * highCasualties);
-            } else if (qualAmount(more) - 1 == qualAmount(less)) {
-                output[1] = more - (int) Math.ceil(less * mediumCasualties);
-            } else if (qualAmount(more) - 2 == qualAmount(less)) {
-                output[1] = more - (int) Math.ceil(less * lowCasualties);
-            }
-            return output;
-        }
-    }
-
-    char qualAmount(int amount) {
-        if (amount < 10) {
-            return 'l';
-        } else if (amount < 20) {
-            return 'm';
-        } else {
-            return 'h';
-        }
-    }
+	char qualAmount(int amount) {
+		if (amount < 10) {
+			return 'l';
+		} else if (amount < 20) {
+			return 'm';
+		} else {
+			return 'h';
+		}
+	}
 
     @Override
     public void generateOutputs() {

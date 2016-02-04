@@ -1,6 +1,7 @@
 package server.core;
 
 import network.data.Message;
+import server.config.Configs;
 import server.exceptions.OutputControllerQueueOverflowException;
 import server.network.UINetwork;
 
@@ -55,50 +56,24 @@ public class OutputController implements Runnable {
      * Note that this will raise a runtime exception, in the case of invalid arguments.
      * </p>
      *
-     * @param sendToUI     Indicates that data will be sent to given {@link server.network.UINetwork UINetwork} instance
-     *                     or not
      * @param uiNetwork    The given instance of {@link server.network.UINetwork UINetwork} class to send data to
-     * @param timeInterval The indicated timer tick which triggers
-     *                     {@link server.core.OutputController.UINetworkSender#sendToUINetwork(network.data.Message)
-     *                     sendToUINetwork(Message)} method
-     * @param sendToFile   Indicates that a log of output will be saved in the given {@link java.io.File java.io.File} or
-     *                     not
-     * @param outputFile   The given {@link java.io.File java.io.File} to save data within
-     * @param bufferSize   The preferred number of message elements to be held on memory before writing to file
      */
-    public OutputController(boolean sendToUI, UINetwork uiNetwork, int timeInterval
-            , boolean sendToFile, File outputFile, int bufferSize) {
+    public OutputController(UINetwork uiNetwork) {
         messagesQueue = new LinkedList<>();
-        this.sendToUI = sendToUI;
+        this.sendToUI = Configs.PARAM_OC_SEND_TO_UI.getValue();
         if (sendToUI) {
-            if (uiNetwork != null) {
-                this.uiNetwork = uiNetwork;
-            } else {
-                throw new RuntimeException("The given parameter as uiNetwork is null");
-            }
-
-            if (timeInterval > 0) {
-                this.timeInterval = timeInterval;
-            } else {
-                throw new RuntimeException("The given parameter as timeInterval is invalid");
-            }
+            this.uiNetwork = uiNetwork;
+            this.timeInterval = Configs.PARAM_OC_TIME_INTERVAL.getValue();
         }
-        this.sendToFile = sendToFile;
+        this.sendToFile = Configs.PARAM_OC_SEND_TO_FILE.getValue();
         if (sendToFile) {
-            this.outputFile = outputFile;
+            this.outputFile = new File(Configs.PARAM_OC_FILE_PATH.getValue());
             try {
                 this.outputFile.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException("Could not create log file");
             }
-
-            if (bufferSize > 0 && bufferSize <= QUEUE_DEFAULT_SIZE) {
-                this.bufferSize = bufferSize;
-            } else if (bufferSize > 0) {
-                throw new RuntimeException("The given parameter as bufferSize is greater than max queue size");
-            } else {
-                throw new RuntimeException("The given parameter as bufferSize is not valid");
-            }
+            this.bufferSize = Configs.PARAM_OC_BUFFER_SIZE.getValue();
         }
     }
 

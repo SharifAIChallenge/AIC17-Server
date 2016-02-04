@@ -5,7 +5,7 @@ import java.io.File;
 /**
  * Copyright (C) 2016 Hadi
  */
-public class FileParam extends Param<File> {
+public class FileParam extends ConfigParam<File> {
     public FileParam(String paramName, File defaultValue) {
         super(paramName, defaultValue);
     }

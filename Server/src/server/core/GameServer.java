@@ -28,7 +28,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * (OutputController).
  * The sequence of the creation and running the operations of this class will be through the call of the following
  * methods.
- * {@link GameServer#init() init()}, {@link GameServer#start() start()} and then at the
+ * {@link GameServer#start() start()} and then at the
  * moment the external terminal user wants to shut down the games loop (except than waiting for the
  * {@link server.core.GameLogic GameLogic} to flag the end of the game), the
  * {@link GameServer#shutdown() shutdown()} method would be called.
@@ -66,34 +66,17 @@ public class GameServer {
         mClientNetwork = new ClientNetwork();
         mUINetwork = new UINetwork();
         terminalEventsQueue = new LinkedBlockingQueue<>();
-        init();
+        mOutputController = new OutputController(mUINetwork);
         initGame();
     }
 
     private void setClientConfigs() {
         int clientsNum = mGameLogic.getClientsNum();
+        mClientConfigs = new ClientConfig[clientsNum];
         for (int i = 0; i < clientsNum; i++) {
-            Configs.CLIENT_CONFIGS.add(new ClientConfig());
+            mClientConfigs[i] = new ClientConfig();
+            Configs.CLIENT_CONFIGS.add(mClientConfigs[i]);
         }
-    }
-
-    /**
-     * Initializes the game handler module based on the given game.
-     * <p>
-     * This method creates needed instance of module {@link server.core.OutputController OutputController} based on
-     * configurations located in the "output_handler.conf" file
-     * ({@see https://github.com/JavaChallenge/JGFramework/wiki wiki}).
-     * Any problem in loading or parsing the configuration JSON files, will result in rising a runtime exception.
-     * </p>
-     */
-    public void init() {
-        Configs.OutputHandlerConfig outputHandlerConfig = Configs.getConfigs().outputHandler;
-        mOutputController = new OutputController(outputHandlerConfig.sendToUI,
-                mUINetwork,
-                outputHandlerConfig.timeInterval,
-                outputHandlerConfig.sendToFile,
-                new File(outputHandlerConfig.filePath),
-                outputHandlerConfig.bufferSize);
     }
 
     private void initGame() throws IOException {

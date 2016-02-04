@@ -1,6 +1,11 @@
 package server.config;
 
+import com.google.gson.JsonObject;
+import network.Json;
+
 import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
 /**
@@ -8,6 +13,7 @@ import java.util.ArrayList;
  */
 public class Configs {
     public static String DEFAULT_CONFIG_PATH = "game.conf";
+    private static JsonObject configFile = null;
 
     // Client Configs
     public static final IntegerParam PARAM_CLIENTS_PORT = new IntegerParam("ClientsPort", 7099);
@@ -20,6 +26,32 @@ public class Configs {
     public static final IntegerParam PARAM_UI_PORT = new IntegerParam("UIPort", 7000);
     public static final IntegerParam PARAM_UI_CONNECTIONS_TIMEOUT = new IntegerParam("UIConnectionTimeout", Integer.MAX_VALUE);
 
+    // Output Controller Configs
+    // Indicates that data will be sent to given {@link server.network.UINetwork UINetwork} instance or not
+    public static final BooleanParam PARAM_OC_SEND_TO_UI = new BooleanParam("OCSendToUI", false);
+    // The indicated timer tick which triggers {@link server.core.OutputController.UINetworkSender#sendToUINetwork(network.data.Message) sendToUINetwork(Message)} method
+    public static final IntegerParam PARAM_OC_TIME_INTERVAL = new IntegerParam("OCTimeInterval", 500);
+    // Indicates that a log of output will be saved in the given {@link java.io.File java.io.File} or not
+    public static final BooleanParam PARAM_OC_SEND_TO_FILE = new BooleanParam("OCSendToFile", false);
+    // The given {@link java.io.File java.io.File} to save data within
+    public static final StringParam PARAM_OC_FILE_PATH = new StringParam("OCFilePath", "./game.log");
+    // The preferred number of message elements to be held on memory before writing to file
+    public static final IntegerParam PARAM_OC_BUFFER_SIZE = new IntegerParam("OCBufferSize", 100);
+
+    public static void setConfigFile(File file) {
+        try {
+            byte[] bytes = Files.readAllBytes(file.toPath());
+            String content = new String(bytes, Charset.forName("UTF-8"));
+            configFile = Json.GSON.fromJson(content, JsonObject.class);
+        } catch (Exception ignore) {
+            configFile = null;
+        }
+    }
+
+    public static JsonObject getConfigFile() {
+        return configFile;
+    }
+
     public static void handleCMDArgs(String[] args) {
         if (args.length != 1)
             return;
@@ -29,6 +61,6 @@ public class Configs {
         File configFile = new File(split[1]);
         if (!configFile.exists())
             configFile = new File(DEFAULT_CONFIG_PATH);
-        Param.setConfigFile(configFile);
+        setConfigFile(configFile);
     }
 }

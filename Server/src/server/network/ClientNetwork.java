@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import model.Event;
 import network.JsonSocket;
 import network.data.Message;
-import server.config.IntegerParam;
-import server.config.Param;
 import util.Log;
 
 import java.util.ArrayList;

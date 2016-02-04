@@ -3,7 +3,7 @@ package server.config;
 /**
  * Copyright (C) 2016 Hadi
  */
-public class BooleanParam extends Param<Boolean> {
+public class BooleanParam extends ConfigParam<Boolean> {
     public BooleanParam(String paramName, Boolean defaultValue) {
         super(paramName, defaultValue);
     }

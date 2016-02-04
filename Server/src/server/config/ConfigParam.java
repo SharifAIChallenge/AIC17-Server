@@ -1,32 +1,17 @@
 package server.config;
 
 import com.google.gson.JsonObject;
-import network.Json;
 
-import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.ArrayList;
 
 /**
  * Copyright (C) 2016 Hadi
  */
-public abstract class Param<T> {
-    private static JsonObject configFile = null;
-    private static ArrayList<Param> allParameters = new ArrayList<>();
+public abstract class ConfigParam<T> {
+    private static ArrayList<ConfigParam> allParameters = new ArrayList<>();
 
-    public static void setConfigFile(File file) {
-        try {
-            byte[] bytes = Files.readAllBytes(file.toPath());
-            String content = new String(bytes, Charset.forName("UTF-8"));
-            configFile = Json.GSON.fromJson(content, JsonObject.class);
-        } catch (Exception ignore) {
-            configFile = null;
-        }
-    }
-
-    public static Param[] getAllParameters() {
-        return allParameters.toArray(new Param[allParameters.size()]);
+    public static ConfigParam[] getAllParameters() {
+        return allParameters.toArray(new ConfigParam[allParameters.size()]);
     }
 
     private String paramName;
@@ -34,7 +19,7 @@ public abstract class Param<T> {
     private T value;
     private boolean cached = false;
 
-    public Param(String paramName, T defaultValue) {
+    public ConfigParam(String paramName, T defaultValue) {
         this.paramName = paramName;
         this.defaultValue = defaultValue;
     }
@@ -44,7 +29,7 @@ public abstract class Param<T> {
             return value;
         if ((value = getValueFromEnv()) != null)
             return value;
-        if ((value = getValueFromJsonObject(configFile)) != null)
+        if ((value = getValueFromJsonObject(Configs.getConfigFile())) != null)
             return value;
         if ((value = getDefaultValue()) != null)
             return value;

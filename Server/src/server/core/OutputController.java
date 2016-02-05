@@ -270,6 +270,8 @@ public class OutputController implements Runnable {
         }
 
         public void queue(Message msg) {
+            if (msg == null) // prevent NullPointerException
+                return;
             messagesQueue.add(msg);
         }
 
@@ -292,8 +294,7 @@ public class OutputController implements Runnable {
             open = true;
             try {
                 while (open) {
-                    while (!messagesQueue.isEmpty())
-                        sendToUINetwork(messagesQueue.pollFirst(1, TimeUnit.SECONDS));
+                    sendToUINetwork(messagesQueue.pollFirst(1, TimeUnit.SECONDS));
                 }
             } catch (InterruptedException ignored) {
             }

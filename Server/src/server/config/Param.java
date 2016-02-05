@@ -1,6 +1,7 @@
 package server.config;
 
 import com.google.gson.JsonObject;
+import util.Log;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -37,8 +38,11 @@ public abstract class Param<T> {
             return value;
         if ((value = getValueFromJsonObject(Configs.getConfigFile())) != null)
             return value;
-        if ((value = getDefaultValue()) != null)
+        if ((value = getDefaultValue()) != null) {
+            if (this == Configs.PARAM_AIC_DEPLOY || Configs.PARAM_AIC_DEPLOY.getValue() == Boolean.TRUE)
+                Log.w("PARAM", "Using default value for parameter " + paramName + ".");
             return value;
+        }
         if (Configs.PARAM_AIC_DEPLOY.getValue() == Boolean.TRUE)
             throw new RuntimeException("Config '" + paramName + "' not found.");
         while (value == null)

@@ -8,14 +8,18 @@ import java.io.StringWriter;
  */
 public final class Log {
 
-    public static final int VERBOSE = 2;
-    public static final int DEBUG = 3;
-    public static final int INFO = 4;
-    public static final int WARN = 5;
-    public static final int ERROR = 6;
+    public static final int VERBOSE = 0;
+    public static final int DEBUG = 1;
+    public static final int INFO = 2;
+    public static final int WARN = 3;
+    public static final int ERROR = 4;
 
     public static final boolean DEV_MODE = System.getenv("AICDev") != null;
     public static final int LOG_LEVEL = DEV_MODE ? VERBOSE : WARN;
+
+    private static final String[] LEVELS = {
+            "Verbose", "Debug", "Info", "Warning", "Error"
+    };
 
     private Log() {
     }
@@ -73,9 +77,9 @@ public final class Log {
         if (priority < LOG_LEVEL)
             return;
         if (DEV_MODE) {
-            System.err.printf("\tpriority=%d,%n\ttag=%s,%n\tmessage=%s%n", priority, tag, msg);
+            System.err.printf("%s (%s): %s%n", LEVELS[priority], tag, msg);
         } else {
-            System.err.println(msg);
+            System.err.println(LEVELS[priority] + ": " + msg);
         }
     }
 
@@ -83,9 +87,9 @@ public final class Log {
         if (priority < LOG_LEVEL)
             return;
         if (DEV_MODE) {
-            System.err.printf("\tpriority=%d,%n\ttag=%s,%n\tmessage=%s%n", priority, tag, msg + '\n' + getStackTraceString(tr));
+            System.err.printf("%s (%s): %s%n", LEVELS[priority], tag, msg + '\n' + getStackTraceString(tr));
         } else {
-            System.err.println(msg);
+            System.err.println(LEVELS[priority] + ": " + msg);
         }
     }
 

@@ -1,5 +1,9 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Copyright (C) 2016 Hadi
@@ -37,7 +41,7 @@ public class UITest {
 
     private JFrame frame = new JFrame();
     private JPanel panel = new JPanel();
-    private final int width = 1000, height = 700;
+    private final int width = 800, height = 600;
     private final int radius = 9, border = 1, edge = 2;
     private int nNodes;
     private Node[] nodes;
@@ -141,6 +145,22 @@ public class UITest {
             this.armyCounts = armyCounts;
         }
         panel.repaint();
+//        saveImage();
+    }
+
+
+    private int step = 0;
+    private void saveImage() {
+        BufferedImage bImg = new BufferedImage(panel.getWidth(), panel.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D cg = bImg.createGraphics();
+        panel.paintAll(cg);
+        try {
+            if (ImageIO.write(bImg, "png", new File(String.format("./screenshot/step%04d.png", step++)))) {
+                System.out.println("-- saved");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 

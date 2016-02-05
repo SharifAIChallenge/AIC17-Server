@@ -159,7 +159,6 @@ public class JsonSocket {
             buffer[total++] = (byte) current;
         }
         String json = new String(buffer, 0, total, ENCODING);
-        System.out.println("mehrdad horny received : " + json);
         T result = null;
         try {
             result = Json.GSON.fromJson(json, classOfInput);

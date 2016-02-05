@@ -329,6 +329,7 @@ public class FlowsGameLogic implements GameLogic {
     @Override
     public void generateOutputs() {
         this.context.flush();
+        this.context.turnUP();
     }
 
     @Override

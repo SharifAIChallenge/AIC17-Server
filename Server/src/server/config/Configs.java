@@ -27,14 +27,14 @@ public class Configs {
     public static final ArrayList<ClientConfig> CLIENT_CONFIGS = new ArrayList<>();
 
     // UI Configs
-    public static final BooleanParam PARAM_UI_ENABLE = new BooleanParam("UIEnable", true);
+    public static final BooleanParam PARAM_UI_ENABLE = new BooleanParam("UIEnable", false);
     public static final StringParam PARAM_UI_TOKEN = new StringParam("UIToken", "00000000000000000000000000000000");
     public static final IntegerParam PARAM_UI_PORT = new IntegerParam("UIPort", 7000);
     public static final IntegerParam PARAM_UI_CONNECTIONS_TIMEOUT = new IntegerParam("UIConnectionTimeout", Integer.MAX_VALUE);
 
     // Output Controller Configs
     // Indicates that data will be sent to given {@link server.network.UINetwork UINetwork} instance or not
-    public static final BooleanParam PARAM_OC_SEND_TO_UI = new BooleanParam("OCSendToUI", true);
+    public static final BooleanParam PARAM_OC_SEND_TO_UI = new BooleanParam("OCSendToUI", false);
     // Indicates that a log of output will be saved in the given {@link java.io.File java.io.File} or not
     public static final BooleanParam PARAM_OC_SEND_TO_FILE = new BooleanParam("OCSendToFile", false);
     // The given {@link java.io.File java.io.File} to save data within

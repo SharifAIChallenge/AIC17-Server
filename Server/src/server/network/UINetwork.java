@@ -161,6 +161,7 @@ public final class UINetwork extends NetServer {
 
     @Override
     public synchronized void listen(int port) {
+        Log.i(TAG, "Listening on port " + port + ".");
         executor = Executors.newCachedThreadPool();
         sendExecutor = Executors.newSingleThreadExecutor();
         super.listen(port);

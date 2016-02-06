@@ -231,6 +231,7 @@ public class ClientNetwork extends NetServer {
         acceptExecutor.submit(() -> {
             try {
                 verifyClient(client);
+                Log.i(TAG, "Client accepted.");
             } catch (Exception e) {
                 // if anything went wrong reject the client!
                 Log.w(TAG, "Client rejected.", e);
@@ -367,6 +368,7 @@ public class ClientNetwork extends NetServer {
 
     @Override
     public void listen(int port) {
+        Log.i(TAG, "Listening on port " + port + ".");
         super.listen(port);
         acceptExecutor = Executors.newCachedThreadPool();
     }

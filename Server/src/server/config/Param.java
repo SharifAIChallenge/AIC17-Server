@@ -34,19 +34,25 @@ public abstract class Param<T> {
     public T getValue() {
         if (value != null || cached)
             return value;
-        if ((value = getValueFromEnv()) != null)
+        if ((value = getValueFromEnv()) != null) {
+            Log.i("PARAM", paramName + "=" + value);
             return value;
-        if ((value = getValueFromJsonObject(Configs.getConfigFile())) != null)
+        }
+        if ((value = getValueFromJsonObject(Configs.getConfigFile())) != null) {
+            Log.i("PARAM", paramName + "=" + value);
             return value;
+        }
         if ((value = getDefaultValue()) != null) {
             if (this == Configs.PARAM_AIC_DEPLOY || Configs.PARAM_AIC_DEPLOY.getValue() == Boolean.TRUE)
                 Log.w("PARAM", "Using default value for parameter " + paramName + ".");
+            Log.i("PARAM", paramName + "=" + value);
             return value;
         }
         if (Configs.PARAM_AIC_DEPLOY.getValue() == Boolean.TRUE)
             throw new RuntimeException("Config '" + paramName + "' not found.");
         while (value == null)
             value = getValueFromUser();
+        Log.i("PARAM", paramName + "=" + value);
         cached = true;
         return value;
     }

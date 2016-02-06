@@ -70,13 +70,13 @@ public class Context {
 
     public int[][] getUIDiffList() {
         ArrayList<DiffReport> diffs = this.differ.getUIDiff();
-        int[][] intDiff = new int[diffs.size()][5];
-        for (int i = 0; i < diffs.size(); i++) {
-            intDiff[i][0] = diffs.get(i).getVertex();
-            intDiff[i][1] = diffs.get(i).getOwner();
-            intDiff[i][2] = diffs.get(i).getArmyCount();
-            intDiff[i][3] = map.getNode(intDiff[i][0]).getX();
-            intDiff[i][4] = map.getNode(intDiff[i][0]).getY();
+        int[][] intDiff = new int[map.getVertexNum()][4];
+        for (DiffReport diff : diffs) {
+            int index = diff.getVertex();
+            intDiff[index][0] = diff.getOwner();
+            intDiff[index][1] = diff.getArmyCount();
+            intDiff[index][2] = map.getNode(index).getX();
+            intDiff[index][3] = map.getNode(index).getY();
         }
         return intDiff;
     }

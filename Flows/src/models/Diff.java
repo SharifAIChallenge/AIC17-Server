@@ -77,9 +77,7 @@ public class Diff {
     public ArrayList<DiffReport> getUIDiff(){
         ArrayList<DiffReport> diff = new ArrayList<>();
         for(int i = 0; i < this.length; i++){
-            if(this.diff_armyCount[i] || this.diff_ownership[i]) {
-                diff.add(new DiffReport(i, this.prev_ownership[i], this.prev_armyCount[i]));
-            }
+            diff.add(new DiffReport(i, this.prev_ownership[i], this.prev_armyCount[i]));
         }
         return diff;
     }

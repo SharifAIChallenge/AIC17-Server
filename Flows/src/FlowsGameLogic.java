@@ -1,4 +1,5 @@
 import model.Event;
+import models.Diff;
 import network.data.Message;
 import server.config.FileParam;
 import server.config.IntegerParam;
@@ -79,7 +80,8 @@ public class FlowsGameLogic implements GameLogic {
     @Override
     public Message getUIInitialMessage() {
         // todo: send army levels (low, medium, high)
-        Object[] args = {this.context.getMap().getAdjacencyList(), this.context.getUIDiffList()};
+        Object[] args = {this.context.getMap().getVertexNum(), Diff.max_low, Diff.max_normal,
+                this.context.getMap().getAdjacencyList(), this.context.getUIDiffList()};
         String name = Message.NAME_INIT;
         return new Message(name, args);
     }

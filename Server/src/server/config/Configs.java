@@ -34,7 +34,7 @@ public class Configs {
 
     // Output Controller Configs
     // Indicates that data will be sent to given {@link server.network.UINetwork UINetwork} instance or not
-    public static final BooleanParam PARAM_OC_SEND_TO_UI = new BooleanParam("OCSendToUI", false);
+    public static final BooleanParam PARAM_OC_SEND_TO_UI = new BooleanParam("OCSendToUI", true);
     // Indicates that a log of output will be saved in the given {@link java.io.File java.io.File} or not
     public static final BooleanParam PARAM_OC_SEND_TO_FILE = new BooleanParam("OCSendToFile", false);
     // The given {@link java.io.File java.io.File} to save data within

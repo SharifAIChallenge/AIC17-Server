@@ -72,9 +72,11 @@ public class Context {
         ArrayList<DiffReport> diffs = this.differ.getUIDiff();
         int[][] intDiff = new int[diffs.size()][3];
         for (int i = 0; i < diffs.size(); i++) {
-            intDiff[i][0] = diffs.get(i).getVertex();
-            intDiff[i][1] = diffs.get(i).getOwner();
-            intDiff[i][2] = diffs.get(i).getArmyCount();
+            int index = diffs.get(i).getVertex();
+            intDiff[index][0] = diffs.get(i).getOwner();
+            intDiff[index][1] = diffs.get(i).getArmyCount();
+            intDiff[index][2] = map.getNode(index).getX();
+            intDiff[index][3] = map.getNode(index).getY();
         }
         return intDiff;
     }

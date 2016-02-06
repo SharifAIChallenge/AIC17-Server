@@ -6,9 +6,9 @@ import java.util.ArrayList;
  * Created by pezzati on 1/28/16.
  */
 public class Diff {
-    private static int max_low = 3;
-    private static int max_normal = 6;
-    private static int max_huge = 10;
+    public static final int max_low = 3;
+    public static final int max_normal = 6;
+    public static final int max_huge = 10;
     private int length;
     private int[] prev_ownership;
     private int[] prev_armyCount;

@@ -79,7 +79,6 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message getUIInitialMessage() {
-        // todo: send army levels (low, medium, high)
         Object[] args = {this.context.getMap().getVertexNum(), Diff.max_low, Diff.max_normal,
                 this.context.getMap().getAdjacencyList(), this.context.getUIDiffList()};
         String name = Message.NAME_INIT;
@@ -90,11 +89,11 @@ public class FlowsGameLogic implements GameLogic {
     public Message[] getClientInitialMessages() {
         Message[] msg = new Message[2];
         String name0 = Message.NAME_INIT;
-        Object[] args0 = {0, this.context.getMap().getAdjacencyList(), this.context.getDiffList(0)};
+        Object[] args0 = {PARAM_CLIENT_TIMEOUT.getValue(), 0, this.context.getMap().getAdjacencyList(), this.context.getDiffList(0)};
         msg[0] = new Message(name0, args0);
 
         String name1 = Message.NAME_INIT;
-        Object[] args1 = {1, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1)};
+        Object[] args1 = {PARAM_CLIENT_TIMEOUT.getValue(), 1, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1)};
         msg[1] = new Message(name1, args1);
         return msg;
     }

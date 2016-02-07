@@ -377,13 +377,16 @@ public class ClientNetwork extends NetServer {
     public void terminate() {
         super.terminate();
         acceptExecutor.shutdownNow();
+        receiveExecutor.shutdownNow();
+        sendExecutor.shutdownNow();
     }
 
     public void shutdownAll() {
+        mClients.forEach(ClientHandler::terminateReceiving);
         Message shutdown = new Message(Message.NAME_SHUTDOWN, new Object[] {});
         mClients.forEach(c -> c.queue(shutdown));
         sendAllBlocking();
-        mClients.forEach(ClientHandler::terminate);
+        mClients.forEach(ClientHandler::terminateSending);
     }
 
 }

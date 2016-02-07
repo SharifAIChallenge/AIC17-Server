@@ -171,9 +171,9 @@ public final class UINetwork extends NetServer {
     @Override
     public synchronized void terminate() {
         super.terminate();
-        executor.shutdown();
+        executor.shutdownNow();
         executor = null;
-        sendExecutor.shutdown();
+        sendExecutor.shutdownNow();
         sendExecutor = null;
     }
 

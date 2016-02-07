@@ -188,6 +188,10 @@ public class GameServer {
                 } catch (Exception e) {
                     err("Generating outputs", e);
                 }
+
+                mOutputController.putMessage(mGameLogic.getUIMessage());
+                mOutputController.putMessage(mGameLogic.getStatusMessage());
+
                 try {
                     if (mGameLogic.isGameFinished()) {
                         mGameLogic.terminate();
@@ -195,29 +199,33 @@ public class GameServer {
                         for (int i = 0; i < mClientsNum; i++) {
                             mClientNetwork.queue(i, shutdown);
                         }
+                        mClientNetwork.sendAllBlocking();
+                        mClientNetwork.shutdownAll();
+                        mClientNetwork.terminate();
+                        Message uiShutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
+                        mUINetwork.sendBlocking(uiShutdown);
+                        mUINetwork.terminate();
                         mLoop.shutdown();
                         mOutputController.shutdown();
+                        return;
                     }
                 } catch (Exception e) {
                     err("Finishing game", e);
                 }
-
-                mOutputController.putMessage(mGameLogic.getUIMessage());
-                mOutputController.putMessage(mGameLogic.getStatusMessage());
 
                 Message[] output = mGameLogic.getClientMessages();
                 for (int i = 0; i < output.length; ++i) {
                     mClientNetwork.queue(i, output[i]);
                 }
 
-                if (mGameLogic.isGameFinished()) {
-                    mClientNetwork.sendAllBlocking();
-                    mGameLogic.terminate();
-                    mClientNetwork.shutdownAll();
-                    mLoop.shutdown();
-                    mOutputController.shutdown();
-                    return;
-                }
+//                if (mGameLogic.isGameFinished()) {
+//                    mClientNetwork.sendAllBlocking();
+//                    mGameLogic.terminate();
+//                    mClientNetwork.shutdownAll();
+//                    mLoop.shutdown();
+//                    mOutputController.shutdown();
+//                    return;
+//                }
 
                 mClientNetwork.startReceivingAll();
                 mClientNetwork.sendAllBlocking();

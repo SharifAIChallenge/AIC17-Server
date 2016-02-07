@@ -46,7 +46,12 @@ public class ClientHandler {
     /**
      * Termination flag.
      */
-    private boolean terminateFlag;
+    private boolean sendTerminateFlag;
+
+    /**
+     * Termination flag.
+     */
+    private boolean receiveTerminateFlag;
 
     /**
      * Last valid message which is arrived on time.
@@ -117,10 +122,11 @@ public class ClientHandler {
      */
     public Runnable getSender() {
         return () -> {
-            while (!terminateFlag) {
+            while (!sendTerminateFlag) {
                 try {
+                    Thread.sleep(0);
                     Message msg = messagesToSend.take();
-                    if (terminateFlag)
+                    if (sendTerminateFlag)
                         return;
                     if (msg == null)
                         continue;
@@ -184,7 +190,7 @@ public class ClientHandler {
      */
     public Runnable getReceiver(Supplier<Boolean> timeValidator) {
         return () -> {
-            while (!terminateFlag) {
+            while (!receiveTerminateFlag) {
                 try {
                     receive();
                     if (timeValidator.get() && lastReceivedMessage != null)
@@ -206,9 +212,10 @@ public class ClientHandler {
      *
      * @throws java.io.IOException if an I/O error occurs.
      */
-    private void receive() throws IOException {
+    private void receive() throws IOException, InterruptedException {
+        Thread.sleep(0);
         lastReceivedMessage = null;
-        if (terminateFlag)
+        if (receiveTerminateFlag)
             return;
         lastReceivedMessage = client.get(Message.class);
         synchronized (messageNotifier) {
@@ -279,7 +286,28 @@ public class ClientHandler {
      * changes a flag.
      */
     public void terminate() {
-        terminateFlag = true;
+        sendTerminateFlag = true;
+        receiveTerminateFlag = true;
+        if (client != null)
+            try {
+                client.close();
+            } catch (IOException ignored) {
+            }
+        client = null;
+    }
+
+    /**
+     * Terminates sending messages.
+     */
+    public void terminateSending() {
+        sendTerminateFlag = true;
+    }
+
+    /**
+     * Terminates receiving messages.
+     */
+    public void terminateReceiving() {
+        receiveTerminateFlag = true;
     }
 
     /**

@@ -39,7 +39,7 @@ public class FlowsGameLogic implements GameLogic {
 
     private Message uiMessage;
 
-    public static final IntegerParam PARAM_NUM_TURNS = new IntegerParam("Turns", 100);
+    public static final IntegerParam PARAM_NUM_TURNS = new IntegerParam("Turns", 20);
     public static final IntegerParam PARAM_CLIENT_TIMEOUT = new IntegerParam("ClientTimeout", 500);
     public static final IntegerParam PARAM_TURN_TIMEOUT = new IntegerParam("TurnTimeout", 1000);
     public static final FileParam PARAM_MAP = new FileParam("Map", null);

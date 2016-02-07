@@ -1,6 +1,8 @@
 import models.Diff;
 import models.DiffReport;
 import models.Map;
+import server.config.Configs;
+import util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,7 +15,7 @@ public class Context {
     private Map map;
     private Diff differ;
     private int turn;
-//    private UITest uiTest;
+    private UITest uiTest;
 
     public Context(File map) {
         super();
@@ -25,7 +27,8 @@ public class Context {
             xy[0][i] = this.map.getNode(i).getX();
             xy[1][i] = this.map.getNode(i).getY();
         }
-//        this.uiTest = new UITest(this.map.getVertexNum(), this.map.getAdjacencyList(), xy[0], xy[1]);
+        if (Configs.PARAM_AIC_DEPLOY.getValue() != Boolean.TRUE)
+            this.uiTest = new UITest(this.map.getVertexNum(), this.map.getAdjacencyList(), xy[0], xy[1]);
         this.differ = new Diff(this.map.getVertexNum());
         this.map_size = this.map.getVertexNum();
         this.turn = -1;
@@ -34,7 +37,8 @@ public class Context {
     public void flush() {
         this.differ.updateArmyCount(this.map.getArmyCount());
         this.differ.updateOwnership(this.map.getOwnership());
-//        this.uiTest.update(this.map.getOwnership(), this.map.getArmyCount());
+        if (Configs.PARAM_AIC_DEPLOY.getValue() != Boolean.TRUE)
+            this.uiTest.update(this.map.getOwnership(), this.map.getArmyCount());
     }
 
     public int getTurn() {

@@ -203,10 +203,10 @@ public class GameServer {
                         mClientNetwork.shutdownAll();
                         mClientNetwork.terminate();
                         Message uiShutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
-                        mUINetwork.sendBlocking(uiShutdown);
-                        mUINetwork.terminate();
+                        mOutputController.putMessage(uiShutdown);
                         mLoop.shutdown();
                         mOutputController.shutdown();
+                        mUINetwork.terminate();
                         return;
                     }
                 } catch (Exception e) {

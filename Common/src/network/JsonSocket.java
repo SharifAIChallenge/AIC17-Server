@@ -1,6 +1,5 @@
 package network;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import util.Log;
 
@@ -56,7 +55,7 @@ public class JsonSocket {
      * @param host the host name.
      * @param port the port number.
      * @throws java.io.IOException if an I/O error occurs when creating the socket or
-     *                     its input or output stream.
+     *                             its input or output stream.
      * @see java.net.Socket#Socket(String, int)
      * @see #JsonSocket(java.net.Socket)
      */
@@ -69,7 +68,7 @@ public class JsonSocket {
      *
      * @param socket the socket object.
      * @throws java.io.IOException if an I/O error occurs when creating the
-     *                     input or output stream of the socket.
+     *                             input or output stream of the socket.
      */
     public JsonSocket(Socket socket) throws IOException {
         mSocket = socket;
@@ -109,10 +108,11 @@ public class JsonSocket {
      */
     public void send(Object obj) throws IOException {
         String json = Json.GSON.toJson(obj);
-//        System.out.println("send : " + json);
         byte buffer[] = json.getBytes(ENCODING);
+        Log.i(TAG, "Sending message: " + json);
         mOut.write(buffer, 0, buffer.length);
         mOut.write('\0');
+        Log.i(TAG, "Message sent.");
     }
 
     /**
@@ -159,6 +159,7 @@ public class JsonSocket {
             buffer[total++] = (byte) current;
         }
         String json = new String(buffer, 0, total, ENCODING);
+        Log.i(TAG, "Message received: " + json);
         T result = null;
         try {
             result = Json.GSON.fromJson(json, classOfInput);

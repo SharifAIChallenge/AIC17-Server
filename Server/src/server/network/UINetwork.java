@@ -1,9 +1,8 @@
 package server.network;
 
-import network.Json;
 import network.JsonSocket;
 import network.data.Message;
-import server.config.*;
+import server.config.Configs;
 import util.Log;
 
 import java.io.IOException;

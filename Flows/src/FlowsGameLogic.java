@@ -118,8 +118,22 @@ public class FlowsGameLogic implements GameLogic {
             }
         }
         // args0: source, args1: destination, args2: army size
-        if ((clientsEvent[0] == null || clientsEvent[0].length == 0) && (clientsEvent[1] == null || clientsEvent[1].length == 0))
+        if ((clientsEvent[0] == null || clientsEvent[0].length == 0) && (clientsEvent[1] == null || clientsEvent[1].length == 0)){
+            //increase army
+            for (int i = 0; i < vertexNum; i++) {
+                if (ownership[i] == -1)
+                    continue;
+                for (int j = 0; j < adjacencyList[i].length; j++) {
+                    if (ownership[adjacencyList[i][j]] == ownership[i]) {
+                        armyCount[i] += increaseWithEdge;
+                        uiMessages.add(new Message("6", new Object[]{i, increaseWithEdge}));
+                    }
+                }
+            }
+
+            uiMessage = new Message(Message.NAME_TURN, uiMessages.toArray());
             return;
+        }
         for (int j = 0; j < 2; j++) {
             if (clientsEvent[j] == null || clientsEvent[j].length == 0)
                 continue;
@@ -268,6 +282,7 @@ public class FlowsGameLogic implements GameLogic {
 
         uiMessage = new Message(Message.NAME_TURN, uiMessages.toArray());
     }
+
 
     private boolean isMoveValid(int src, int dst, int armySize, int clientNum) {
         if (src < 0 || src > vertexNum - 1)

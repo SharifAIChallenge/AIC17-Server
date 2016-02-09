@@ -174,8 +174,10 @@ public class FlowsGameLogic implements GameLogic {
 
                         if (ownership[src] == battleInfo[0]) {
                             movesSize[src] = battleInfo[1];
+                            movesSize[dst] = 0;
                         } else if (ownership[dst] == battleInfo[0]) {
                             movesSize[dst] = battleInfo[1];
+                            movesSize[src] = 0;
                         } else {
                             movesSize[src] = 0;
                             movesSize[dst] = 0;

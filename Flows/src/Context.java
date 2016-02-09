@@ -49,8 +49,8 @@ public class Context {
         return differ;
     }
 
-    public int[][] getDiffList(int owner) {
-        ArrayList<DiffReport> diffs = this.differ.getDiff(owner);
+    public int[][] getDiffList(int owner, int maxLow, int maxNormal) {
+        ArrayList<DiffReport> diffs = this.differ.getDiff(owner, maxLow, maxNormal);
         int[][] intDiff = new int[diffs.size()][3];
         for (int i = 0; i < diffs.size(); i++) {
             intDiff[i][0] = diffs.get(i).getVertex();

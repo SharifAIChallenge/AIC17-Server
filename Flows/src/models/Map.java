@@ -29,19 +29,6 @@ public class Map {
 //            this.ownership[i] = -1;
 //        this.armyCount = new int[vertexNum];
 
-        class MapJson {
-            private int count;
-            private int[][] props;
-            private int[][] adj;
-            private int escape;
-            private int nodeBonus;
-            private int edgeBonus;
-            private int firstlvl;
-            private int secondlvl;
-            private double lossRate1;
-            private double lossRate2;
-        }
-
         try {
             MapJson mapJson = Json.GSON.fromJson(new FileReader(mapFile), MapJson.class);
             this.vertexNum = mapJson.count;
@@ -73,6 +60,19 @@ public class Map {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private class MapJson {
+        private int count;
+        private int[][] props;
+        private int[][] adj;
+        private int escape;
+        private int nodeBonus;
+        private int edgeBonus;
+        private int firstlvl;
+        private int secondlvl;
+        private double lossRate1;
+        private double lossRate2;
     }
 
     public int getVertexNum() {

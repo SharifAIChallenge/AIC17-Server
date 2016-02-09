@@ -161,7 +161,6 @@ public class GameServer {
         private boolean shutdownRequest = false;
 
         private Event[] environmentEvents;
-        private Event[] terminalEvents;
         private Event[][] clientEvents;
 
         /**
@@ -179,7 +178,7 @@ public class GameServer {
 
             Runnable simulate = () -> {
                 try {
-                    mGameLogic.simulateEvents(terminalEvents, environmentEvents, clientEvents);
+                    mGameLogic.simulateEvents(environmentEvents, clientEvents);
                 } catch (Exception e) {
                     err("Simulation", e);
                 }

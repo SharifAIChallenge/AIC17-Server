@@ -1,6 +1,6 @@
 import model.Event;
-import models.Diff;
 import models.GameConstants;
+import models.Map;
 import network.data.Message;
 import server.config.BooleanParam;
 import server.config.FileParam;
@@ -10,9 +10,7 @@ import server.core.GameServer;
 import util.Log;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 
 /**
@@ -25,12 +23,13 @@ public class FlowsGameLogic implements GameLogic {
     private DebugUI debugUI;
 
     //Constants
-    final static int escapeNum = 1;
-    final static int increaseWithOwnership = 1;
-    final static int increaseWithEdge = 1;
-    final static double highCasualties = 1.0;
-    final static double mediumCasualties = 2.0 / 3.0;
-    final static double lowCasualties = 1.0 / 3.0;
+    private int escapeNum;
+    private int increaseWithOwnership;
+    private int increaseWithEdge;
+    private double highCasualties;
+    private double mediumCasualties;
+    private double lowCasualties;
+    private int maxLow, maxNormal;
 
     //Temps
     private int vertexNum;
@@ -80,12 +79,22 @@ public class FlowsGameLogic implements GameLogic {
     @Override
     public void init() {
         this.context = new Context(PARAM_MAP.getValue());
-
         this.context.flush();
 
-        vertexNum = this.context.getMap().getVertexNum();
-        graph = this.context.getMap().getGraph();
-        adjacencyList = this.context.getMap().getAdjacencyList();
+        Map map = this.context.getMap();
+        vertexNum = map.getVertexNum();
+        graph = map.getGraph();
+        adjacencyList = map.getAdjacencyList();
+
+        GameConstants constants = map.getGameConstants();
+        escapeNum = constants.getEscape();
+        increaseWithOwnership = constants.getNodeBonus();
+        increaseWithEdge = constants.getEdgeBonus();
+        highCasualties = 1;
+        mediumCasualties = constants.getLossRate1();
+        lowCasualties = constants.getLossRate2();
+        maxLow = constants.getFirstlvl();
+        maxNormal = constants.getSecondlvl();
 
         if (PARAM_SHOW_DEBUG_UI.getValue() == Boolean.TRUE) {
             debugUI = new DebugUI(this);
@@ -94,7 +103,7 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message getUIInitialMessage() {
-        Object[] args = {this.context.getMap().getVertexNum(), Diff.max_low, Diff.max_normal,
+        Object[] args = {this.context.getMap().getVertexNum(), maxLow, maxNormal,
                 this.context.getMap().getAdjacencyList(), this.context.getUIDiffList()};
         String name = Message.NAME_INIT;
         return new Message(name, args);
@@ -107,17 +116,17 @@ public class FlowsGameLogic implements GameLogic {
 
         Message[] msg = new Message[2];
         String name0 = Message.NAME_INIT;
-        Object[] args0 = {constants, 0, this.context.getMap().getAdjacencyList(), this.context.getDiffList(0)};
+        Object[] args0 = {constants, 0, this.context.getMap().getAdjacencyList(), this.context.getDiffList(0, maxLow, maxNormal)};
         msg[0] = new Message(name0, args0);
 
         String name1 = Message.NAME_INIT;
-        Object[] args1 = {constants, 1, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1)};
+        Object[] args1 = {constants, 1, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1, maxLow, maxNormal)};
         msg[1] = new Message(name1, args1);
         return msg;
     }
 
     @Override
-    public void simulateEvents(Event[] terminalEvent, Event[] environmentEvent, Event[][] clientsEvent) {
+    public void simulateEvents(Event[] environmentEvent, Event[][] clientsEvent) {
         armyCount = this.context.getMap().getArmyCount();
         ownership = this.context.getMap().getOwnership();
 
@@ -136,7 +145,7 @@ public class FlowsGameLogic implements GameLogic {
             }
         }
         // args0: source, args1: destination, args2: army size
-        if ((clientsEvent[0] == null || clientsEvent[0].length == 0) && (clientsEvent[1] == null || clientsEvent[1].length == 0)){
+        if ((clientsEvent[0] == null || clientsEvent[0].length == 0) && (clientsEvent[1] == null || clientsEvent[1].length == 0)) {
             //increase army
             for (int i = 0; i < vertexNum; i++) {
                 if (ownership[i] == -1)
@@ -186,7 +195,7 @@ public class FlowsGameLogic implements GameLogic {
                         // args in order: winner node, looser node, winner initial army, size of alive army of winner after battle, casualties of looser
                         if (ownership[src] == battleInfo[0])
                             uiMessages.add(new Message("1", new Object[]{src, dst, movesSize[src], battleInfo[1], movesSize[dst]}));
-                        //else if (ownership[dst] == battleInfo[0])
+                            //else if (ownership[dst] == battleInfo[0])
                         else
                             uiMessages.add(new Message("1", new Object[]{dst, src, movesSize[dst], battleInfo[1], movesSize[src]}));
 
@@ -362,6 +371,8 @@ public class FlowsGameLogic implements GameLogic {
     public void generateOutputs() {
         this.context.flush();
         this.context.turnUP();
+        if (debugUI != null)
+            debugUI.update();
     }
 
     @Override
@@ -371,18 +382,18 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message getStatusMessage() {
-        return null;
+        return new Message(Message.NAME_STATUS, new Object[]{context.getTurn()});
     }
 
     @Override
     public Message[] getClientMessages() {
         Message[] messages = new Message[2];
         String name0 = Message.NAME_TURN;
-        Object[] args0 = {this.context.getTurn(), this.context.getDiffList(0)};
+        Object[] args0 = {this.context.getTurn(), this.context.getDiffList(0, maxLow, maxNormal)};
         messages[0] = new Message(name0, args0);
 
         String name1 = Message.NAME_TURN;
-        Object[] args1 = {this.context.getTurn(), this.context.getDiffList(1)};
+        Object[] args1 = {this.context.getTurn(), this.context.getDiffList(1, maxLow, maxNormal)};
         messages[1] = new Message(name1, args1);
 
         return messages;

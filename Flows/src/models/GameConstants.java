@@ -27,4 +27,36 @@ public class GameConstants {
     public void setTurnTimeout(long timeout) {
         this.turnTimeout = timeout;
     }
+
+    public long getTurnTimeout() {
+        return turnTimeout;
+    }
+
+    public int getEscape() {
+        return escape;
+    }
+
+    public int getNodeBonus() {
+        return nodeBonus;
+    }
+
+    public int getEdgeBonus() {
+        return edgeBonus;
+    }
+
+    public int getFirstlvl() {
+        return firstlvl;
+    }
+
+    public int getSecondlvl() {
+        return secondlvl;
+    }
+
+    public double getLossRate1() {
+        return lossRate1;
+    }
+
+    public double getLossRate2() {
+        return lossRate2;
+    }
 }

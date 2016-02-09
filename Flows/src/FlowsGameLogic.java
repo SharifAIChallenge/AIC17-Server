@@ -1,6 +1,8 @@
 import model.Event;
 import models.Diff;
+import models.GameConstants;
 import network.data.Message;
+import server.config.BooleanParam;
 import server.config.FileParam;
 import server.config.IntegerParam;
 import server.core.GameLogic;
@@ -8,6 +10,9 @@ import server.core.GameServer;
 import util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -17,6 +22,7 @@ public class FlowsGameLogic implements GameLogic {
     private static final String TAG = "Flows";
 
     private Context context;
+    private DebugUI debugUI;
 
     //Constants
     final static int escapeNum = 1;
@@ -43,12 +49,17 @@ public class FlowsGameLogic implements GameLogic {
     public static final IntegerParam PARAM_CLIENT_TIMEOUT = new IntegerParam("ClientTimeout", 500);
     public static final IntegerParam PARAM_TURN_TIMEOUT = new IntegerParam("TurnTimeout", 1000);
     public static final FileParam PARAM_MAP = new FileParam("Map", null);
+    public static final BooleanParam PARAM_SHOW_DEBUG_UI = new BooleanParam("ShowDebugUI", true);
 
     public static void main(String[] args) throws InterruptedException {
         GameServer gameServer = new GameServer(new FlowsGameLogic(), args);
         gameServer.waitForClients();
         gameServer.start();
         gameServer.waitForFinish();
+    }
+
+    public Context getContext() {
+        return context;
     }
 
     @Override
@@ -75,6 +86,10 @@ public class FlowsGameLogic implements GameLogic {
         vertexNum = this.context.getMap().getVertexNum();
         graph = this.context.getMap().getGraph();
         adjacencyList = this.context.getMap().getAdjacencyList();
+
+        if (PARAM_SHOW_DEBUG_UI.getValue() == Boolean.TRUE) {
+            debugUI = new DebugUI(this);
+        }
     }
 
     @Override
@@ -87,13 +102,16 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message[] getClientInitialMessages() {
+        GameConstants constants = context.getMap().getGameConstants();
+        constants.setTurnTimeout(PARAM_TURN_TIMEOUT.getValue());
+
         Message[] msg = new Message[2];
         String name0 = Message.NAME_INIT;
-        Object[] args0 = {PARAM_CLIENT_TIMEOUT.getValue(), 0, this.context.getMap().getAdjacencyList(), this.context.getDiffList(0)};
+        Object[] args0 = {constants, 0, this.context.getMap().getAdjacencyList(), this.context.getDiffList(0)};
         msg[0] = new Message(name0, args0);
 
         String name1 = Message.NAME_INIT;
-        Object[] args1 = {PARAM_CLIENT_TIMEOUT.getValue(), 1, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1)};
+        Object[] args1 = {constants, 1, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1)};
         msg[1] = new Message(name1, args1);
         return msg;
     }
@@ -212,15 +230,18 @@ public class FlowsGameLogic implements GameLogic {
                 if (escaper == -1)
                     continue;
 
-                for (int j = 0; j < adjacencyList[i].length; j++) {
-                    if (ownership[adjacencyList[i][j]] == escaper && armyInV[escaper][i] >= escapeNum) {
+                ArrayList<Integer> adjacencyListTemp = new ArrayList<>(adjacencyList[i].length);
+                for (int j = 0; j < adjacencyList[i].length; j++)
+                    adjacencyListTemp.add(adjacencyList[i][j]);
+                Collections.shuffle(adjacencyListTemp);
+                for (int j = 0; j < adjacencyListTemp.size(); j++) {
+                    if (ownership[adjacencyListTemp.get(j)] == escaper && armyInV[escaper][i] >= escapeNum) {
                         armyInV[escaper][i] -= escapeNum;
-                        armyInV[escaper][adjacencyList[i][j]] += escapeNum;
+                        armyInV[escaper][adjacencyListTemp.get(j)] += escapeNum;
 
                         // type: escape
                         // args in order: source node, destination node, escape army size
-                        uiMessages.add(new Message("3", new Object[]{i, adjacencyList[i][j], escapeNum}));
-
+                        uiMessages.add(new Message("3", new Object[]{i, adjacencyListTemp.get(j), escapeNum}));
                     }
                 }
             }

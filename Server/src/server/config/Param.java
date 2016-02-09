@@ -60,6 +60,8 @@ public abstract class Param<T> {
     public T getValueFromEnv() {
         try {
             String value = System.getenv("AIC" + paramName);
+            if (value == null)
+                return null;
             return getValueFromString(value);
         } catch (Exception ignore) {
             return null;

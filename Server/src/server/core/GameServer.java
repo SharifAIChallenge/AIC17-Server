@@ -192,8 +192,8 @@ public class GameServer {
                 mOutputController.putMessage(mGameLogic.getUIMessage());
                 mOutputController.putMessage(mGameLogic.getStatusMessage());
 
-                try {
-                    if (mGameLogic.isGameFinished()) {
+                if (mGameLogic.isGameFinished()) {
+                    try {
                         mGameLogic.terminate();
                         Message shutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
                         for (int i = 0; i < mClientsNum; i++) {
@@ -207,10 +207,10 @@ public class GameServer {
                         mLoop.shutdown();
                         mOutputController.shutdown();
                         mUINetwork.terminate();
-                        return;
+                    } catch (Exception e) {
+                        err("Finishing game", e);
                     }
-                } catch (Exception e) {
-                    err("Finishing game", e);
+                    return;
                 }
 
                 Message[] output = mGameLogic.getClientMessages();

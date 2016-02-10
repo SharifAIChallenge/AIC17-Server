@@ -426,7 +426,7 @@ public class FlowsGameLogic implements GameLogic {
                 diffSign = 1;
             if (diffSign == 0)
                 diffSign = 0;
-            points[i] = 1 + (double) unitsCount[i] / totalUnits + (double) remainingTurns / totalTurns * diffSign;
+            points[i] = 1 + (totalUnits == 0 ? 0.5 : (double) unitsCount[i] / totalUnits) + (double) remainingTurns / totalTurns * diffSign;
         }
         return new Message(Message.NAME_STATUS, new Object[]{context.getTurn(), points[0], points[1]});
     }

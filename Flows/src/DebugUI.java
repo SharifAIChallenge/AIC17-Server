@@ -108,13 +108,13 @@ public class DebugUI {
                     new Color(242, 242, 223), // text
             },
             {
-                    new Color(97, 97, 115), // back ground
-                    new Color(242, 242, 223), // edges
-                    new Color(242, 242, 223), // nodes border
-                    new Color(97, 97, 115), // free
-                    new Color(156, 87, 106), // player 1
-                    new Color(56, 59, 51), // player 2
-                    new Color(242, 242, 223), // text
+                    new Color(238, 223, 204), // back ground
+                    new Color(72, 36, 10), // edges
+                    new Color(72, 36, 10), // nodes border
+                    new Color(238, 223, 204), // free
+                    new Color(250, 128, 114), // player 1
+                    new Color(179, 238, 251), // player 2
+                    new Color(72, 36, 10), // text
             },
     };
     private String[] themeNames = {

@@ -40,7 +40,9 @@ public class FlowsGameLogic implements GameLogic {
     private int[][] adjacencyList;
 
     private int[] movesDest;
+    private int[] movesDest2;
     private int[] movesSize;
+    private int[] movesSize2;
     private int[][] armyInV;
 
     private Message uiMessage;
@@ -59,18 +61,6 @@ public class FlowsGameLogic implements GameLogic {
 
     public Context getContext() {
         return context;
-    }
-
-    public Event[][] getLastClientEvents() {
-        return lastClientEvents;
-    }
-
-    public int[] getMovesDest() {
-        return movesDest;
-    }
-
-    public int[] getMovesSize() {
-        return movesSize;
     }
 
     @Override
@@ -110,7 +100,7 @@ public class FlowsGameLogic implements GameLogic {
 
         if (PARAM_SHOW_DEBUG_UI.getValue() == Boolean.TRUE) {
             debugUI = new DebugUI(this);
-            debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), lastClientEvents, getStatusMessage(), movesDest, movesSize);
+            debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), lastClientEvents, getStatusMessage(), movesDest2, movesSize2);
         }
     }
 
@@ -146,7 +136,9 @@ public class FlowsGameLogic implements GameLogic {
         ownership = this.context.getMap().getOwnership();
 
         movesDest = new int[vertexNum];
+        movesDest2 = new int[vertexNum];
         movesSize = new int[vertexNum];
+        movesSize2 = new int[vertexNum];
         armyInV = new int[2][vertexNum];
 
         int[] conflictedMoves = new int[vertexNum];
@@ -155,6 +147,7 @@ public class FlowsGameLogic implements GameLogic {
 
         for (int i = 0; i < vertexNum; i++) {
             movesDest[i] = -1;
+            movesDest2[i] = -1;
             if (ownership[i] > -1) {
                 armyInV[ownership[i]][i] = armyCount[i];
             }
@@ -194,6 +187,8 @@ public class FlowsGameLogic implements GameLogic {
 
                     movesDest[src] = dst;
                     movesSize[src] = armySize;
+                    movesDest2[src] = dst;
+                    movesSize2[src] = armySize;
                     armyInV[j][src] -= armySize;
 
                     // type: exitArmy
@@ -287,7 +282,7 @@ public class FlowsGameLogic implements GameLogic {
                 if (battleInfo[0] != -1)
                     uiMessages.add(new Message("4", new Object[]{i, battleInfo[0], battleInfo[1], armyInV[battleInfo[0]][i] - battleInfo[1], armyInV[(battleInfo[0] - 1) * -1][i]}));
                 else
-                    uiMessages.add(new Message("4", new Object[]{i, battleInfo[0], 0, armyInV[battleInfo[0]][i] - battleInfo[1], armyInV[(battleInfo[0] - 1) * -1][i]}));
+                    uiMessages.add(new Message("4", new Object[]{i, battleInfo[0], 0, 0, 0}));
 
                 if (battleInfo[0] > -1) {
                     if (ownership[i] != battleInfo[0]) {
@@ -392,7 +387,7 @@ public class FlowsGameLogic implements GameLogic {
     @Override
     public void generateOutputs() {
         if (debugUI != null) {
-            debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), lastClientEvents, getStatusMessage(), movesDest, movesSize);
+            debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), lastClientEvents, getStatusMessage(), movesDest2, movesSize2);
         }
         this.context.flush();
         this.context.turnUP();
@@ -457,7 +452,7 @@ public class FlowsGameLogic implements GameLogic {
     @Override
     public void terminate() {
         if (debugUI != null) {
-            debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), lastClientEvents, getStatusMessage(), movesDest, movesSize);
+            debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), lastClientEvents, getStatusMessage(), movesDest2, movesSize2);
         }
     }
 }

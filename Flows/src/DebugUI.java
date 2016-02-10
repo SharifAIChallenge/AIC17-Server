@@ -189,6 +189,7 @@ public class DebugUI {
             c.setBackground(themes[theme][0]);
             c.setForeground(themes[theme][6]);
         }
+        buttons[0].setToolTipText(themeNames[theme]);
 
         // background
         g.setColor(themes[theme][0]);
@@ -283,7 +284,7 @@ public class DebugUI {
         double score1 = status.args.get(2).getAsDouble();
         drawNode(g, String.format("%.1f", score0), 10, 10, 2 * radius, 2 * border, 4, 2, 0.7);
         drawNode(g, String.format("%.1f", score1), width - 4 * (radius + border) - 10, 10, 2 * radius, 2 * border, 5, 2, 0.7);
-        drawNode(g, String.format("%d", turn), width/2 - radius, border, radius, border, 0, 0, 1);
+        drawNode(g, String.format("%d", Math.max(turn, 0)), width/2 - radius, border, radius, border, 0, 0, 1);
     }
 
     private void drawNode(Graphics2D g, String str, int x, int y, int radius, int border, int color, int borderColor, double scale) {

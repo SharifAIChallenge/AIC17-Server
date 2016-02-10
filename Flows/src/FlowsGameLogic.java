@@ -259,9 +259,14 @@ public class FlowsGameLogic implements GameLogic {
                     adjacencyListTemp.add(adjacencyList[i][j]);
                 Collections.shuffle(adjacencyListTemp);
                 for (int j = 0; j < adjacencyListTemp.size(); j++) {
-                    if (ownership[adjacencyListTemp.get(j)] == escaper && armyInV[escaper][i] >= escapeNum) {
-                        armyInV[escaper][i] -= escapeNum;
-                        armyInV[escaper][adjacencyListTemp.get(j)] += escapeNum;
+                    if (ownership[adjacencyListTemp.get(j)] == escaper && armyInV[escaper][i] >= 0) {
+                        if (armyInV[escaper][i] >= escapeNum) {
+                            armyInV[escaper][i] -= escapeNum;
+                            armyInV[escaper][adjacencyListTemp.get(j)] += escapeNum;
+                        } else {
+                            armyInV[escaper][adjacencyListTemp.get(j)] += armyInV[escaper][i];
+                            armyInV[escaper][i] = 0;
+                        }
 
                         // type: escape
                         // args in order: source node, destination node, escape army size
@@ -373,9 +378,9 @@ public class FlowsGameLogic implements GameLogic {
     }
 
     private int qualAmount(int amount) {
-        if (amount < 10) {
+        if (amount <= maxLow) {
             return 0;
-        } else if (amount < 20) {
+        } else if (amount <= maxNormal) {
             return 1;
         } else {
             return 2;

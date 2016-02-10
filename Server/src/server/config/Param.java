@@ -43,15 +43,14 @@ public abstract class Param<T> {
             return value;
         }
         if ((value = getDefaultValue()) != null) {
-            if (this == Configs.PARAM_AIC_DEPLOY || Configs.PARAM_AIC_DEPLOY.getValue() == Boolean.TRUE)
+            if (this != Configs.PARAM_AIC_DEPLOY && Configs.PARAM_AIC_DEPLOY.getValue() == Boolean.TRUE)
                 Log.w("PARAM", "Using default value for parameter " + paramName + ".");
             Log.i("PARAM", paramName + "=" + value);
             return value;
         }
         if (Configs.PARAM_AIC_DEPLOY.getValue() == Boolean.TRUE)
             throw new RuntimeException("Config '" + paramName + "' not found.");
-        while (value == null)
-            value = getValueFromUser();
+        value = getValueFromUser();
         Log.i("PARAM", paramName + "=" + value);
         cached = true;
         return value;
@@ -82,11 +81,12 @@ public abstract class Param<T> {
     }
 
     public T getValueFromUser() {
-        while (value == null) {
+        if (value == null) {
             try {
                 String result = JOptionPane.showInputDialog(null, "Parameter '" + paramName + "' is not specified. Please enter a value to continue.", "Game Parameters", JOptionPane.INFORMATION_MESSAGE);
                 value = getValueFromString(result);
             } catch (Exception ignore) {
+                return null;
             }
         }
         return value;

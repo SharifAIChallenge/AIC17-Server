@@ -456,5 +456,8 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public void terminate() {
+        if (debugUI != null) {
+            debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), lastClientEvents, getStatusMessage(), movesDest, movesSize);
+        }
     }
 }

@@ -19,36 +19,6 @@ import java.util.zip.ZipOutputStream;
  * Copyright (C) 2016 Hadi
  */
 public class DebugUI {
-    public static void main(String[] args) {
-//        int[][] adj = {
-//                {1, 2, 3, 4}, // 0
-//                {0, 2, 5, 6}, // 1
-//                {0, 1, 7, 8}, // 2
-//                {0, 9, 10}, // 3
-//                {0, 5, 7}, // 4
-//                {1, 4, 8}, // 5
-//                {1, 10}, // 6
-//                {2, 4, 8, 9}, // 7
-//                {2, 5, 7}, // 8
-//                {3, 7, 10}, // 9
-//                {3, 6, 9}, // 10
-//        };
-//        int[] owners = {
-//                -1, -1, -1, 0, 0, 0, 0, 1, 1, 1, 1,
-//        };
-//        int[] armyCounts = {
-//                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-//        };
-//        int[] xs = {
-//                1, 2, 3, 4, 5, 6, 10, 100, 1000, 10000, 50,
-//        };
-//        int[] ys = {
-//                1, 2, 3, 4, 5, 6, 10, 100, 1000, 10000, 50,
-//        };
-//        DebugUI uit = new DebugUI(11, adj, xs, ys);
-//        uit.update(owners, armyCounts);
-    }
-
     private final int width = 800, height = 600;
     private final int radius = 14, border = 3, edge = 3, arrSize = 5;
     private int nNodes;

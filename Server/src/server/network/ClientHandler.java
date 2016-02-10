@@ -193,10 +193,15 @@ public class ClientHandler {
             while (!receiveTerminateFlag) {
                 try {
                     receive();
-                    if (timeValidator.get() && lastReceivedMessage != null)
-                        synchronized (receivedMessages) {
-                            receivedMessages.add(lastReceivedMessage);
+                    if (lastReceivedMessage != null) {
+                        if (timeValidator.get()) {
+                            synchronized (receivedMessages) {
+                                receivedMessages.add(lastReceivedMessage);
+                            }
+                        } else {
+                            Log.i(TAG, "Message received late.");
                         }
+                    }
                 } catch (IOException e) {
                     Log.i(TAG, "message receiving failure", e);
                     handleIOE(e);

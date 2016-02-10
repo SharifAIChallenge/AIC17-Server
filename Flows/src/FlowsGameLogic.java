@@ -21,6 +21,7 @@ public class FlowsGameLogic implements GameLogic {
 
     private Context context;
     private DebugUI debugUI;
+    private Event[][] lastClientEvents;
 
     //Constants
     private int escapeNum;
@@ -59,6 +60,18 @@ public class FlowsGameLogic implements GameLogic {
 
     public Context getContext() {
         return context;
+    }
+
+    public Event[][] getLastClientEvents() {
+        return lastClientEvents;
+    }
+
+    public int[] getMovesDest() {
+        return movesDest;
+    }
+
+    public int[] getMovesSize() {
+        return movesSize;
     }
 
     @Override
@@ -127,6 +140,8 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public void simulateEvents(Event[] environmentEvent, Event[][] clientsEvent) {
+        lastClientEvents = clientsEvent;
+
         armyCount = this.context.getMap().getArmyCount();
         ownership = this.context.getMap().getOwnership();
 

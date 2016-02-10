@@ -1,4 +1,5 @@
 import models.Map;
+import network.data.Message;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -28,16 +29,18 @@ public class DebugUI {
     private int theme = 0;
     private volatile boolean paused = false;
     private volatile boolean recording = false;
+    private volatile boolean cont = false;
 
     private JFrame frame = new JFrame();
     private ArrayList<BufferedImage> screenshots = new ArrayList<>();
     private JPanel container = new JPanel();
     private JPanel panel = new JPanel();
     private Box buttonsPanel = Box.createHorizontalBox();
-    private JButton[] buttons = new JButton[]{
+    private JButton[] buttons = new JButton[] {
             new JButton("Change Theme"),
             new JButton("Pause Game"),
             new JButton("Start Recording"),
+            new JButton("Next Step"),
     };
     private ActionListener[] buttonActions = new ActionListener[]{
             e -> {
@@ -48,9 +51,11 @@ public class DebugUI {
                 if (!paused) {
                     paused = true;
                     buttons[1].setText("Resume Game");
+                    buttons[3].setEnabled(true);
                 } else {
                     paused = false;
                     buttons[1].setText("Pause Game");
+                    buttons[3].setEnabled(false);
                 }
             },
             e -> {
@@ -63,6 +68,9 @@ public class DebugUI {
                     saveImages();
                 }
             },
+            e -> {
+                cont = true;
+            }
     };
 
     private static final Color[][] themes = new Color[][]{
@@ -93,6 +101,21 @@ public class DebugUI {
                     new Color(56, 59, 51), // player 2
                     new Color(242, 242, 223), // text
             },
+            {
+                    new Color(97, 97, 115), // back ground
+                    new Color(242, 242, 223), // edges
+                    new Color(242, 242, 223), // nodes border
+                    new Color(97, 97, 115), // free
+                    new Color(156, 87, 106), // player 1
+                    new Color(56, 59, 51), // player 2
+                    new Color(242, 242, 223), // text
+            },
+    };
+    private String[] themeNames = {
+            "Typical",
+            "Nice",
+            "Dark",
+            "Short",
     };
 
     public DebugUI(FlowsGameLogic logic) {
@@ -136,6 +159,7 @@ public class DebugUI {
             buttons[i].setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10, 5, 10, 5), buttons[i].getBorder()));
         }
         buttonsPanel.add(Box.createGlue());
+        buttons[3].setEnabled(false);
 
         JFrame frame = new JFrame("Flows (Debugging UI)");
         frame.getContentPane().add(container);
@@ -248,20 +272,29 @@ public class DebugUI {
                     }
                 }
             }
-            int total = border + radius;
-            g.setColor(themes[theme][2]);
-            g.fillOval(x[i] - total, y[i] - total, 2 * total, 2 * total);
-            g.setColor(themes[theme][owners[i] + 4]);
-            g.fillOval(x[i] - radius, y[i] - radius, 2 * radius, 2 * radius);
-            if (owners[i] != -1) {
-                g.setColor(themes[theme][6]);
-                g.setFont(new Font("Calibri", Font.PLAIN, (int) (radius * 1.5)));
-                String str = String.valueOf(armyCounts[i]);
-                g.drawString(str, x[i] - g.getFontMetrics().stringWidth(str) / 2, y[i] + radius / 2);
-            }
+            drawNode(g, owners[i] != -1 ? String.valueOf(armyCounts[i]) : "", x[i] - (radius+border), y[i] - (radius+border), radius, border, owners[i]+4, 2, 1);
         }
         g.setStroke(oldStroke);
 
+        // draw status
+        Message status = logic.getStatusMessage();
+        int turn = status.args.get(0).getAsInt();
+        double score0 = status.args.get(1).getAsDouble();
+        double score1 = status.args.get(2).getAsDouble();
+        drawNode(g, String.format("%.1f", score0), 10, 10, 2 * radius, 2 * border, 4, 2, 0.7);
+        drawNode(g, String.format("%.1f", score1), width - 4 * (radius + border) - 10, 10, 2 * radius, 2 * border, 5, 2, 0.7);
+        drawNode(g, String.format("%d", turn), width/2 - radius, border, radius, border, 0, 0, 1);
+    }
+
+    private void drawNode(Graphics2D g, String str, int x, int y, int radius, int border, int color, int borderColor, double scale) {
+        int total = border + radius;
+        g.setColor(themes[theme][borderColor]);
+        g.fillOval(x, y, 2 * total, 2 * total);
+        g.setColor(themes[theme][color]);
+        g.fillOval(x + border, y + border, 2 * radius, 2 * radius);
+        g.setColor(themes[theme][6]);
+        g.setFont(new Font("Calibri", Font.PLAIN, (int) (scale * radius * 1.5)));
+        g.drawString(str, x + total - g.getFontMetrics().stringWidth(str) / 2, y + total + g.getFontMetrics().getHeight() / 4);
     }
 
     private void drawArrow(Graphics g1, int x1, int y1, int x2, int y2, int arrSize) {
@@ -284,7 +317,8 @@ public class DebugUI {
     }
 
     public void update() {
-        while (paused)
+        cont = false;
+        while (paused && !cont)
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {

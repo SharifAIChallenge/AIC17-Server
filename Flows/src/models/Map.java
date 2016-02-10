@@ -57,7 +57,7 @@ public class Map {
     }
 
     private class MapJson {
-        private int turns = 100;
+        private int turns;
         private int count;
         private int[][] props;
         private int[][] adj;

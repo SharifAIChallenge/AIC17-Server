@@ -115,7 +115,7 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message getUIInitialMessage() {
-        Object[] args = {this.context.getMap().getGameConstants().getTurns(), this.context.getMap().getVertexNum(), maxLow, maxNormal,
+        Object[] args = {this.context.getMap().getVertexNum(), maxLow, maxNormal,
                 this.context.getMap().getAdjacencyList(), this.context.getUIDiffList()};
         String name = Message.NAME_INIT;
         return new Message(name, args);
@@ -403,7 +403,31 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message getStatusMessage() {
-        return new Message(Message.NAME_STATUS, new Object[]{context.getTurn()});
+        int[] armyCount = this.context.getMap().getArmyCount();
+        int[] ownerships = this.context.getMap().getOwnership();
+        int unitsCount[] = new int[2];
+        for (int i = 0; i < ownerships.length; i++) {
+            if (ownerships[i] != -1) {
+                unitsCount[ownerships[i]] += armyCount[i];
+            }
+        }
+        int totalUnits = unitsCount[0] + unitsCount[1];
+        int totalTurns = this.context.getMap().getGameConstants().getTurns();
+        int remainingTurns = totalTurns - this.context.getTurn();
+        double points[] = new double[2];
+        for (int i = 0; i < 2; i++) {
+            int diffSign = unitsCount[i] - unitsCount[1-i];
+            if (diffSign < 0)
+                diffSign = -1;
+            if (diffSign > 0)
+                diffSign = 1;
+            if (diffSign == 0)
+                diffSign = 0;
+            points[i] = 1 + (double) unitsCount[i] / totalUnits + (double) remainingTurns / totalTurns * diffSign;
+            System.err.println(totalUnits);
+            System.err.println(totalTurns);
+        }
+        return new Message(Message.NAME_STATUS, new Object[]{context.getTurn(), points[0], points[1]});
     }
 
     @Override

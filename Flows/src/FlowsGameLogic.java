@@ -110,6 +110,7 @@ public class FlowsGameLogic implements GameLogic {
 
         if (PARAM_SHOW_DEBUG_UI.getValue() == Boolean.TRUE) {
             debugUI = new DebugUI(this);
+            debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), lastClientEvents, getStatusMessage(), movesDest, movesSize);
         }
     }
 
@@ -390,10 +391,11 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public void generateOutputs() {
+        if (debugUI != null) {
+            debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), lastClientEvents, getStatusMessage(), movesDest, movesSize);
+        }
         this.context.flush();
         this.context.turnUP();
-        if (debugUI != null)
-            debugUI.update();
     }
 
     @Override
@@ -416,7 +418,7 @@ public class FlowsGameLogic implements GameLogic {
         int remainingTurns = totalTurns - this.context.getTurn();
         double points[] = new double[2];
         for (int i = 0; i < 2; i++) {
-            int diffSign = unitsCount[i] - unitsCount[1-i];
+            int diffSign = unitsCount[i] - unitsCount[1 - i];
             if (diffSign < 0)
                 diffSign = -1;
             if (diffSign > 0)

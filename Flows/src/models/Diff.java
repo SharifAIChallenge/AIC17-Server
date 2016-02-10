@@ -49,6 +49,14 @@ public class Diff {
         return diffArmyCount;
     }
 
+    public int[] getPrevArmyCount() {
+        return prevArmyCount;
+    }
+
+    public int[] getPrevOwnership() {
+        return prevOwnership;
+    }
+
     public ArrayList<DiffReport> getDiff(int owner, int max_low, int max_normal){
         ArrayList<DiffReport> diff = new ArrayList<>();
         for(int i = 0; i < this.length; i++){

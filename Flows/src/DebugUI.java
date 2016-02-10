@@ -1,4 +1,3 @@
-import models.Map;
 import network.data.Message;
 
 import javax.imageio.ImageIO;
@@ -25,7 +24,14 @@ public class DebugUI {
     private int nNodes;
     private int[] x, y;
 
-    private FlowsGameLogic logic;
+    private int[][] adj;
+    private int owners[];
+    private int armyCounts[];
+    private model.Event[][] events;
+    private Message status;
+    private int[] movesDest;
+    private int[] moveSize;
+
     private int theme = 0;
     private volatile boolean paused = false;
     private volatile boolean recording = false;
@@ -36,7 +42,7 @@ public class DebugUI {
     private JPanel container = new JPanel();
     private JPanel panel = new JPanel();
     private Box buttonsPanel = Box.createHorizontalBox();
-    private JButton[] buttons = new JButton[] {
+    private JButton[] buttons = new JButton[]{
             new JButton("Change Theme"),
             new JButton("Pause Game"),
             new JButton("Start Recording"),
@@ -119,7 +125,6 @@ public class DebugUI {
     };
 
     public DebugUI(FlowsGameLogic logic) {
-        this.logic = logic;
         this.nNodes = logic.getContext().getMap().getVertexNum();
 
         x = new int[nNodes];
@@ -132,7 +137,6 @@ public class DebugUI {
         }
 
         initUI();
-        update();
     }
 
     private void initUI() {
@@ -178,11 +182,6 @@ public class DebugUI {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
-        Map map = logic.getContext().getMap();
-        int[][] adj = map.getAdjacencyList();
-        int owners[] = map.getOwnership();
-        int armyCounts[] = map.getArmyCount();
-
         container.setBackground(themes[theme][0]);
         buttonsPanel.setBackground(themes[theme][0]);
         for (Component c : buttonsPanel.getComponents()) {
@@ -194,6 +193,9 @@ public class DebugUI {
         // background
         g.setColor(themes[theme][0]);
         g.fillRect(0, 0, g.getClipBounds().width, g.getClipBounds().height);
+
+        if (adj == null)
+            return;
 
         // draw edges
         g.setColor(themes[theme][1]);
@@ -208,7 +210,6 @@ public class DebugUI {
 
         // draw events
         g.setStroke(new BasicStroke(edge));
-        model.Event[][] events = logic.getLastClientEvents();
         if (events != null) {
             for (int i = 0; i < 2; i++) {
                 for (model.Event event : events[i]) {
@@ -220,7 +221,7 @@ public class DebugUI {
                     int dst = Integer.parseInt(event.getArgs()[1]);
                     int arm = Integer.parseInt(event.getArgs()[2]);
                     g.setColor(themes[theme][1]);
-                    drawArrow(g, x[src], y[src], (x[dst] + 2 * x[src]) / 3, (y[dst] + 2 * y[src]) / 3, arrSize+2);
+                    drawArrow(g, x[src], y[src], (x[dst] + 2 * x[src]) / 3, (y[dst] + 2 * y[src]) / 3, arrSize + 2);
                     g.setColor(themes[theme][i + 4]);
                     drawArrow(g, x[src], y[src], (x[dst] + 2 * x[src]) / 3, (y[dst] + 2 * y[src]) / 3, arrSize);
                     g.setColor(themes[theme][6]);
@@ -242,8 +243,6 @@ public class DebugUI {
         }
 
         // draw nodes & accepted events
-        int[] movesDest = logic.getMovesDest();
-        int[] moveSize = logic.getMovesSize();
         g.setStroke(new BasicStroke(edge + 2));
         for (int i = 0; i < nNodes; i++) {
             if (movesDest != null && moveSize != null) {
@@ -266,25 +265,24 @@ public class DebugUI {
                         g.setColor(themes[theme][2]);
                         g.fillOval((x[dst] + 2 * x[src]) / 3 - radius - ddx, (y[dst] + 2 * y[src]) / 3 - radius * 3 / 4 + ddy, (int) (1.5 * radius), (int) (1.5 * radius));
                         g.setColor(themes[theme][0]);
-                        g.fillOval((x[dst] + 2 * x[src]) / 3 - radius + border/2 - ddx, (y[dst] + 2 * y[src]) / 3 - radius * 3 / 4 + border/2 + ddy, (int) (1.5 * radius) - border, (int) (1.5 * radius) - border);
+                        g.fillOval((x[dst] + 2 * x[src]) / 3 - radius + border / 2 - ddx, (y[dst] + 2 * y[src]) / 3 - radius * 3 / 4 + border / 2 + ddy, (int) (1.5 * radius) - border, (int) (1.5 * radius) - border);
                         g.setColor(themes[theme][2]);
                         g.setFont(new Font("Calibri", Font.PLAIN, radius));
                         g.drawString(str, (x[dst] + 2 * x[src]) / 3 - g.getFontMetrics().stringWidth(str) - ddx, (y[dst] + 2 * y[src]) / 3 + radius / 3 + ddy);
                     }
                 }
             }
-            drawNode(g, owners[i] != -1 ? String.valueOf(armyCounts[i]) : "", x[i] - (radius+border), y[i] - (radius+border), radius, border, owners[i]+4, 2, 1);
+            drawNode(g, owners[i] != -1 ? String.valueOf(armyCounts[i]) : "", x[i] - (radius + border), y[i] - (radius + border), radius, border, owners[i] + 4, 2, 1);
         }
         g.setStroke(oldStroke);
 
         // draw status
-        Message status = logic.getStatusMessage();
         int turn = status.args.get(0).getAsInt();
         double score0 = status.args.get(1).getAsDouble();
         double score1 = status.args.get(2).getAsDouble();
         drawNode(g, String.format("%.1f", score0), 10, 10, 2 * radius, 2 * border, 4, 2, 0.7);
         drawNode(g, String.format("%.1f", score1), width - 4 * (radius + border) - 10, 10, 2 * radius, 2 * border, 5, 2, 0.7);
-        drawNode(g, String.format("%d", Math.max(turn, 0)), width/2 - radius, border, radius, border, 0, 0, 1);
+        drawNode(g, String.format("%d", Math.max(turn, 0)), width / 2 - radius, border, radius, border, 0, 0, 1);
     }
 
     private void drawNode(Graphics2D g, String str, int x, int y, int radius, int border, int color, int borderColor, double scale) {
@@ -310,14 +308,14 @@ public class DebugUI {
 
         // Draw horizontal arrow starting in (0, 0)
         Stroke old = g.getStroke();
-        g.setStroke(new BasicStroke(arrSize/2));
+        g.setStroke(new BasicStroke(arrSize / 2));
         g.setStroke(old);
         g.drawLine(0, 0, len, 0);
-        g.fillPolygon(new int[]{len + arrSize/2, len - arrSize / 2, len - arrSize / 2, len + arrSize / 2},
+        g.fillPolygon(new int[]{len + arrSize / 2, len - arrSize / 2, len - arrSize / 2, len + arrSize / 2},
                 new int[]{0, -arrSize, arrSize, 0}, 4);
     }
 
-    public void update() {
+    public void update(int[][] adj, int[] owners, int[] armyCounts, model.Event[][] clientEvents, Message status, int[] movesDest, int[] moveSize) {
         cont = false;
         while (paused && !cont)
             try {
@@ -325,9 +323,33 @@ public class DebugUI {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        this.adj = copy(adj);
+        this.owners = copy(owners);
+        this.armyCounts = copy(armyCounts);
+        this.events = clientEvents;
+        this.status = status;
+        this.movesDest = copy(movesDest);
+        this.moveSize = copy(moveSize);
         panel.repaint();
         if (recording)
             screenshot();
+    }
+
+    private int[][] copy(int[][] arr) {
+        if (arr == null)
+            return null;
+        int[][] cp = new int[arr.length][];
+        for (int i = 0; i < arr.length; i++)
+            cp[i] = copy(arr[i]);
+        return cp;
+    }
+
+    private int[] copy(int[] arr) {
+        if (arr == null)
+            return null;
+        int[] cp = new int[arr.length];
+        System.arraycopy(arr, 0, cp, 0, arr.length);
+        return cp;
     }
 
     private void screenshot() {

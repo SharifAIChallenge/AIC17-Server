@@ -22,12 +22,6 @@ public class Map {
 
     public Map(File mapFile) {
         this.mapName = mapFile.getName();
-//        this.vertexNum = vertexNum;
-//        this.graph = new boolean[vertexNum][vertexNum];
-//        this.ownership = new int[vertexNum];
-//        for(int i = 0; i < vertexNum; i++)
-//            this.ownership[i] = -1;
-//        this.armyCount = new int[vertexNum];
 
         try {
             MapJson mapJson = Json.GSON.fromJson(new FileReader(mapFile), MapJson.class);
@@ -56,13 +50,14 @@ public class Map {
                 }
             }
 
-            gameConstants = new GameConstants(0, mapJson.escape, mapJson.nodeBonus, mapJson.edgeBonus, mapJson.firstlvl, mapJson.secondlvl, mapJson.lossRate1, mapJson.lossRate2);
+            gameConstants = new GameConstants(mapJson.turns, 0, mapJson.escape, mapJson.nodeBonus, mapJson.edgeBonus, mapJson.firstlvl, mapJson.secondlvl, mapJson.lossRate1, mapJson.lossRate2);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private class MapJson {
+        private int turns = 100;
         private int count;
         private int[][] props;
         private int[][] adj;

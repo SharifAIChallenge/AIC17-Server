@@ -45,7 +45,6 @@ public class FlowsGameLogic implements GameLogic {
 
     private Message uiMessage;
 
-    public static final IntegerParam PARAM_NUM_TURNS = new IntegerParam("Turns", 100);
     public static final IntegerParam PARAM_CLIENT_TIMEOUT = new IntegerParam("ClientTimeout", 500);
     public static final IntegerParam PARAM_TURN_TIMEOUT = new IntegerParam("TurnTimeout", 1000);
     public static final FileParam PARAM_MAP = new FileParam("Map", null);
@@ -116,7 +115,7 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message getUIInitialMessage() {
-        Object[] args = {this.context.getMap().getVertexNum(), maxLow, maxNormal,
+        Object[] args = {this.context.getMap().getGameConstants().getTurns(), this.context.getMap().getVertexNum(), maxLow, maxNormal,
                 this.context.getMap().getAdjacencyList(), this.context.getUIDiffList()};
         String name = Message.NAME_INIT;
         return new Message(name, args);
@@ -428,7 +427,7 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public boolean isGameFinished() {
-        return (this.context.getMap().isFinished() || this.context.getTurn() >= PARAM_NUM_TURNS.getValue());
+        return (this.context.getMap().isFinished() || this.context.getTurn() >= this.context.getMap().getGameConstants().getTurns());
     }
 
     @Override

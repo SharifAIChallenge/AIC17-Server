@@ -4,6 +4,7 @@ package models;
  * Copyright (C) 2016 Hadi
  */
 public class GameConstants {
+    private int turns;
     private long turnTimeout;
     private int escape;
     private int nodeBonus;
@@ -13,7 +14,8 @@ public class GameConstants {
     private double lossRate1;
     private double lossRate2;
 
-    public GameConstants(long turnTimeout, int escape, int nodeBonus, int edgeBonus, int firstlvl, int secondlvl, double lossRate1, double lossRate2) {
+    public GameConstants(int turns, long turnTimeout, int escape, int nodeBonus, int edgeBonus, int firstlvl, int secondlvl, double lossRate1, double lossRate2) {
+        this.turns = turns;
         this.turnTimeout = turnTimeout;
         this.escape = escape;
         this.nodeBonus = nodeBonus;
@@ -26,6 +28,10 @@ public class GameConstants {
 
     public void setTurnTimeout(long timeout) {
         this.turnTimeout = timeout;
+    }
+
+    public int getTurns() {
+        return turns;
     }
 
     public long getTurnTimeout() {

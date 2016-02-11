@@ -406,8 +406,8 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message getStatusMessage() {
-        int[] armyCount = this.context.getMap().getArmyCount();
-        int[] ownerships = this.context.getMap().getOwnership();
+        int[] armyCount = this.context.getDiffer().getPrevArmyCount();
+        int[] ownerships = this.context.getDiffer().getPrevOwnership();
         int unitsCount[] = new int[2];
         for (int i = 0; i < ownerships.length; i++) {
             if (ownerships[i] != -1) {

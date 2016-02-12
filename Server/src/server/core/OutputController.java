@@ -156,6 +156,23 @@ public class OutputController implements Runnable {
         uiSender = null;
     }
 
+    public void waitToSend() throws InterruptedException {
+        if (uiSender != null) {
+            synchronized (uiSender.messagesQueue) {
+                while (!uiSender.messagesQueue.isEmpty()) {
+                    uiSender.messagesQueue.wait();
+                }
+            }
+        }
+        if (fileWriter != null) {
+            synchronized (fileWriter.messagesQueue) {
+                while (!fileWriter.messagesQueue.isEmpty()) {
+                    fileWriter.messagesQueue.wait();
+                }
+            }
+        }
+    }
+
     /**
      * This inner class is used to do processes needed during the file saving operations, as an alternative
      * thread.
@@ -206,8 +223,12 @@ public class OutputController implements Runnable {
             open = true;
             try {
                 while (open) {
-                    while (!messagesQueue.isEmpty())
-                        writeToFile(messagesQueue.pollFirst(1, TimeUnit.SECONDS));
+                    synchronized (messagesQueue) {
+                        while (!messagesQueue.isEmpty()) {
+                            writeToFile(messagesQueue.pollFirst(1, TimeUnit.SECONDS));
+                            messagesQueue.notifyAll();
+                        }
+                    }
                 }
             } catch (InterruptedException ignored) {
             } finally {
@@ -294,7 +315,10 @@ public class OutputController implements Runnable {
             open = true;
             try {
                 while (open) {
-                    sendToUINetwork(messagesQueue.pollFirst(1, TimeUnit.SECONDS));
+                    synchronized (messagesQueue) {
+                        sendToUINetwork(messagesQueue.pollFirst(1, TimeUnit.SECONDS));
+                        messagesQueue.notifyAll();
+                    }
                 }
             } catch (InterruptedException ignored) {
             }

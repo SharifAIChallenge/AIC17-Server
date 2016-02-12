@@ -203,6 +203,7 @@ public class GameServer {
                         mClientNetwork.terminate();
                         Message uiShutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
                         mOutputController.putMessage(uiShutdown);
+                        mOutputController.waitToSend();
                         mLoop.shutdown();
                         mOutputController.shutdown();
                         mUINetwork.terminate();

@@ -58,7 +58,7 @@ public abstract class NetServer {
      */
     public synchronized void terminate() {
         if (listener == null)
-            throw new IllegalStateException("NetServer is not started or has been terminated.");
+            return;
         listener.terminate();
         listener = null;
     }

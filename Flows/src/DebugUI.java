@@ -328,7 +328,7 @@ public class DebugUI {
         int fontSize = (int) (scale * radius);
         do {
             g.setFont(new Font("Calibri", Font.PLAIN, fontSize));
-            fontSize /= 2;
+            fontSize /= 1.1;
         } while (g.getFontMetrics().stringWidth(str) > 1.7 * radius);
         g.drawString(str, x + total - g.getFontMetrics().stringWidth(str) / 2, y + total + g.getFontMetrics().getHeight() / 4);
     }

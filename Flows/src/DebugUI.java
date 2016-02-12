@@ -116,12 +116,32 @@ public class DebugUI {
                     new Color(179, 238, 251), // player 2
                     new Color(72, 36, 10), // text
             },
+            {
+                    new Color(239, 187, 255), // back ground
+                    new Color(95, 0, 95), // edges
+                    new Color(95, 0, 95), // nodes border
+                    new Color(239, 187, 255), // free
+                    new Color(216, 150, 255), // player 1
+                    new Color(190, 41, 236), // player 2
+                    new Color(95, 0, 95), // text
+            },
+            {
+                    new Color(223, 169, 67), // back ground
+                    new Color(139, 52, 14), // edges
+                    new Color(77, 27, 0), // nodes border
+                    new Color(223, 169, 67), // free
+                    new Color(169, 94, 0), // player 1
+                    new Color(255, 180, 0), // player 2
+                    new Color(77, 27, 0), // text
+            },
     };
     private String[] themeNames = {
             "Typical",
-            "Nice",
+            "Bruise",
             "Dark",
             "Short",
+            "Purpy",
+            "Wood",
     };
 
     public DebugUI(FlowsGameLogic logic) {
@@ -188,7 +208,7 @@ public class DebugUI {
             c.setBackground(themes[theme][0]);
             c.setForeground(themes[theme][6]);
         }
-        buttons[0].setToolTipText(themeNames[theme]);
+        buttons[0].setText("Theme: " + themeNames[theme]);
 
         // background
         g.setColor(themes[theme][0]);

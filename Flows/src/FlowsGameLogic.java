@@ -49,7 +49,7 @@ public class FlowsGameLogic implements GameLogic {
 
     public static final IntegerParam PARAM_CLIENT_TIMEOUT = new IntegerParam("ClientTimeout", 500);
     public static final IntegerParam PARAM_TURN_TIMEOUT = new IntegerParam("TurnTimeout", 1000);
-    public static final FileParam PARAM_MAP = new FileParam("Map", null);
+    public static final FileParam PARAM_MAP = new FileParam("Map", null, ".*\\.map");
     public static final BooleanParam PARAM_SHOW_DEBUG_UI = new BooleanParam("ShowDebugUI", true);
 
     public static void main(String[] args) throws InterruptedException {

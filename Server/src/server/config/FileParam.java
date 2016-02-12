@@ -1,14 +1,18 @@
 package server.config;
 
-import javax.swing.*;
+import java.awt.*;
 import java.io.File;
+import java.io.FilenameFilter;
 
 /**
  * Copyright (C) 2016 Hadi
  */
 public class FileParam extends Param<File> {
-    public FileParam(String paramName, File defaultValue) {
+    private String pattern;
+
+    public FileParam(String paramName, File defaultValue, String pattern) {
         super(paramName, defaultValue);
+        this.pattern = pattern;
     }
 
     @Override
@@ -19,11 +23,17 @@ public class FileParam extends Param<File> {
 
     @Override
     public File getValueFromUser() {
-        JOptionPane.showMessageDialog(null, "Parameter '" + getParamName() + "' is not specified or invalid.\nPlease select a file to continue.", "Game Parameters", JOptionPane.INFORMATION_MESSAGE);
-        JFileChooser fileChooser = new JFileChooser((String) null);
-        int result = fileChooser.showOpenDialog(null);
-        if (result != JOptionPane.YES_OPTION)
-            return null;
-        return fileChooser.getSelectedFile();
+        FileDialog fileDialog = new FileDialog((Frame) null, "Choose " + getParamName(), FileDialog.LOAD);
+        fileDialog.setFilenameFilter((dir, name) -> name.matches(pattern));
+        fileDialog.setMultipleMode(false);
+        fileDialog.setVisible(true);
+        File[] files = fileDialog.getFiles();
+//        JOptionPane.showMessageDialog(null, "Parameter '" + getParamName() + "' is not specified or invalid.\nPlease select a file to continue.", "Game Parameters", JOptionPane.INFORMATION_MESSAGE);
+//        JFileChooser fileChooser = new JFileChooser((String) null);
+//        int result = fileChooser.showOpenDialog(null);
+//        if (result != JOptionPane.YES_OPTION)
+//            return null;
+//        return fileChooser.getSelectedFile();
+        return files.length != 1 ? null : files[0];
     }
 }

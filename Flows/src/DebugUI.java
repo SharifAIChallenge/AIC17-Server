@@ -21,7 +21,7 @@ import java.util.zip.ZipOutputStream;
 public class DebugUI {
     private final int width = 800, height = 600;
     private final int radius = 14, border = 3, edge = 3, arrSize = 5;
-    private int nNodes;
+    private int nNodes, nTurns;
     private int[] x, y;
 
     private int[][] adj;
@@ -88,6 +88,7 @@ public class DebugUI {
                     new Color(242, 184, 133), // player 1
                     new Color(222, 230, 181), // player 2
                     new Color(84, 82, 87), // text
+                    new Color(0, 0, 0, 0), // transparent
             },
             {
                     new Color(245, 237, 243), // back ground
@@ -97,6 +98,7 @@ public class DebugUI {
                     new Color(204, 126, 156), // player 1
                     new Color(164, 179, 156), // player 2
                     new Color(89, 79, 83), // text
+                    new Color(0, 0, 0, 0), // transparent
             },
             {
                     new Color(97, 97, 115), // back ground
@@ -106,6 +108,7 @@ public class DebugUI {
                     new Color(156, 87, 106), // player 1
                     new Color(56, 59, 51), // player 2
                     new Color(242, 242, 223), // text
+                    new Color(0, 0, 0, 0), // transparent
             },
             {
                     new Color(238, 223, 204), // back ground
@@ -115,6 +118,7 @@ public class DebugUI {
                     new Color(250, 128, 114), // player 1
                     new Color(179, 238, 251), // player 2
                     new Color(72, 36, 10), // text
+                    new Color(0, 0, 0, 0), // transparent
             },
             {
                     new Color(239, 187, 255), // back ground
@@ -124,6 +128,7 @@ public class DebugUI {
                     new Color(216, 150, 255), // player 1
                     new Color(190, 41, 236), // player 2
                     new Color(95, 0, 95), // text
+                    new Color(0, 0, 0, 0), // transparent
             },
             {
                     new Color(223, 169, 67), // back ground
@@ -133,6 +138,7 @@ public class DebugUI {
                     new Color(169, 94, 0), // player 1
                     new Color(255, 180, 0), // player 2
                     new Color(77, 27, 0), // text
+                    new Color(0, 0, 0, 0), // transparent
             },
     };
     private String[] themeNames = {
@@ -146,6 +152,7 @@ public class DebugUI {
 
     public DebugUI(FlowsGameLogic logic) {
         this.nNodes = logic.getContext().getMap().getVertexNum();
+        this.nTurns = logic.getContext().getMap().getGameConstants().getTurns();
 
         x = new int[nNodes];
         y = new int[nNodes];
@@ -155,6 +162,8 @@ public class DebugUI {
             x[i] = (int) ((width - radius * 3) * (double) xs / 1000 + 1.5 * radius);
             y[i] = (int) ((height - radius * 3) * (double) ys / 1000 + 1.5 * radius);
         }
+
+        theme = (int) (Math.random() * themes.length);
 
         initUI();
     }
@@ -244,9 +253,6 @@ public class DebugUI {
                     drawArrow(g, x[src], y[src], (x[dst] + 2 * x[src]) / 3, (y[dst] + 2 * y[src]) / 3, arrSize + 2);
                     g.setColor(themes[theme][i + 4]);
                     drawArrow(g, x[src], y[src], (x[dst] + 2 * x[src]) / 3, (y[dst] + 2 * y[src]) / 3, arrSize);
-                    g.setColor(themes[theme][6]);
-                    g.setFont(new Font("Calibri", Font.PLAIN, radius));
-                    String str = String.valueOf(arm);
                     int dx = x[dst] - x[src];
                     int dy = y[dst] - y[src];
                     if (dy < 0) {
@@ -256,7 +262,12 @@ public class DebugUI {
                     int norm2 = dx * dx + dy * dy;
                     if (norm2 != 0) {
                         double norm = Math.sqrt(norm2);
-                        g.drawString(str, (x[dst] + 2 * x[src]) / 3 - g.getFontMetrics().stringWidth(str) - (int) (radius * 0.8 * dy / norm), (y[dst] + 2 * y[src]) / 3 + radius / 3 + (int) (radius * 0.8 * dx / norm));
+                        int rad = (int) (radius * 0.75);
+                        drawNode(g, String.valueOf(arm), (x[dst] + 2 * x[src]) / 3 - rad - (int) (radius * 1.1 * dy / norm), (y[dst] + 2 * y[src]) / 3 - rad + (int) (radius * 1.1 * dx / norm), rad, 0, 0, 0, 1.5);
+//                        g.setColor(themes[theme][6]);
+//                        g.setFont(new Font("Calibri", Font.PLAIN, radius));
+//                        String str = String.valueOf(arm);
+//                        g.drawString(str, (x[dst] + 2 * x[src]) / 3 - g.getFontMetrics().stringWidth(str) - (int) (radius * 0.8 * dy / norm), (y[dst] + 2 * y[src]) / 3 + radius / 3 + (int) (radius * 0.8 * dx / norm));
                     }
                 }
             }
@@ -280,19 +291,21 @@ public class DebugUI {
                     int norm2 = dx * dx + dy * dy;
                     if (norm2 != 0) {
                         double norm = Math.sqrt(norm2);
-                        int ddx = (int) (radius * dy / norm);
-                        int ddy = (int) (radius * dx / norm);
-                        g.setColor(themes[theme][2]);
-                        g.fillOval((x[dst] + 2 * x[src]) / 3 - radius - ddx, (y[dst] + 2 * y[src]) / 3 - radius * 3 / 4 + ddy, (int) (1.5 * radius), (int) (1.5 * radius));
-                        g.setColor(themes[theme][0]);
-                        g.fillOval((x[dst] + 2 * x[src]) / 3 - radius + border / 2 - ddx, (y[dst] + 2 * y[src]) / 3 - radius * 3 / 4 + border / 2 + ddy, (int) (1.5 * radius) - border, (int) (1.5 * radius) - border);
-                        g.setColor(themes[theme][2]);
-                        g.setFont(new Font("Calibri", Font.PLAIN, radius));
-                        g.drawString(str, (x[dst] + 2 * x[src]) / 3 - g.getFontMetrics().stringWidth(str) - ddx, (y[dst] + 2 * y[src]) / 3 + radius / 3 + ddy);
+                        int rad = (int) (radius * 0.75);
+                        drawNode(g, str, (x[dst] + 2 * x[src]) / 3 - rad - (int) (radius * 1.1 * dy / norm), (y[dst] + 2 * y[src]) / 3 - rad + (int) (radius * 1.1 * dx / norm), rad, 1, 0, 2, 1.5);
+//                        int ddx = (int) (radius * dy / norm);
+//                        int ddy = (int) (radius * dx / norm);
+//                        g.setColor(themes[theme][2]);
+//                        g.fillOval((x[dst] + 2 * x[src]) / 3 - radius - ddx, (y[dst] + 2 * y[src]) / 3 - radius * 3 / 4 + ddy, (int) (1.5 * radius), (int) (1.5 * radius));
+//                        g.setColor(themes[theme][0]);
+//                        g.fillOval((x[dst] + 2 * x[src]) / 3 - radius + border / 2 - ddx, (y[dst] + 2 * y[src]) / 3 - radius * 3 / 4 + border / 2 + ddy, (int) (1.5 * radius) - border, (int) (1.5 * radius) - border);
+//                        g.setColor(themes[theme][2]);
+//                        g.setFont(new Font("Calibri", Font.PLAIN, radius));
+//                        g.drawString(str, (x[dst] + 2 * x[src]) / 3 - g.getFontMetrics().stringWidth(str) - ddx, (y[dst] + 2 * y[src]) / 3 + radius / 3 + ddy);
                     }
                 }
             }
-            drawNode(g, owners[i] != -1 ? String.valueOf(armyCounts[i]) : "", x[i] - (radius + border), y[i] - (radius + border), radius, border, owners[i] + 4, 2, 1);
+            drawNode(g, owners[i] != -1 ? String.valueOf(armyCounts[i]) : "", x[i] - (radius + border), y[i] - (radius + border), radius, border, owners[i] + 4, 2, 1.5);
         }
         g.setStroke(oldStroke);
 
@@ -300,9 +313,9 @@ public class DebugUI {
         int turn = status.args.get(0).getAsInt();
         double score0 = status.args.get(1).getAsDouble();
         double score1 = status.args.get(2).getAsDouble();
-        drawNode(g, String.format("%.1f", score0), 10, 10, 2 * radius, 2 * border, 4, 2, 0.7);
-        drawNode(g, String.format("%.1f", score1), width - 4 * (radius + border) - 10, 10, 2 * radius, 2 * border, 5, 2, 0.7);
-        drawNode(g, String.format("%d", Math.max(turn, 0)), width / 2 - radius, border, radius, border, 0, 0, 1);
+        drawNode(g, String.format("%.1f", score0), 10, 10, 2 * radius, 2 * border, 4, 2, 1);
+        drawNode(g, String.format("%.1f", score1), width - 4 * (radius + border) - 10, 10, 2 * radius, 2 * border, 5, 2, 1);
+        drawNode(g, String.format("%d/%d", Math.max(turn, 0), nTurns), width / 2 - 3*radius, -10, 3*radius, 0, 7, 7, 0.6);
     }
 
     private void drawNode(Graphics2D g, String str, int x, int y, int radius, int border, int color, int borderColor, double scale) {
@@ -312,7 +325,11 @@ public class DebugUI {
         g.setColor(themes[theme][color]);
         g.fillOval(x + border, y + border, 2 * radius, 2 * radius);
         g.setColor(themes[theme][6]);
-        g.setFont(new Font("Calibri", Font.PLAIN, (int) (scale * radius * 1.5)));
+        int fontSize = (int) (scale * radius);
+        do {
+            g.setFont(new Font("Calibri", Font.PLAIN, fontSize));
+            fontSize /= 2;
+        } while (g.getFontMetrics().stringWidth(str) > 1.7 * radius);
         g.drawString(str, x + total - g.getFontMetrics().stringWidth(str) / 2, y + total + g.getFontMetrics().getHeight() / 4);
     }
 
@@ -382,16 +399,23 @@ public class DebugUI {
     private void saveImages() {
         BufferedImage[] images = screenshots.toArray(new BufferedImage[screenshots.size()]);
         screenshots.clear();
-        File file = null;
-
-        while (file == null) {
-            JOptionPane.showMessageDialog(null, "Choose a name to save the 'zip' file of recordings.", "AIC16", JOptionPane.INFORMATION_MESSAGE);
-            JFileChooser fileChooser = new JFileChooser((String) null);
-            int result = fileChooser.showOpenDialog(null);
-            if (result != JOptionPane.YES_OPTION)
-                return;
-            file = fileChooser.getSelectedFile();
-        }
+//        File file = null;
+//        while (file == null) {
+//            JOptionPane.showMessageDialog(null, "Choose a name to save the 'zip' file of recordings.", "AIC16", JOptionPane.INFORMATION_MESSAGE);
+//            JFileChooser fileChooser = new JFileChooser((String) null);
+//            int result = fileChooser.showOpenDialog(null);
+//            if (result != JOptionPane.YES_OPTION)
+//                return;
+//            file = fileChooser.getSelectedFile();
+//        }
+        FileDialog fileDialog = new FileDialog((Frame) null, "Save Recorded Images", FileDialog.SAVE);
+        fileDialog.setFilenameFilter((dir, name) -> name.matches(".*\\.zip"));
+        fileDialog.setMultipleMode(false);
+        fileDialog.setVisible(true);
+        File[] files = fileDialog.getFiles();
+        if (files.length != 1)
+            return;
+        File file = files[0];
 
         ZipOutputStream zout;
         try {

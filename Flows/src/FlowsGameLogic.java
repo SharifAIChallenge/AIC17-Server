@@ -1,6 +1,8 @@
 import model.Event;
-import models.Diff;
+import models.GameConstants;
+import models.Map;
 import network.data.Message;
+import server.config.BooleanParam;
 import server.config.FileParam;
 import server.config.IntegerParam;
 import server.core.GameLogic;
@@ -8,6 +10,7 @@ import server.core.GameServer;
 import util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 /**
@@ -17,14 +20,17 @@ public class FlowsGameLogic implements GameLogic {
     private static final String TAG = "Flows";
 
     private Context context;
+    private DebugUI debugUI;
+    private Event[][] lastClientEvents;
 
     //Constants
-    final static int escapeNum = 1;
-    final static int increaseWithOwnership = 1;
-    final static int increaseWithEdge = 1;
-    final static double highCasualties = 1.0;
-    final static double mediumCasualties = 2.0 / 3.0;
-    final static double lowCasualties = 1.0 / 3.0;
+    private int escapeNum;
+    private int increaseWithOwnership;
+    private int increaseWithEdge;
+    private double highCasualties;
+    private double mediumCasualties;
+    private double lowCasualties;
+    private int maxLow, maxNormal;
 
     //Temps
     private int vertexNum;
@@ -34,21 +40,27 @@ public class FlowsGameLogic implements GameLogic {
     private int[][] adjacencyList;
 
     private int[] movesDest;
+    private int[] movesDest2;
     private int[] movesSize;
+    private int[] movesSize2;
     private int[][] armyInV;
 
     private Message uiMessage;
 
-    public static final IntegerParam PARAM_NUM_TURNS = new IntegerParam("Turns", 100);
     public static final IntegerParam PARAM_CLIENT_TIMEOUT = new IntegerParam("ClientTimeout", 500);
     public static final IntegerParam PARAM_TURN_TIMEOUT = new IntegerParam("TurnTimeout", 1000);
     public static final FileParam PARAM_MAP = new FileParam("Map", null);
+    public static final BooleanParam PARAM_SHOW_DEBUG_UI = new BooleanParam("ShowDebugUI", true);
 
     public static void main(String[] args) throws InterruptedException {
         GameServer gameServer = new GameServer(new FlowsGameLogic(), args);
         gameServer.waitForClients();
         gameServer.start();
         gameServer.waitForFinish();
+    }
+
+    public Context getContext() {
+        return context;
     }
 
     @Override
@@ -69,17 +81,32 @@ public class FlowsGameLogic implements GameLogic {
     @Override
     public void init() {
         this.context = new Context(PARAM_MAP.getValue());
-
         this.context.flush();
 
-        vertexNum = this.context.getMap().getVertexNum();
-        graph = this.context.getMap().getGraph();
-        adjacencyList = this.context.getMap().getAdjacencyList();
+        Map map = this.context.getMap();
+        vertexNum = map.getVertexNum();
+        graph = map.getGraph();
+        adjacencyList = map.getAdjacencyList();
+
+        GameConstants constants = map.getGameConstants();
+        escapeNum = constants.getEscape();
+        increaseWithOwnership = constants.getNodeBonus();
+        increaseWithEdge = constants.getEdgeBonus();
+        highCasualties = 1;
+        mediumCasualties = constants.getLossRate1();
+        lowCasualties = constants.getLossRate2();
+        maxLow = constants.getFirstlvl();
+        maxNormal = constants.getSecondlvl();
+
+        if (PARAM_SHOW_DEBUG_UI.getValue() == Boolean.TRUE) {
+            debugUI = new DebugUI(this);
+            debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), lastClientEvents, getStatusMessage(), movesDest2, movesSize2);
+        }
     }
 
     @Override
     public Message getUIInitialMessage() {
-        Object[] args = {this.context.getMap().getVertexNum(), Diff.max_low, Diff.max_normal,
+        Object[] args = {this.context.getMap().getVertexNum(), maxLow, maxNormal,
                 this.context.getMap().getAdjacencyList(), this.context.getUIDiffList()};
         String name = Message.NAME_INIT;
         return new Message(name, args);
@@ -87,24 +114,31 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message[] getClientInitialMessages() {
+        GameConstants constants = context.getMap().getGameConstants();
+        constants.setTurnTimeout(PARAM_TURN_TIMEOUT.getValue());
+
         Message[] msg = new Message[2];
         String name0 = Message.NAME_INIT;
-        Object[] args0 = {PARAM_CLIENT_TIMEOUT.getValue(), 0, this.context.getMap().getAdjacencyList(), this.context.getDiffList(0)};
+        Object[] args0 = {constants, 0, this.context.getMap().getAdjacencyList(), this.context.getDiffList(0, maxLow, maxNormal)};
         msg[0] = new Message(name0, args0);
 
         String name1 = Message.NAME_INIT;
-        Object[] args1 = {PARAM_CLIENT_TIMEOUT.getValue(), 1, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1)};
+        Object[] args1 = {constants, 1, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1, maxLow, maxNormal)};
         msg[1] = new Message(name1, args1);
         return msg;
     }
 
     @Override
-    public void simulateEvents(Event[] terminalEvent, Event[] environmentEvent, Event[][] clientsEvent) {
+    public void simulateEvents(Event[] environmentEvent, Event[][] clientsEvent) {
+        lastClientEvents = clientsEvent;
+
         armyCount = this.context.getMap().getArmyCount();
         ownership = this.context.getMap().getOwnership();
 
         movesDest = new int[vertexNum];
+        movesDest2 = new int[vertexNum];
         movesSize = new int[vertexNum];
+        movesSize2 = new int[vertexNum];
         armyInV = new int[2][vertexNum];
 
         int[] conflictedMoves = new int[vertexNum];
@@ -113,12 +147,13 @@ public class FlowsGameLogic implements GameLogic {
 
         for (int i = 0; i < vertexNum; i++) {
             movesDest[i] = -1;
+            movesDest2[i] = -1;
             if (ownership[i] > -1) {
                 armyInV[ownership[i]][i] = armyCount[i];
             }
         }
         // args0: source, args1: destination, args2: army size
-        if ((clientsEvent[0] == null || clientsEvent[0].length == 0) && (clientsEvent[1] == null || clientsEvent[1].length == 0)){
+        if ((clientsEvent[0] == null || clientsEvent[0].length == 0) && (clientsEvent[1] == null || clientsEvent[1].length == 0)) {
             //increase army
             for (int i = 0; i < vertexNum; i++) {
                 if (ownership[i] == -1)
@@ -152,6 +187,8 @@ public class FlowsGameLogic implements GameLogic {
 
                     movesDest[src] = dst;
                     movesSize[src] = armySize;
+                    movesDest2[src] = dst;
+                    movesSize2[src] = armySize;
                     armyInV[j][src] -= armySize;
 
                     // type: exitArmy
@@ -168,7 +205,7 @@ public class FlowsGameLogic implements GameLogic {
                         // args in order: winner node, looser node, winner initial army, size of alive army of winner after battle, casualties of looser
                         if (ownership[src] == battleInfo[0])
                             uiMessages.add(new Message("1", new Object[]{src, dst, movesSize[src], battleInfo[1], movesSize[dst]}));
-                        //else if (ownership[dst] == battleInfo[0])
+                            //else if (ownership[dst] == battleInfo[0])
                         else
                             uiMessages.add(new Message("1", new Object[]{dst, src, movesSize[dst], battleInfo[1], movesSize[src]}));
 
@@ -201,9 +238,12 @@ public class FlowsGameLogic implements GameLogic {
         }
 
         //escapes
+        int[][] armyInVTemp = new int[2][vertexNum];
+        for (int i = 0; i < 2; i++)
+            for (int j = 0; j < vertexNum; j++)
+                armyInVTemp[i][j] = armyInV[i][j];
         for (int i = 0; i < vertexNum; i++) {
             if (armyInV[0][i] != 0 && armyInV[1][i] != 0) {
-
                 int escaper = -1;
                 if (armyInV[0][i] < armyInV[1][i])
                     escaper = 0;
@@ -212,19 +252,30 @@ public class FlowsGameLogic implements GameLogic {
                 if (escaper == -1)
                     continue;
 
-                for (int j = 0; j < adjacencyList[i].length; j++) {
-                    if (ownership[adjacencyList[i][j]] == escaper && armyInV[escaper][i] >= escapeNum) {
-                        armyInV[escaper][i] -= escapeNum;
-                        armyInV[escaper][adjacencyList[i][j]] += escapeNum;
+                ArrayList<Integer> adjacencyListTemp = new ArrayList<>(adjacencyList[i].length);
+                for (int j = 0; j < adjacencyList[i].length; j++)
+                    adjacencyListTemp.add(adjacencyList[i][j]);
+                Collections.shuffle(adjacencyListTemp);
+                for (int j = 0; j < adjacencyListTemp.size(); j++) {
+                    if (ownership[adjacencyListTemp.get(j)] == escaper && armyInV[escaper][i] >= 0) {
+                        if (armyInV[escaper][i] >= escapeNum) {
+                            armyInVTemp[escaper][i] -= escapeNum;
+                            armyInVTemp[escaper][adjacencyListTemp.get(j)] += escapeNum;
+                        } else {
+                            armyInVTemp[escaper][adjacencyListTemp.get(j)] += armyInV[escaper][i];
+                            armyInVTemp[escaper][i] = 0;
+                        }
 
                         // type: escape
                         // args in order: source node, destination node, escape army size
-                        uiMessages.add(new Message("3", new Object[]{i, adjacencyList[i][j], escapeNum}));
-
+                        uiMessages.add(new Message("3", new Object[]{i, adjacencyListTemp.get(j), escapeNum}));
                     }
                 }
             }
         }
+        for (int i = 0; i < 2; i++)
+            for (int j = 0; j < vertexNum; j++)
+                armyInV[i][j] = armyInVTemp[i][j];
 
         //battles
         for (int i = 0; i < vertexNum; i++) {
@@ -236,6 +287,8 @@ public class FlowsGameLogic implements GameLogic {
                 // args in order: node battle, final owner, final size of winner army, size of winner casualties, size of looser casualties
                 if (battleInfo[0] != -1)
                     uiMessages.add(new Message("4", new Object[]{i, battleInfo[0], battleInfo[1], armyInV[battleInfo[0]][i] - battleInfo[1], armyInV[(battleInfo[0] - 1) * -1][i]}));
+                else
+                    uiMessages.add(new Message("4", new Object[]{i, battleInfo[0], 0, 0, 0}));
 
                 if (battleInfo[0] > -1) {
                     if (ownership[i] != battleInfo[0]) {
@@ -328,9 +381,9 @@ public class FlowsGameLogic implements GameLogic {
     }
 
     private int qualAmount(int amount) {
-        if (amount < 10) {
+        if (amount <= maxLow) {
             return 0;
-        } else if (amount < 20) {
+        } else if (amount <= maxNormal) {
             return 1;
         } else {
             return 2;
@@ -339,6 +392,9 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public void generateOutputs() {
+        if (debugUI != null) {
+            debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), lastClientEvents, getStatusMessage(), movesDest2, movesSize2);
+        }
         this.context.flush();
         this.context.turnUP();
     }
@@ -350,18 +406,40 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public Message getStatusMessage() {
-        return null;
+        int[] armyCount = this.context.getMap().getArmyCount();
+        int[] ownerships = this.context.getMap().getOwnership();
+        int unitsCount[] = new int[2];
+        for (int i = 0; i < ownerships.length; i++) {
+            if (ownerships[i] != -1) {
+                unitsCount[ownerships[i]] += armyCount[i];
+            }
+        }
+        int totalUnits = unitsCount[0] + unitsCount[1];
+        int totalTurns = this.context.getMap().getGameConstants().getTurns();
+        int remainingTurns = totalTurns - this.context.getTurn();
+        double points[] = new double[2];
+        for (int i = 0; i < 2; i++) {
+            int diffSign = unitsCount[i] - unitsCount[1 - i];
+            if (diffSign < 0)
+                diffSign = -1;
+            if (diffSign > 0)
+                diffSign = 1;
+            if (diffSign == 0)
+                diffSign = 0;
+            points[i] = 1 + (totalUnits == 0 ? 0.5 : (double) unitsCount[i] / totalUnits) + (double) remainingTurns / totalTurns * diffSign;
+        }
+        return new Message(Message.NAME_STATUS, new Object[]{context.getTurn(), points[0], points[1]});
     }
 
     @Override
     public Message[] getClientMessages() {
         Message[] messages = new Message[2];
         String name0 = Message.NAME_TURN;
-        Object[] args0 = {this.context.getTurn(), this.context.getDiffList(0)};
+        Object[] args0 = {this.context.getTurn(), this.context.getDiffList(0, maxLow, maxNormal)};
         messages[0] = new Message(name0, args0);
 
         String name1 = Message.NAME_TURN;
-        Object[] args1 = {this.context.getTurn(), this.context.getDiffList(1)};
+        Object[] args1 = {this.context.getTurn(), this.context.getDiffList(1, maxLow, maxNormal)};
         messages[1] = new Message(name1, args1);
 
         return messages;
@@ -374,10 +452,13 @@ public class FlowsGameLogic implements GameLogic {
 
     @Override
     public boolean isGameFinished() {
-        return (this.context.getMap().isFinished() || this.context.getTurn() >= PARAM_NUM_TURNS.getValue());
+        return (this.context.getMap().isFinished() || this.context.getTurn() >= this.context.getMap().getGameConstants().getTurns());
     }
 
     @Override
     public void terminate() {
+        if (debugUI != null) {
+            debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), null, getStatusMessage(), null, null);
+        }
     }
 }

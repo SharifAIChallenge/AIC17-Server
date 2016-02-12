@@ -1,6 +1,7 @@
 package models;
 
-import java.io.BufferedReader;
+import network.Json;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -14,29 +15,18 @@ public class Map {
     private boolean[][] graph;
     private int[] ownership;
     private int[] armyCount;
+    private GameConstants gameConstants;
 
     private String mapName;
     private ArrayList<Node> nodes;
 
     public Map(File mapFile) {
         this.mapName = mapFile.getName();
-//        this.vertexNum = vertexNum;
-//        this.graph = new boolean[vertexNum][vertexNum];
-//        this.ownership = new int[vertexNum];
-//        for(int i = 0; i < vertexNum; i++)
-//            this.ownership[i] = -1;
-//        this.armyCount = new int[vertexNum];
 
 
         try {
-            FileReader fr = new FileReader(mapFile);
-            BufferedReader br = new BufferedReader(fr);
-
-            String line = br.readLine();
-            String[] inputs = line.split("[\0]")[0].split("[ ]+");
-
-            this.vertexNum = Integer.valueOf(inputs[0]);
-
+            MapJson mapJson = Json.GSON.fromJson(new FileReader(mapFile), MapJson.class);
+            this.vertexNum = mapJson.count;
             this.nodes = new ArrayList<>();
             this.graph = new boolean[this.vertexNum][this.vertexNum];
             this.ownership = new int[this.vertexNum];
@@ -45,31 +35,40 @@ public class Map {
             this.armyCount = new int[this.vertexNum];
 
             for (int i = 0; i < this.vertexNum; i++) {
-                String[] args = new String[4];
-                System.arraycopy(inputs, 1 + (i * 4), args, 0, 4);
-                Node node = new Node(Integer.valueOf(args[2]), Integer.valueOf(args[3]), i);
-
-                this.ownership[i] = Integer.valueOf(args[0]);
+                Node node = new Node(mapJson.props[i][2], mapJson.props[i][3], i);
+                this.ownership[i] = mapJson.props[i][0];
                 node.setOwnership(this.ownership[i]);
-                this.armyCount[i] = Integer.valueOf(args[1]);
+                this.armyCount[i] = mapJson.props[i][1];
                 node.setArmyCount(this.armyCount[i]);
                 this.nodes.add(node);
             }
-            int beginIndex = this.vertexNum * 4 + 1;
-            int nodeIndex = 0;
-            for (int i = beginIndex; i < inputs.length && nodeIndex < this.vertexNum; i++) {
-                int input = Integer.valueOf(inputs[i]);
-                if (input == -1) {
-                    nodeIndex++;
-                    continue;
+
+            int[][] adj = mapJson.adj;
+            for (int i = 0; i < adj.length; i++) {
+                for (int j = 0; j < adj[i].length; j++) {
+                    this.graph[i][adj[i][j]] = true;
+                    this.nodes.get(i).addNeighbor(this.nodes.get(adj[i][j]));
                 }
-                this.graph[nodeIndex][input] = true;
-                this.graph[input][nodeIndex] = true;
-                this.nodes.get(nodeIndex).addNeighbor(this.nodes.get(input));
             }
+
+            gameConstants = new GameConstants(mapJson.turns, 0, mapJson.escape, mapJson.nodeBonus, mapJson.edgeBonus, mapJson.firstlvl, mapJson.secondlvl, mapJson.lossRate1, mapJson.lossRate2);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private class MapJson {
+        private int turns;
+        private int count;
+        private int[][] props;
+        private int[][] adj;
+        private int escape;
+        private int nodeBonus;
+        private int edgeBonus;
+        private int firstlvl;
+        private int secondlvl;
+        private double lossRate1;
+        private double lossRate2;
     }
 
     public int getVertexNum() {
@@ -86,6 +85,10 @@ public class Map {
 
     public int[] getArmyCount() {
         return armyCount;
+    }
+
+    public GameConstants getGameConstants() {
+        return gameConstants;
     }
 
     public boolean setGraph(int x, int y, boolean bool) {

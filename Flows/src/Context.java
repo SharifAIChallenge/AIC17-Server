@@ -1,8 +1,6 @@
 import models.Diff;
 import models.DiffReport;
 import models.Map;
-import server.config.Configs;
-import util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,20 +13,12 @@ public class Context {
     private Map map;
     private Diff differ;
     private int turn;
-    private UITest uiTest;
 
     public Context(File map) {
         super();
 
         this.map = new Map(map);
-//        System.err.println(this.map.getVertexNum());
-        int[][] xy = new int[2][this.map.getVertexNum()];
-        for (int i = 0; i < this.map.getVertexNum(); i++) {
-            xy[0][i] = this.map.getNode(i).getX();
-            xy[1][i] = this.map.getNode(i).getY();
-        }
-        if (Configs.PARAM_AIC_DEPLOY.getValue() != Boolean.TRUE)
-            this.uiTest = new UITest(this.map.getVertexNum(), this.map.getAdjacencyList(), xy[0], xy[1]);
+
         this.differ = new Diff(this.map.getVertexNum());
         this.map_size = this.map.getVertexNum();
         this.turn = -1;
@@ -37,8 +27,6 @@ public class Context {
     public void flush() {
         this.differ.updateArmyCount(this.map.getArmyCount());
         this.differ.updateOwnership(this.map.getOwnership());
-        if (Configs.PARAM_AIC_DEPLOY.getValue() != Boolean.TRUE)
-            this.uiTest.update(this.map.getOwnership(), this.map.getArmyCount());
     }
 
     public int getTurn() {
@@ -61,8 +49,8 @@ public class Context {
         return differ;
     }
 
-    public int[][] getDiffList(int owner) {
-        ArrayList<DiffReport> diffs = this.differ.getDiff(owner);
+    public int[][] getDiffList(int owner, int maxLow, int maxNormal) {
+        ArrayList<DiffReport> diffs = this.differ.getDiff(owner, maxLow, maxNormal);
         int[][] intDiff = new int[diffs.size()][3];
         for (int i = 0; i < diffs.size(); i++) {
             intDiff[i][0] = diffs.get(i).getVertex();

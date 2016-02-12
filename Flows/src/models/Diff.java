@@ -6,68 +6,73 @@ import java.util.ArrayList;
  * Created by pezzati on 1/28/16.
  */
 public class Diff {
-    public static final int max_low = 3;
-    public static final int max_normal = 6;
-    public static final int max_huge = 10;
     private int length;
-    private int[] prev_ownership;
-    private int[] prev_armyCount;
+    private int[] prevOwnership;
+    private int[] prevArmyCount;
 
-    private boolean[] diff_ownership;
-    private boolean[] diff_armyCount;
+    private boolean[] diffOwnership;
+    private boolean[] diffArmyCount;
 
     public Diff(int length) {
         this.length = length;
-        this.prev_armyCount = new int[length];
-        this.prev_ownership = new int[length];
+        this.prevArmyCount = new int[length];
+        this.prevOwnership = new int[length];
         for(int i = 0; i < length; i++)
-            this.prev_ownership[i] = -1;
-        this.diff_ownership = new boolean[length];
-        this.diff_armyCount = new boolean[length];
+            this.prevOwnership[i] = -1;
+        this.diffOwnership = new boolean[length];
+        this.diffArmyCount = new boolean[length];
     }
 
     public void updateOwnership(int[] new_ownership){
         for(int i = 0; i < this.length; i++){
-            this.diff_ownership[i] = false;
-            if(new_ownership[i] != this.prev_ownership[i])
-                this.diff_ownership[i] = true;
-            this.prev_ownership[i] = new_ownership[i];
+            this.diffOwnership[i] = false;
+            if(new_ownership[i] != this.prevOwnership[i])
+                this.diffOwnership[i] = true;
+            this.prevOwnership[i] = new_ownership[i];
         }
     }
 
     public void updateArmyCount(int[] new_armyCount){
         for(int i = 0; i < this.length; i++){
-            this.diff_armyCount[i] = false;
-            if(new_armyCount[i] != this.prev_armyCount[i])
-                this.diff_armyCount[i] = true;
-            this.prev_armyCount[i] = new_armyCount[i];
+            this.diffArmyCount[i] = false;
+            if(new_armyCount[i] != this.prevArmyCount[i])
+                this.diffArmyCount[i] = true;
+            this.prevArmyCount[i] = new_armyCount[i];
         }
     }
 
-    public boolean[] getDiff_ownership() {
-        return diff_ownership;
+    public boolean[] getDiffOwnership() {
+        return diffOwnership;
     }
 
-    public boolean[] getDiff_armyCount() {
-        return diff_armyCount;
+    public boolean[] getDiffArmyCount() {
+        return diffArmyCount;
     }
 
-    public ArrayList<DiffReport> getDiff(int owner){
+    public int[] getPrevArmyCount() {
+        return prevArmyCount;
+    }
+
+    public int[] getPrevOwnership() {
+        return prevOwnership;
+    }
+
+    public ArrayList<DiffReport> getDiff(int owner, int max_low, int max_normal){
         ArrayList<DiffReport> diff = new ArrayList<>();
         for(int i = 0; i < this.length; i++){
-            if(this.diff_armyCount[i] || this.diff_ownership[i]){
+            if(this.diffArmyCount[i] || this.diffOwnership[i]){
                 int tempArmyCount = 0;
-                if(this.prev_ownership[i] == owner)
-                    tempArmyCount = this.prev_armyCount[i];
+                if(this.prevOwnership[i] == owner)
+                    tempArmyCount = this.prevArmyCount[i];
                 else{
-                    if(this.prev_armyCount[i] <= max_low)
+                    if(this.prevArmyCount[i] <= max_low)
+                        tempArmyCount = 0;
+                    else if(this.prevArmyCount[i] <= max_normal)
                         tempArmyCount = 1;
-                    else if(this.prev_armyCount[i] <= max_normal)
+                    else
                         tempArmyCount = 2;
-                    else if(this.prev_armyCount[i] > max_normal)
-                        tempArmyCount = 3;
                 }
-                diff.add(new DiffReport(i, this.prev_ownership[i], tempArmyCount));
+                diff.add(new DiffReport(i, this.prevOwnership[i], tempArmyCount));
             }
         }
 
@@ -77,7 +82,7 @@ public class Diff {
     public ArrayList<DiffReport> getUIDiff(){
         ArrayList<DiffReport> diff = new ArrayList<>();
         for(int i = 0; i < this.length; i++){
-            diff.add(new DiffReport(i, this.prev_ownership[i], this.prev_armyCount[i]));
+            diff.add(new DiffReport(i, this.prevOwnership[i], this.prevArmyCount[i]));
         }
         return diff;
     }

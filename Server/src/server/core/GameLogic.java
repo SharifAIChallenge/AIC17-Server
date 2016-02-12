@@ -40,12 +40,11 @@ public interface GameLogic {
     /**
      * Simulate events based on the current turn event and calculate the changes in game.
      *
-     * @param terminalEvent    Events that user enters in terminal.
      * @param environmentEvent Events that is related to environment. Suppose we want to develop a strategic game.
      *                         Increasing/Decreasing a specific resource in map is an environment event.
      * @param clientsEvent     Events that is related to client e.g. moving the player.
      */
-    public void simulateEvents(Event[] terminalEvent, Event[] environmentEvent, Event[][] clientsEvent);
+    public void simulateEvents(Event[] environmentEvent, Event[][] clientsEvent);
 
     /**
      * This method generates the output based on the changes that were calculated in

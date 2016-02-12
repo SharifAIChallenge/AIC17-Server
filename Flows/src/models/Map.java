@@ -23,6 +23,7 @@ public class Map {
     public Map(File mapFile) {
         this.mapName = mapFile.getName();
 
+
         try {
             MapJson mapJson = Json.GSON.fromJson(new FileReader(mapFile), MapJson.class);
             this.vertexNum = mapJson.count;

@@ -239,11 +239,11 @@ public class FlowsGameLogic implements GameLogic {
 
         //escapes
         int[][] armyInVTemp = new int[2][vertexNum];
-        for (int i = 0; i < 2; i++)
-            for (int j = 0; j < vertexNum; j++)
-                armyInVTemp[i][j] = armyInV[i][j];
+        //for (int i = 0; i < 2; i++)
+        //    for (int j = 0; j < vertexNum; j++)
+        //        armyInVTemp[i][j] = armyInV[i][j];
         for (int i = 0; i < vertexNum; i++) {
-            if (armyInV[0][i] != 0 && armyInV[1][i] != 0) {
+            if (armyInV[0][i] > 0 && armyInV[1][i] > 0) {
                 int escaper = -1;
                 if (armyInV[0][i] < armyInV[1][i])
                     escaper = 0;
@@ -257,13 +257,13 @@ public class FlowsGameLogic implements GameLogic {
                     adjacencyListTemp.add(adjacencyList[i][j]);
                 Collections.shuffle(adjacencyListTemp);
                 for (int j = 0; j < adjacencyListTemp.size(); j++) {
-                    if (ownership[adjacencyListTemp.get(j)] == escaper && armyInV[escaper][i] >= 0) {
+                    if (ownership[adjacencyListTemp.get(j)] == escaper && armyInV[escaper][i] > 0) {
                         if (armyInV[escaper][i] >= escapeNum) {
-                            armyInVTemp[escaper][i] -= escapeNum;
+                            armyInV[escaper][i] -= escapeNum;
                             armyInVTemp[escaper][adjacencyListTemp.get(j)] += escapeNum;
                         } else {
                             armyInVTemp[escaper][adjacencyListTemp.get(j)] += armyInV[escaper][i];
-                            armyInVTemp[escaper][i] = 0;
+                            armyInV[escaper][i] = 0;
                         }
 
                         // type: escape
@@ -275,11 +275,11 @@ public class FlowsGameLogic implements GameLogic {
         }
         for (int i = 0; i < 2; i++)
             for (int j = 0; j < vertexNum; j++)
-                armyInV[i][j] = armyInVTemp[i][j];
+                armyInV[i][j] += armyInVTemp[i][j];
 
         //battles
         for (int i = 0; i < vertexNum; i++) {
-            if (armyInV[0][i] != 0 && armyInV[1][i] != 0) {
+            if (armyInV[0][i] > 0 && armyInV[1][i] > 0) {
                 int[] battleInfo = doBattle('v', i, -1, armyInV[0][i], armyInV[1][i]);
 
                 // need talk to pooya
@@ -307,13 +307,13 @@ public class FlowsGameLogic implements GameLogic {
                     armyInV[0][i] = 0;
                     armyInV[1][i] = 0;
                 }
-            } else if (armyInV[0][i] != 0) {
+            } else if (armyInV[0][i] > 0) {
                 if (ownership[i] != 0) {
                     armyInV[0][i] += increaseWithOwnership;
                     uiMessages.add(new Message("5", new Object[]{i, increaseWithOwnership}));
                 }
                 ownership[i] = 0;
-            } else if (armyInV[1][i] != 0) {
+            } else if (armyInV[1][i] > 0) {
                 if (ownership[i] != 1) {
                     armyInV[1][i] += increaseWithOwnership;
                     uiMessages.add(new Message("5", new Object[]{i, increaseWithOwnership}));

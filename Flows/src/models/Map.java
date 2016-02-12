@@ -27,6 +27,7 @@ public class Map {
 //            this.ownership[i] = -1;
 //        this.armyCount = new int[vertexNum];
 
+
         try {
             FileReader fr = new FileReader(mapFile);
             BufferedReader br = new BufferedReader(fr);

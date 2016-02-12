@@ -411,6 +411,7 @@ public class DebugUI {
         FileDialog fileDialog = new FileDialog((Frame) null, "Save Recorded Images", FileDialog.SAVE);
         fileDialog.setFilenameFilter((dir, name) -> name.matches(".*\\.zip"));
         fileDialog.setMultipleMode(false);
+        fileDialog.setFile("out.zip");
         fileDialog.setVisible(true);
         File[] files = fileDialog.getFiles();
         if (files.length != 1)

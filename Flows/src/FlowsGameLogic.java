@@ -232,6 +232,8 @@ public class FlowsGameLogic implements GameLogic {
                     // type: nonConflictedMove
                     // args in order: source node, destination node, owner, army size
                     uiMessages.add(new Message("2", new Object[]{i, movesDest[i], ownership[i], movesSize[i]}));
+                    if (ownership[i] == ownership[movesDest[i]])
+                        uiMessages.add(new Message("4", new Object[]{movesDest[i], ownership[i], movesSize[i], 0, 0}));
                 }
 
             }

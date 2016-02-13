@@ -232,8 +232,7 @@ public class FlowsGameLogic implements GameLogic {
                     // type: nonConflictedMove
                     // args in order: source node, destination node, owner, army size
                     uiMessages.add(new Message("2", new Object[]{i, movesDest[i], ownership[i], movesSize[i]}));
-                    if (ownership[i] == ownership[movesDest[i]])
-                        uiMessages.add(new Message("4", new Object[]{movesDest[i], ownership[i], movesSize[i], 0, 0}));
+
                 }
 
             }
@@ -312,16 +311,16 @@ public class FlowsGameLogic implements GameLogic {
             } else if (armyInV[0][i] > 0) {
                 if (ownership[i] != 0) {
                     armyInV[0][i] += increaseWithOwnership;
-                    uiMessages.add(new Message("4", new Object[]{i, 0, armyInV[0][i], 0, 0}));
                     uiMessages.add(new Message("5", new Object[]{i, increaseWithOwnership}));
                 }
+                uiMessages.add(new Message("4", new Object[]{i, 0, armyInV[0][i], 0, 0}));
                 ownership[i] = 0;
             } else if (armyInV[1][i] > 0) {
                 if (ownership[i] != 1) {
                     armyInV[1][i] += increaseWithOwnership;
-                    uiMessages.add(new Message("4", new Object[]{i, 1, armyInV[1][i], 0, 0}));
                     uiMessages.add(new Message("5", new Object[]{i, increaseWithOwnership}));
                 }
+                uiMessages.add(new Message("4", new Object[]{i, 1, armyInV[1][i], 0, 0}));
                 ownership[i] = 1;
             }
             armyCount[i] = Math.max(armyInV[0][i], armyInV[1][i]);

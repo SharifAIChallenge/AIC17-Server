@@ -289,7 +289,7 @@ public class FlowsGameLogic implements GameLogic {
                 if (battleInfo[0] != -1)
                     uiMessages.add(new Message("4", new Object[]{i, battleInfo[0], battleInfo[1], armyInV[battleInfo[0]][i] - battleInfo[1], armyInV[(battleInfo[0] - 1) * -1][i]}));
                 else
-                    uiMessages.add(new Message("4", new Object[]{i, battleInfo[0], 0, 0, 0}));
+                    uiMessages.add(new Message("4", new Object[]{i, battleInfo[0], 0, armyInV[0][i], armyInV[0][i]}));
 
                 if (battleInfo[0] > -1) {
                     if (ownership[i] != battleInfo[0]) {

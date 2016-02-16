@@ -262,14 +262,14 @@ public class FlowsGameLogic implements GameLogic {
                         if (armyInV[escaper][i] >= escapeNum) {
                             armyInV[escaper][i] -= escapeNum;
                             armyInVTemp[escaper][adjacencyListTemp.get(j)] += escapeNum;
+                            // type: escape
+                            // args in order: source node, destination node, escape army size
+                            uiMessages.add(new Message("3", new Object[]{i, adjacencyListTemp.get(j), escapeNum}));
                         } else {
                             armyInVTemp[escaper][adjacencyListTemp.get(j)] += armyInV[escaper][i];
                             armyInV[escaper][i] = 0;
+                            uiMessages.add(new Message("3", new Object[]{i, adjacencyListTemp.get(j), armyInV[escaper][i]}));
                         }
-
-                        // type: escape
-                        // args in order: source node, destination node, escape army size
-                        uiMessages.add(new Message("3", new Object[]{i, adjacencyListTemp.get(j), escapeNum}));
                     }
                 }
             }

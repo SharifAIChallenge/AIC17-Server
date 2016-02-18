@@ -199,19 +199,19 @@ public class GameServer {
                             mClientNetwork.queue(i, shutdown);
                         }
                         mClientNetwork.sendAllBlocking();
-                        mClientNetwork.shutdownAll();
-                        mClientNetwork.terminate();
+//                        mClientNetwork.shutdownAll();
+//                        mClientNetwork.terminate();
                         Message uiShutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
                         mOutputController.putMessage(uiShutdown);
                         mOutputController.waitToSend();
                         mLoop.shutdown();
                         mOutputController.shutdown();
-                        mUINetwork.terminate();
+//                        mUINetwork.terminate();
                     } catch (Exception e) {
                         err("Finishing game", e);
                     }
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(3000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

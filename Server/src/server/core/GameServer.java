@@ -210,6 +210,12 @@ public class GameServer {
                     } catch (Exception e) {
                         err("Finishing game", e);
                     }
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.exit(0);
                     return;
                 }
 

@@ -193,40 +193,23 @@ public class GameServer {
 
                 if (mGameLogic.isGameFinished()) {
                     try {
-                        System.err.println("finishing 1");
                         mGameLogic.terminate();
-                        System.err.println("finishing 2");
                         Message shutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
-                        System.err.println("finishing 3");
                         for (int i = 0; i < mClientsNum; i++) {
                             mClientNetwork.queue(i, shutdown);
                         }
-                        System.err.println("finishing 4");
                         mClientNetwork.sendAllBlocking();
-                        System.err.println("finishing 5");
                         mClientNetwork.shutdownAll();
-                        System.err.println("finishing 5.5");
                         mClientNetwork.terminate();
                         Message uiShutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
-                        System.err.println("finishing 6");
                         mOutputController.putMessage(uiShutdown);
-                        System.err.println("finishing 7");
                         mOutputController.waitToSend();
-                        System.err.println("finishing 8");
                         mLoop.shutdown();
-                        System.err.println("finishing 9");
                         mOutputController.shutdown();
-                        System.err.println("finishing 10");
                         mUINetwork.terminate();
                     } catch (Exception e) {
                         err("Finishing game", e);
                     }
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.exit(0);
                     return;
                 }
 

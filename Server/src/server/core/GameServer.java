@@ -88,7 +88,7 @@ public class GameServer {
             try {
                 mUINetwork.waitForClient(Configs.PARAM_UI_CONNECTIONS_TIMEOUT.getValue());
             } catch (InterruptedException e) {
-                throw new RuntimeException("Waiting for ui clients interrupted");
+                throw new RuntimeException("Waiting for ui interrupted");
             }
 
             try {
@@ -98,7 +98,12 @@ public class GameServer {
             }
 
             Message initialMessage = mGameLogic.getUIInitialMessage();
-            mUINetwork.sendBlocking(initialMessage);
+            mOutputController.putMessage(initialMessage);
+            try {
+                mOutputController.waitToSend();
+            } catch (InterruptedException e) {
+                throw new RuntimeException("Waiting for ui interrupted");
+            }
 
             Message[] initialMessages = mGameLogic.getClientInitialMessages();
             for (int i = 0; i < initialMessages.length; ++i) {
@@ -210,6 +215,12 @@ public class GameServer {
                     } catch (Exception e) {
                         err("Finishing game", e);
                     }
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.exit(0);
                     return;
                 }
 

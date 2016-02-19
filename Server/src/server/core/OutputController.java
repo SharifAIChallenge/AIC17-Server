@@ -157,11 +157,7 @@ public class OutputController implements Runnable {
 
     public void waitToSend() throws InterruptedException {
         if (uiSender != null) {
-            synchronized (uiSender.messagesQueue) {
-                while (!uiSender.messagesQueue.isEmpty()) {
-                    uiSender.messagesQueue.wait();
-                }
-            }
+            uiSender.waitToFinish();
         }
         if (fileWriter != null) {
             fileWriter.waitToFinish();

@@ -3,6 +3,7 @@ import models.GameConstants;
 import models.Map;
 import network.data.Message;
 import server.config.BooleanParam;
+import server.config.Configs;
 import server.config.FileParam;
 import server.config.IntegerParam;
 import server.core.GameLogic;
@@ -54,7 +55,7 @@ public class FlowsGameLogic implements GameLogic {
 
     public static void main(String[] args) throws InterruptedException {
         GameServer gameServer = new GameServer(new FlowsGameLogic(), args);
-        gameServer.waitForClients();
+        System.err.println("start");
         gameServer.start();
         gameServer.waitForFinish();
     }
@@ -107,7 +108,8 @@ public class FlowsGameLogic implements GameLogic {
     @Override
     public Message getUIInitialMessage() {
         Object[] args = {this.context.getMap().getVertexNum(), maxLow, maxNormal,
-                this.context.getMap().getAdjacencyList(), this.context.getUIDiffList()};
+                this.context.getMap().getAdjacencyList(), this.context.getUIDiffList(),
+                Configs.CLIENT_CONFIGS.get(0).getName(), Configs.CLIENT_CONFIGS.get(1).getName()};
         String name = Message.NAME_INIT;
         return new Message(name, args);
     }

@@ -9,8 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
+import java.util.LinkedList;
 
 /**
  * Class created as a part of {@link GameServer GameServer} class for controlling the output.
@@ -165,11 +164,7 @@ public class OutputController implements Runnable {
             }
         }
         if (fileWriter != null) {
-            synchronized (fileWriter.messagesQueue) {
-                while (!fileWriter.messagesQueue.isEmpty()) {
-                    fileWriter.messagesQueue.wait();
-                }
-            }
+            fileWriter.waitToFinish();
         }
     }
 
@@ -188,7 +183,7 @@ public class OutputController implements Runnable {
 
         private boolean open;
         private ObjectOutputStream outputStream;
-        private final LinkedBlockingDeque<Message> messagesQueue;
+        private final LinkedList<Message> messagesQueue;
 
         /**
          * Constructor of the class which accepts a File and sets it as the output of writing operations.
@@ -197,12 +192,22 @@ public class OutputController implements Runnable {
          */
         public FileWriter(File file) throws IOException {
             outputStream = new ObjectOutputStream(new FileOutputStream(file, false));
-            messagesQueue = new LinkedBlockingDeque<>();
+            messagesQueue = new LinkedList<>();
 //            this.messagesQueue = new ArrayBlockingQueue<>(QUEUE_DEFAULT_SIZE);
         }
 
+        public void waitToFinish() throws InterruptedException {
+            synchronized (messagesQueue) {
+                while (!messagesQueue.isEmpty())
+                    messagesQueue.wait();
+            }
+        }
+
         public void queue(Message msg) {
-            messagesQueue.add(msg);
+            synchronized (messagesQueue) {
+                messagesQueue.add(msg);
+                messagesQueue.notifyAll();
+            }
         }
 
         /**
@@ -225,9 +230,10 @@ public class OutputController implements Runnable {
                 while (open) {
                     synchronized (messagesQueue) {
                         while (!messagesQueue.isEmpty()) {
-                            writeToFile(messagesQueue.pollFirst(1, TimeUnit.SECONDS));
+                            writeToFile(messagesQueue.pollFirst());
                             messagesQueue.notifyAll();
                         }
+                        messagesQueue.wait();
                     }
                 }
             } catch (InterruptedException ignored) {
@@ -284,16 +290,26 @@ public class OutputController implements Runnable {
     private class UINetworkSender implements Runnable {
 
         private boolean open;
-        private final LinkedBlockingDeque<Message> messagesQueue;
+        private final LinkedList<Message> messagesQueue;
 
         public UINetworkSender() {
-            messagesQueue = new LinkedBlockingDeque<>();
+            messagesQueue = new LinkedList<>();
+        }
+
+        public void waitToFinish() throws InterruptedException {
+            synchronized (messagesQueue) {
+                while (!messagesQueue.isEmpty())
+                    messagesQueue.wait();
+            }
         }
 
         public void queue(Message msg) {
             if (msg == null) // prevent NullPointerException
                 return;
-            messagesQueue.add(msg);
+            synchronized (messagesQueue) {
+                messagesQueue.add(msg);
+                messagesQueue.notifyAll();
+            }
         }
 
         /**
@@ -316,8 +332,11 @@ public class OutputController implements Runnable {
             try {
                 while (open) {
                     synchronized (messagesQueue) {
-                        sendToUINetwork(messagesQueue.pollFirst(1, TimeUnit.SECONDS));
-                        messagesQueue.notifyAll();
+                        while (!messagesQueue.isEmpty()) {
+                            sendToUINetwork(messagesQueue.pollFirst());
+                            messagesQueue.notifyAll();
+                        }
+                        messagesQueue.wait();
                     }
                 }
             } catch (InterruptedException ignored) {

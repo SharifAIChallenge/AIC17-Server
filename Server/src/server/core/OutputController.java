@@ -19,7 +19,7 @@ import java.util.LinkedList;
  * local file is supported.</i>
  * </p>
  */
-public class OutputController implements Runnable {
+public class OutputController {
 
     public static final String TAG = "OutputController";
 
@@ -64,33 +64,16 @@ public class OutputController implements Runnable {
             if (uiNetwork == null) {
                 this.sendToUI = false;
                 Log.i(TAG, "UINetwork parameter is null.");
+            } else {
+                uiSender = new UINetworkSender();
+                new Thread(uiSender).start();
             }
+//            timer = new Timer();
+//            timer.scheduleAtFixedRate(new UINetworkSender(), 0, timeInterval);
         }
         this.sendToFile = Configs.PARAM_OC_SEND_TO_FILE.getValue();
         if (sendToFile) {
             this.outputFile = new File(Configs.PARAM_OC_FILE_PATH.getValue());
-        }
-    }
-
-    /**
-     * Run method implemented from {@link Runnable java.lang.Runnable} class, which will set and run the two type
-     * of output handlers.
-     * <p>
-     * In this method, if the sendToUI mode got activated in the class, then a {@link java.util.Timer Timer} will
-     * be scheduled in the given period to send data to {@link server.network.UINetwork UINetwork}.
-     * And also if the sendToFile mode got activated, then a thread of
-     * {@link server.core.OutputController.FileWriter FileWriter} class will be run.
-     * </p>
-     */
-    @Override
-    public void run() {
-        if (sendToUI) {
-            uiSender = new UINetworkSender();
-            new Thread(uiSender).start();
-//            timer = new Timer();
-//            timer.scheduleAtFixedRate(new UINetworkSender(), 0, timeInterval);
-        }
-        if (sendToFile) {
             try {
                 fileWriter = new FileWriter(outputFile);
                 new Thread(fileWriter).start();

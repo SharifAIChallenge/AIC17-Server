@@ -81,12 +81,14 @@ public class GameServer {
             mClientConfigs[i].setID(id);
         }
 
-        if (Configs.PARAM_UI_ENABLE.getValue()) {
+        if (Configs.PARAM_UI_ENABLE.getValue() == Boolean.TRUE) {
             mUINetwork.listen(Configs.PARAM_UI_PORT.getValue());
             mClientNetwork.listen(Configs.PARAM_CLIENTS_PORT.getValue());
 
             try {
+                System.err.println("Waiting for UI for " + Configs.PARAM_UI_CONNECTIONS_TIMEOUT.getValue() + "ms.");
                 mUINetwork.waitForClient(Configs.PARAM_UI_CONNECTIONS_TIMEOUT.getValue());
+                System.err.println("UI connected.");
             } catch (InterruptedException e) {
                 throw new RuntimeException("Waiting for ui interrupted");
             }
@@ -97,6 +99,7 @@ public class GameServer {
                 throw new RuntimeException("Waiting for clients interrupted");
             }
 
+            System.err.println("Sending first UI message.");
             Message initialMessage = mGameLogic.getUIInitialMessage();
             mOutputController.putMessage(initialMessage);
             try {
@@ -138,7 +141,6 @@ public class GameServer {
     public void start() {
         mLoop = new Loop();
         new Thread(mLoop).start();
-        new Thread(mOutputController).start();
     }
 
     /**

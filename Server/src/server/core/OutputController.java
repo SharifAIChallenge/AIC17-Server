@@ -1,5 +1,6 @@
 package server.core;
 
+import network.Json;
 import network.data.Message;
 import server.config.Configs;
 import server.network.UINetwork;
@@ -161,7 +162,7 @@ public class OutputController {
     private class FileWriter implements Runnable {
 
         private boolean open;
-        private ObjectOutputStream outputStream;
+        private FileOutputStream outputStream;
         private final LinkedList<Message> messagesQueue;
 
         /**
@@ -170,7 +171,7 @@ public class OutputController {
          * @param file Given File to store message data in
          */
         public FileWriter(File file) throws IOException {
-            outputStream = new ObjectOutputStream(new FileOutputStream(file, false));
+            outputStream = new FileOutputStream(file, false);
             messagesQueue = new LinkedList<>();
 //            this.messagesQueue = new ArrayBlockingQueue<>(QUEUE_DEFAULT_SIZE);
         }
@@ -236,7 +237,9 @@ public class OutputController {
             if (msg == null)
                 return;
             try {
-                outputStream.writeObject(msg);
+                System.err.println("writing " + Json.GSON.toJson(msg));
+                outputStream.write(Json.GSON.toJson(msg).getBytes("UTF-8"));
+                outputStream.write(0);
             } catch (IOException e) {
                 Log.i(TAG, "Write to file failed.", e);
             }

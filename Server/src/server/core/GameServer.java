@@ -11,13 +11,13 @@ import util.Log;
 import java.util.Arrays;
 
 /**
- * Core controller of the framework, controls the {@link server.core.GameLogic GameLogic}, main loop of the game and
+ * Core controller of the framework, controls the {@link server.core.GameLogic GameLogic}, Swarm.main loop of the game and
  * does the output controlling operations.
  * <p>
- * This class runs the main running thread of the framework. Class interacts with the clients, UI, and the
+ * This class runs the Swarm.main running thread of the framework. Class interacts with the clients, UI, and the
  * GameLogic itself.
  * Threads in this class, will gather the clients' events
- * (See also {@link server.network.ClientNetwork ClientNetwork}), send them to the main Game
+ * (See also {@link server.network.ClientNetwork ClientNetwork}), send them to the Swarm.main Game
  * (See also {@link server.core.GameLogic GameLogic})
  * The output will be manipulated and sent to the appropriate controller within a inner module of the class
  * (OutputController).
@@ -135,7 +135,7 @@ public class GameServer {
     }
 
     /**
-     * Starts the main game ({@link server.core.GameLogic GameLogic}) loop and the
+     * Starts the Swarm.main game ({@link server.core.GameLogic GameLogic}) loop and the
      * {@link server.core.OutputController OutputController} operations in two new {@link java.lang.Thread Thread}.
      */
     public void start() {
@@ -144,7 +144,7 @@ public class GameServer {
     }
 
     /**
-     * Registers a shutdown request into the main loop and {@link server.core.OutputController OutputController} class
+     * Registers a shutdown request into the Swarm.main loop and {@link server.core.OutputController OutputController} class
      * <p>
      * Note that the shutdown requests, will be responded as soon as the current queue of operations got freed.
      * </p>
@@ -157,7 +157,7 @@ public class GameServer {
     }
 
     /**
-     * In order to give the loop a thread to be ran beside of the main loop.
+     * In order to give the loop a thread to be ran beside of the Swarm.main loop.
      * <p>
      * This inner class has a {@link java.util.concurrent.Callable Callable} part, which is wrote down as a
      * runnable code template. This template is composed by the multiple steps in every turn of the game.
@@ -289,7 +289,7 @@ public class GameServer {
         }
 
         /**
-         * Will set the shutdown request flag in order to finish the main {@link GameServer.Loop Loop} at
+         * Will set the shutdown request flag in order to finish the Swarm.main {@link GameServer.Loop Loop} at
          * the first possible turn
          */
         public void shutdown() {

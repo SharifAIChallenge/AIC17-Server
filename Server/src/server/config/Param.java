@@ -9,6 +9,7 @@ import java.util.ArrayList;
 /**
  * Copyright (C) 2016 Hadi
  */
+
 public abstract class Param<T> {
     private static final ArrayList<Param> allParameters = new ArrayList<>();
 

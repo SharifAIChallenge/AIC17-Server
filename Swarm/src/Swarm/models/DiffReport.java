@@ -1,4 +1,4 @@
-package models;
+package Swarm.models;
 
 /**
  * Created by pezzati on 1/28/16.

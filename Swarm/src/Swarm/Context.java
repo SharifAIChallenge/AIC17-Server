@@ -1,6 +1,8 @@
-import models.Diff;
-import models.DiffReport;
-import models.Map;
+package Swarm;
+
+import Swarm.models.Diff;
+import Swarm.models.DiffReport;
+import Swarm.models.Map;
 
 import java.io.File;
 import java.util.ArrayList;

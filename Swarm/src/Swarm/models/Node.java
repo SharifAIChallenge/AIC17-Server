@@ -1,4 +1,4 @@
-package models;
+package Swarm.models;
 
 import java.util.ArrayList;
 

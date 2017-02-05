@@ -1,3 +1,5 @@
+package Swarm;
+
 import network.data.Message;
 
 import javax.imageio.ImageIO;
@@ -150,7 +152,7 @@ public class DebugUI {
             "Wood",
     };
 
-    public DebugUI(FlowsGameLogic logic) {
+    public DebugUI(SwarmGameLogic logic) {
         this.nNodes = logic.getContext().getMap().getVertexNum();
         this.nTurns = logic.getContext().getMap().getGameConstants().getTurns();
 

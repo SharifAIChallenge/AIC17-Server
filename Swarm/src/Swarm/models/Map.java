@@ -1,53 +1,39 @@
 package Swarm.models;
 
-import Swarm.objects.Fish;
-import Swarm.objects.Food;
-import Swarm.objects.GameObject;
-import Swarm.objects.Trash;
-import debugUI.paintIt.MapPanel;
+import Swarm.objects.*;
 import network.Json;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ThreadFactory;
 
 import Swarm.map.Cell;
-
-import javax.swing.*;
-
 /**
  * Created by pezzati on 1/27/16.
  */
 public class Map {
+    private int idCounter = 0;
+    private ArrayList<Teleport> teleports = new ArrayList<>();
+
+    public int getIdCounter() {
+        return idCounter;
+    }
+
+    public void setIdCounter(int idCounter) {
+        this.idCounter = idCounter;
+    }
+
     private int h,w;
-    private ArrayList<Fish> fishes = new ArrayList<>();
-    private ArrayList<GameObject> contents = new ArrayList<>();
+    private ArrayList<Fish>[] fishes;
+    private ArrayList<GameObject> tempObjects = new ArrayList<>();
 
     private int[] score = new int[2];
-
-    public ArrayList<Fish> getFishes() {
-        return fishes;
-    }
-
-    public void setFishes(ArrayList<Fish> fishes) {
-        this.fishes = fishes;
-    }
-
-    public ArrayList<GameObject> getContents() {
-        return contents;
-    }
-
-    public void setContents(ArrayList<GameObject> contents) {
-        this.contents = contents;
-    }
 
     private String mapName;
     private Cell[][] cells;
 
-    public Cell[][] getCells(){
+    public Cell[][] getCells() {
         return cells;
     }
 
@@ -64,12 +50,35 @@ public class Map {
             if(fishes[i][5] == 1){
                 b = true;
             }
-            Fish fish = new Fish(fishes[i][0],cells[fishes[i][1]][fishes[i][2]], fishes[i][7],fishes[i][3],b,fishes[i][4]);
-            this.fishes.add(fish);
+            Fish fish = new Fish(idCounter,cells[fishes[i][0]][fishes[i][1]], fishes[i][6],fishes[i][2],b,fishes[i][3]);
+
+            idCounter++;
+
+            if(fish.getTeamNumber() == 0)
+                this.fishes[0].add(fish);
+            else
+                this.fishes[1].add(fish);
+
             cells[fishes[i][1]][fishes[i][2]].setContent(fish);
 
         }
 
+    }
+
+    public ArrayList<Fish>[] getFishes() {
+        return fishes;
+    }
+
+    public void setFishes(ArrayList<Fish>[] fishes) {
+        this.fishes = fishes;
+    }
+
+    public ArrayList<GameObject> getTempObjects() {
+        return tempObjects;
+    }
+
+    public void setTempObjects(ArrayList<GameObject> tempObjects) {
+        this.tempObjects = tempObjects;
     }
 
     public Map(File mapFile) {
@@ -85,14 +94,18 @@ public class Map {
             for (int i = 0; i < h; i++) {
                 for (int j = 0; j < w; j++) {
                     cells[i][j] = new Cell();
+                    cells[i][j].setRow(i);
+                    cells[i][j].setColumn(j);
                 }
             }
 
             makeFish(mapJson.fishes);
             makeFood(mapJson.foods);
             makeTrash(mapJson.trashes);
-            /*
+            makeNets(mapJson.nets);
+
             makeTeleport(mapJson.teleports);
+            /*
             makeConstant(mapJson.constants);
             */
 
@@ -102,28 +115,46 @@ public class Map {
 
     }
 
-    private Map(){
-        Cell cells[][] = new Cell[20][20];
-        Fish fish1 = new Fish(1, cells[0][0], 0, 2, false, 0);
-        Fish fish2 = new Fish(1, cells[0][0], 0, 3, false, 0);
-        Fish fish3 = new Fish(1, cells[0][0], 0, 0, false, 0);
-        for(int i = 0; i<20; i++)
-            for(int j = 0; j<20; j++)
-                cells[i][j] = new Cell(fish1, false,false);
-        //cells[0][0] = new Cell(fish1, true, false);
-        //cells[0][1] = new Cell(null, false, false);
-        //cells[1][0] = new Cell(fish2, false, false);
-        //cells[1][1] = new Cell(fish3, true, false);
-        this.setCells(cells);
-        this.setW(cells.length);
-        this.setH(cells[0].length);
-        this.setMapName("test_map");
+    public ArrayList<Teleport> getTeleports() {
+        return teleports;
+    }
+
+    public void setTeleports(ArrayList<Teleport> teleports) {
+        this.teleports = teleports;
+    }
+
+    private void makeTeleport(int[][] teleports) {
+        for (int i = 0; i < teleports.length; i++) {
+            Teleport teleport1 = new Teleport(idCounter,cells[teleports[i][0]][teleports[i][1]]);
+            idCounter++;
+            Teleport teleport2 = new Teleport(idCounter,cells[teleports[i][2]][teleports[i][3]]);
+            idCounter++;
+            teleport1.setPair(cells[teleports[i][2]][teleports[i][3]]);
+            teleport2.setPair(cells[teleports[i][0]][teleports[i][1]]);
+
+            this.tempObjects.add(teleport1);
+            this.tempObjects.add(teleport2);
+            cells[teleports[i][0]][teleports[i][1]].setTeleport(teleport1);
+            cells[teleports[i][2]][teleports[i][3]].setTeleport(teleport2);
+
+        }
+    }
+
+    private void makeNets(int[][] nets) {
+        for (int i = 0; i < nets.length; i++) {
+            Net net = new Net(idCounter,cells[nets[i][0]][nets[i][1]]);
+            idCounter++;
+            this.tempObjects.add(net);
+            cells[nets[i][1]][nets[i][2]].setNet(net);
+
+        }
     }
 
     private void makeTrash(int[][] trashes) {
         for (int i = 0; i < trashes.length; i++) {
-            Trash trash = new Trash(trashes[i][0],cells[trashes[i][1]][trashes[i][2]]);
-            this.contents.add(trash);
+            Trash trash = new Trash(idCounter,cells[trashes[i][0]][trashes[i][1]]);
+            idCounter++;
+            this.tempObjects.add(trash);
             cells[trashes[i][1]][trashes[i][2]].setContent(trash);
 
         }
@@ -132,8 +163,9 @@ public class Map {
     private void makeFood(int[][] foods) {
 
         for (int i = 0; i < foods.length; i++) {
-            Food food = new Food(foods[i][0],cells[foods[i][1]][foods[i][2]]);
-            this.contents.add(food);
+            Food food = new Food(idCounter,cells[foods[i][0]][foods[i][1]]);
+            idCounter++;
+            this.tempObjects.add(food);
             cells[foods[i][1]][foods[i][2]].setContent(food);
 
         }
@@ -147,6 +179,7 @@ public class Map {
         private int[][] trashes;
         private int[][] teleports;
         private int[][] constants;
+        private int[][] nets;
     }
 
 
@@ -181,30 +214,6 @@ public class Map {
 
     public void setMapName(String mapName) {
         this.mapName = mapName;
-    }
-
-    public static void main(String[] args) {
-        Map map = new Map();
-        System.out.println(map.getH());
-        System.out.println(map.getW());
-        MapPanel mapPanel = new MapPanel(map);
-        JFrame frame = new JFrame();
-        frame.setResizable(false);
-        frame.setVisible(true);
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setContentPane(mapPanel);
-        frame.revalidate();
-        frame.pack();
-        ((Fish)map.getCells()[0][0].getContent()).setDirection(3);
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        mapPanel.setMap(map);
-        mapPanel.gameOver();
-        //System.out.println(map.getH());
     }
 
 }

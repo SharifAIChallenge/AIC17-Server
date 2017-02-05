@@ -9,41 +9,18 @@ import java.util.ArrayList;
 
 public class Cell {
 
-
-    // game object
-    // x,y
+    private Teleport teleport;
+    private Net net;
     private int row, column;
     private GameObject content;
-    private Teleport teleport;
-    private ArrayList<Net> nets;
     private int contentAge = 0;
-    private boolean hasFishnet = false;
-    private boolean hasOutTeleport = false;
-    private ArrayList<Fish> collidingFishes;
 
     // constructors
 
     public Cell() {
-        this.collidingFishes = new ArrayList<>();
+
     }
 
-    public Cell(GameObject content, boolean hasFishnet, boolean hasOutTeleport) {
-        this.content = content;
-        this.hasFishnet = hasFishnet;
-        this.hasOutTeleport = hasOutTeleport;
-        this.collidingFishes = new ArrayList<>();
-    }
-
-    public Cell(GameObject content, Fish fish) {
-        this.content = content;
- //       this.fish = fish;
-        this.collidingFishes = new ArrayList<>();
-    }
-
-    public Cell(GameObject content) {
-        this.content = content;
-        this.collidingFishes = new ArrayList<>();
-    }
 
     /// getter & setter
 
@@ -63,29 +40,7 @@ public class Cell {
         this.contentAge = contentAge;
     }
 
-    public boolean isHasFishnet() {
-        return hasFishnet;
-    }
 
-    public void setHasFishnet(boolean hasFishnet) {
-        this.hasFishnet = hasFishnet;
-    }
-
-    public boolean isHasOutTeleport() {
-        return hasOutTeleport;
-    }
-
-    public void setHasOutTeleport(boolean hasOutTeleport) {
-        this.hasOutTeleport = hasOutTeleport;
-    }
-
-    public ArrayList<Fish> getCollidingFishes() {
-        return collidingFishes;
-    }
-
-    public void setCollidingFishes(ArrayList<Fish> collidingFishes) {
-        this.collidingFishes = collidingFishes;
-    }
 
     public int getRow() {
         return row;
@@ -102,4 +57,23 @@ public class Cell {
     public void setColumn(int column) {
         this.column = column;
     }
+
+    public Teleport getTeleport() {
+        return teleport;
+    }
+
+    public void setTeleport(Teleport teleport) {
+        this.teleport = teleport;
+    }
+
+    public Net getNet() {
+        return net;
+    }
+
+    public void setNet(Net net) {
+        this.net = net;
+    }
+
+
+
 }

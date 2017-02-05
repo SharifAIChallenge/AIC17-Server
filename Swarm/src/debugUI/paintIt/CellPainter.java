@@ -19,7 +19,6 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
     static private Image floor;
     static private Image slipper;
     static private Image teleport_in;
-    static private Image teleport_out;
     static private ArrayList<Image> trashImages = new ArrayList<>();
     static private ArrayList<Image> foodImages = new ArrayList<>();
 
@@ -52,7 +51,6 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
         //---load the images if they are not loaded
         if(floor == null) {
             floor = ImageDataBase.getImageScaled("floor.png", cellSize, cellSize);
-            teleport_out = ImageDataBase.getImageScaled("teleport_out.png", cellSize, cellSize);
             slipper = ImageDataBase.getImageScaled("slipper.png", cellSize, cellSize);
             teleport_in = ImageDataBase.getImageScaled("teleport_in.png", cellSize, cellSize);
             for(int i = 0; i<4; i++)//we assume we have 4 trash images
@@ -64,14 +62,12 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
         }
         //--needed images are loaded now
         ret.add(new ImageToDraw(floor));//we always have floor
-        if(cell.isHasFishnet())
+        if(cell.getNet()!= null)
             ret.add(new ImageToDraw(slipper));
         //TODO:uncomment this and translate this
-        /*if(cell.isTeleportIn()) {
+        if(cell.getTeleport()!=null) {
             ret.add(new ImageToDraw(teleport_in));
         }
-        else if(cell.isTeleportOut())
-            ret.add(new ImageToDraw(teleport_out));*/
 
 
 
@@ -123,13 +119,13 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
     private static Image getFishImage(Fish fish, int cellSize){
         int fish_number = getFishNumber(fish);
         if(fishImages.get(fish_number) == null){
-            fishImages.set(fish_number, ImageDataBase.getImageScaled(Integer.toString(fish_number)+".png", cellSize, cellSize));
+            fishImages.set(fish_number, ImageDataBase.getImageScaled(Integer.toString(fish_number)+".png", cellSize/2, cellSize/2));
         }
         return fishImages.get(fish_number);
     }
     private static int getFishNumber(Fish fish){
         int number = 0;
-        number+= fish.getTeamNumber() * 1;
+        number+= fish.getTeamNumber();
         if(fish.isQueen()){
             number+=2;
         }

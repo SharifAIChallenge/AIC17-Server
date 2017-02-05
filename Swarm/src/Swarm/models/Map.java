@@ -134,6 +134,10 @@ public class Map {
 
     }
 
+    public Map(){
+
+    }
+
     public ArrayList<Teleport> getTeleports() {
         return teleports;
     }

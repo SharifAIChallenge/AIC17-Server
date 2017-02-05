@@ -1,6 +1,8 @@
 package debugUI.paintIt;
 import Swarm.map.Cell;
 import Swarm.models.Map;
+import Swarm.objects.Fish;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -106,11 +108,33 @@ public class MapPanel extends JPanel{
         }
 
     }
-    public static void main(String args[]){
-       // MapPanel mapPanel = new MapPanel();
-    }
 
     public Map getGameMap() {
         return gameMap;
+    }
+
+    public static void main(String[] args) {
+        Cell cells[][] = new Cell[20][20];
+        for(int i = 0; i<20; i++)
+            for(int j = 0; j<20; j++) {
+                cells[i][j] = new Cell();
+                cells[i][j].setContent(new Fish(i,cells[i][j],0,2,true,0));
+            }
+
+        Map map = new Map();
+        map.setCells(cells);
+        map.setW(cells.length);
+        map.setH(cells[0].length);
+        MapPanel mapPanel = new MapPanel(map);
+        //open the JFrame frame
+        JFrame frame = new JFrame();
+        frame.setResizable(false);
+        frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        //
+        frame.setContentPane(mapPanel);
+        frame.pack();
+
     }
 }

@@ -88,17 +88,17 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
             AffineTransform st = new AffineTransform();
             AffineTransform en = new AffineTransform();
             switch (fish.getDirection()) {
-                case 1:
+                case 0:
                     st.rotate(Math.PI / 2, cellSize/2, cellSize/2);
                     en.rotate(-1.0 * Math.PI / 2, cellSize/2, cellSize/2);
                     break;
                 case 2:
-                    st.rotate(Math.PI, cellSize/2, cellSize/2);
-                    en.rotate(-1.0*Math.PI, cellSize/2, cellSize/2);
+                    st.rotate(-1.0*Math.PI / 2, cellSize/2, cellSize/2);
+                    en.rotate(Math.PI / 2, cellSize/2, cellSize/2);
                     break;
                 case 3:
-                    st.rotate(3*Math.PI/2, cellSize/2, cellSize/2);
-                    en.rotate(-3.0*Math.PI/2, cellSize/2, cellSize/2);
+                    st.rotate(-1.0*Math.PI, cellSize/2, cellSize/2);
+                    en.rotate(Math.PI, cellSize/2, cellSize/2);
                     break;
             }
             ret.add(new ImageToDraw(getFishImage(fish, cellSize), st, en));

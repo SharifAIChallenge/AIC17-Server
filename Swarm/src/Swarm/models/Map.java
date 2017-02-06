@@ -6,6 +6,7 @@ import network.Json;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -13,7 +14,7 @@ import Swarm.map.Cell;
 /**
  * Created by pezzati on 1/27/16.
  */
-public class Map {
+public class Map implements Serializable{
     private String mapName;
     private int turn;
     private int h,w;

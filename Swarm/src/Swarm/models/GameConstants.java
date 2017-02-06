@@ -1,9 +1,11 @@
 package Swarm.models;
 
+import java.io.Serializable;
+
 /**
  * Copyright (C) 2016 Hadi
  */
-public class GameConstants {
+public class GameConstants implements Serializable{
 
     private long turnTimeout;
     private int w;

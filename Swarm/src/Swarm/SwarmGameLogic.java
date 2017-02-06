@@ -2,6 +2,7 @@ package Swarm;
 
 import Swarm.models.Diff;
 import Swarm.objects.*;
+import debugUI.paintIt.MapPanel;
 import model.Event;
 import Swarm.models.GameConstants;
 import Swarm.models.Map;
@@ -15,6 +16,7 @@ import server.core.GameServer;
 import Swarm.map.Cell;
 import util.Log;
 
+import javax.swing.*;
 import java.util.*;
 
 
@@ -22,63 +24,62 @@ import java.util.*;
  * Created by pezzati on 1/28/16.
  */
 public class SwarmGameLogic implements GameLogic {
-    private static final String TAG = "Flows";
+    private static final String TAG = "Swarn";
 
-    private Context context;
-    private DebugUI debugUI;
+    private MapPanel debugUI;
     private Event[][] lastClientEvents;
 
-/**
-    //swarm Constatnts :::
-    private int mapSize;
-    private int teamNum = 2;
-    private int teleportNum;
-    private int initFishNum;
-    private int initQueenNum;
+    /**
+     //swarm Constatnts :::
+     private int mapSize;
+     private int teamNum = 2;
+     private int teleportNum;
+     private int initFishNum;
+     private int initQueenNum;
 
-    private double foodProb;
-    private double trashProb;
-    private double netProb;
+     private double foodProb;
+     private double trashProb;
+     private double netProb;
 
-    private int netActiveTime;
-    private int netValidTime;
+     private int netActiveTime;
+     private int netValidTime;
 
-    //
+     //
 
-    private int changeColorLimit;
-    private int kStep;
-    // or :
-    private int colorCost;
-    //
-    private int sickCost;
-    private int UpdateCost;
-    private int detMoveCost;
+     private int changeColorLimit;
+     private int kStep;
+     // or :
+     private int colorCost;
+     //
+     private int sickCost;
+     private int UpdateCost;
+     private int detMoveCost;
 
-    private int killQueenScore;
-    private int killFishScore;
-    private int queenCollisionScore;
-    private int fishFoodScore;
-    private int queenFoodScore;
-    private int sickLifeTime;
+     private int killQueenScore;
+     private int killFishScore;
+     private int queenCollisionScore;
+     private int fishFoodScore;
+     private int queenFoodScore;
+     private int sickLifeTime;
 
-    private int powerRatio;
-    private double endRatio;
+     private int powerRatio;
+     private double endRatio;
 
-    private int disobeyPointerTeam0;
-    private int disobeyPointerTeam1;
-    private int disobeyNum;
-    private double disobeyRatio;
+     private int disobeyPointerTeam0;
+     private int disobeyPointerTeam1;
+     private int disobeyNum;
+     private double disobeyRatio;
 
-    private int foodValidTime;
-    private int trashValidTime;
-*/
+     private int foodValidTime;
+     private int trashValidTime;
+     */
 //////////
     Diff diff = new Diff();
     private int idCounter;
     private int H,W;
     Map map;
-    GameConstants gc ;
-    int[][][][][] update = new int[gc.getTeamNum()][2][3][2][3];
+    GameConstants gc;
+    int[][][][][] update;
 
     int[] rowHeadDir = {0, -1,  0, 1};
     int[] colHeadDir = {1,  0, -1, 0};
@@ -100,8 +101,8 @@ public class SwarmGameLogic implements GameLogic {
     private boolean[][][] newBorn;
     private Fish[][][] motherFish;
 
-    private int score[] = new int[gc.getTeamNum()];
-    private int numberOfQueens[] = new int[gc.getTeamNum()];
+    private int score[];
+    private int numberOfQueens[];
     HashMap<Integer, String> fishChanges;
     HashSet<Integer> fishAlters = new HashSet<>();
     private int turn;
@@ -119,9 +120,6 @@ public class SwarmGameLogic implements GameLogic {
         gameServer.waitForFinish();
     }
 
-    public Context getContext() {
-        return context;
-    }
 
     @Override
     public int getClientsNum() {
@@ -149,10 +147,23 @@ public class SwarmGameLogic implements GameLogic {
         this.idCounter = this.map.getIdCounter();
         this.teleports = this.map.getTeleports();
         this.gc = this.map.getConstants();
+        this.idCounter = this.map.getIdCounter();
+        this.update = new int[gc.getTeamNum()][2][3][2][3];
+        this.score = this.map.getScore();
+        this.numberOfQueens =  new int[gc.getTeamNum()];
+        initialize();
 
-
-
-
+        if (PARAM_SHOW_DEBUG_UI.getValue() == Boolean.TRUE) {
+            debugUI = new MapPanel(this.map);
+            JFrame frame = new JFrame();
+            frame.setResizable(false);
+            frame.setVisible(true);
+            frame.setLocationRelativeTo(null);
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            //
+            frame.setContentPane(debugUI);
+            frame.pack();
+        }
     }
 
     /*
@@ -160,7 +171,7 @@ public class SwarmGameLogic implements GameLogic {
      */
     @Override
     public Message getUIInitialMessage() {
-
+        return null;
     }
 
     @Override
@@ -182,18 +193,11 @@ public class SwarmGameLogic implements GameLogic {
     }
 
     public void initialize(){
-        // init these for the first time from map;
-        //private ArrayList <Fish>[] fishes;
-        //private ArrayList <GameObject> tempObjects;
-        //private ArrayList <Teleport> teleports;
-        //private Cell[][] cells;
-        //private int score[] = new int[gc.getTeamNum()];
 
-        //HashMap<Integer, String> fishChanges;
-        //HashSet<Integer> fishAlters = new HashSet<>();
+        //handle map.getScore()[0];
 
-
-
+        fishChanges = new HashMap<>();
+        fishAlters = new HashSet<>();
         attacks = new ArrayList[H][W][2];
 
         for(int i=0;i<H;i++) {
@@ -293,7 +297,7 @@ public class SwarmGameLogic implements GameLogic {
                  * handle correct type
                  */
                 int id = Integer.parseInt(detMoves[ind].get(i).getArgs()[0]),
-                    mv = Integer.parseInt(detMoves[ind].get(i).getArgs()[1]);
+                        mv = Integer.parseInt(detMoves[ind].get(i).getArgs()[1]);
                 for(int j=0;j<fishes[ind].size();j++){
                     if(fishes[ind].get(j).getId() == id){
                         nextCell[ind].set(j, getNextCellViaMove(fishes[ind].get(j), mv));
@@ -353,7 +357,7 @@ public class SwarmGameLogic implements GameLogic {
                         }
                         if((attacks[i][j][1-ind].size()-queens[1-ind])==1){
                             if( !fishChanges.containsKey(lastNormalFish[1-ind]) );
-                                fishChanges.put(lastNormalFish[1-ind].getId(), "move");
+                            fishChanges.put(lastNormalFish[1-ind].getId(), "move");
                         }
                     }
                 }
@@ -640,11 +644,13 @@ public class SwarmGameLogic implements GameLogic {
      */
     @Override
     public void generateOutputs() {
+        /*
         if (debugUI != null) {
             debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), lastClientEvents, getStatusMessage(), movesDest2, movesSize2);
         }
         this.context.flush();
         this.context.turnUP();
+        */
     }
 
     @Override
@@ -657,29 +663,8 @@ public class SwarmGameLogic implements GameLogic {
      */
     @Override
     public Message getStatusMessage() {
-        int[] armyCount = this.context.getDiffer().getPrevArmyCount();
-        int[] ownerships = this.context.getDiffer().getPrevOwnership();
-        int unitsCount[] = new int[2];
-        for (int i = 0; i < ownerships.length; i++) {
-            if (ownerships[i] != -1) {
-                unitsCount[ownerships[i]] += armyCount[i];
-            }
-        }
-        int totalUnits = unitsCount[0] + unitsCount[1];
-        int totalTurns = this.context.getMap().getGameConstants().getTurns();
-        int remainingTurns = totalTurns - this.context.getTurn();
-        double points[] = new double[2];
-        for (int i = 0; i < 2; i++) {
-            int diffSign = unitsCount[i] - unitsCount[1 - i];
-            if (diffSign < 0)
-                diffSign = -1;
-            if (diffSign > 0)
-                diffSign = 1;
-            if (diffSign == 0)
-                diffSign = 0;
-            points[i] = 1 + (totalUnits == 0 ? 0.5 : (double) unitsCount[i] / totalUnits) + (double) remainingTurns / totalTurns * diffSign;
-        }
-        return new Message(Message.NAME_STATUS, new Object[]{context.getTurn(), points[0], points[1]});
+
+        return new Message(Message.NAME_STATUS, new Object[]{this.turn, this.score[0], this.score[1]});
     }
 
     @Override
@@ -706,7 +691,10 @@ public class SwarmGameLogic implements GameLogic {
      */
     @Override
     public boolean isGameFinished() {
+        /*
         return (this.context.getMap().isFinished() || this.context.getTurn() >= this.context.getMap().getGameConstants().getTurns());
+        */
+        return true;
     }
 
     @Override

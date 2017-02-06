@@ -1,6 +1,9 @@
-package debugUI.paintIt;
+package debugUI.images.paintIt;
 import Swarm.map.Cell;
 import Swarm.models.Map;
+import Swarm.objects.Fish;
+import Swarm.objects.Teleport;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -9,13 +12,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /*
 written by miladink
  */
-public class MapPanel extends JPanel{
+public class MapPanel2 extends JPanel{
 
     private Map gameMap;
     private int cellSize;
@@ -23,10 +27,10 @@ public class MapPanel extends JPanel{
     private int counter = 0;
     private ZipOutputStream out;
 
-    public MapPanel(Map gameMap){
+    public MapPanel2(Map gameMap){
         this.gameMap = gameMap;
-        int cellWidth = Math.min(80, 600/gameMap.getW());//to be sure that width will not violate 600
-        int cellHeight = Math.min(80, 800/gameMap.getH());//to be sure that height will not violate 800
+        int cellWidth = Math.min(80, 800/gameMap.getW());//to be sure that width will not violate 600
+        int cellHeight = Math.min(80, 600/gameMap.getH());//to be sure that height will not violate 800
         cellSize = Math.min(cellWidth, cellHeight);
         int width = gameMap.getW() * cellSize;
         int height = gameMap.getH() * cellSize;
@@ -106,11 +110,39 @@ public class MapPanel extends JPanel{
         }
 
     }
-    public static void main(String args[]){
-       // MapPanel mapPanel = new MapPanel();
-    }
 
     public Map getGameMap() {
         return gameMap;
+    }
+
+    public static void main(String[] args) {
+        Cell cells[][] = new Cell[10][10];
+        for(int i = 0; i<10; i++)
+            for(int j = 0; j<10; j++) {
+                cells[i][j] = new Cell();
+                int randomNum = ThreadLocalRandom.current().nextInt(0, 1 + 1);
+                if((randomNum%2)==0)
+                    cells[i][j].setContent(new Fish(i,cells[i][j],0,0,true,0));
+                cells[i][j].setRow(i);
+                cells[i][j].setColumn(j);
+            }
+        cells[0][7].setTeleport(new Teleport(1, cells[0][7], cells[8][9]));
+        cells[8][9].setTeleport(new Teleport(1, cells[8][9], cells[0][7]));
+        Map map = new Map();
+        map.setCells(cells);
+        map.setW(cells.length);
+        map.setH(cells[0].length);
+        MapPanel mapPanel = new MapPanel(map);
+        //open the JFrame frame
+        JFrame frame = new JFrame();
+        frame.setResizable(false);
+        frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        //
+        frame.setContentPane(mapPanel);
+        frame.pack();
+        mapPanel.gameOver();
+
     }
 }

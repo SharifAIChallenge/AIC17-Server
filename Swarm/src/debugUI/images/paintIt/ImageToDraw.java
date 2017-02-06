@@ -1,4 +1,4 @@
-package debugUI.paintIt;
+package debugUI.images.paintIt;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;

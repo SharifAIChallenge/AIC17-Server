@@ -2,6 +2,7 @@ package Swarm;
 
 import Swarm.models.Diff;
 import Swarm.objects.*;
+import debugUI.paintIt.MapFrame;
 import debugUI.paintIt.MapPanel;
 import model.Event;
 import Swarm.models.GameConstants;
@@ -26,7 +27,7 @@ import java.util.*;
 public class SwarmGameLogic implements GameLogic {
     private static final String TAG = "Swarn";
 
-    private MapPanel debugUI;
+    private MapFrame debugUI;
     private Event[][] lastClientEvents;
 
     /**
@@ -154,15 +155,8 @@ public class SwarmGameLogic implements GameLogic {
         initialize();
 
         if (PARAM_SHOW_DEBUG_UI.getValue() == Boolean.TRUE) {
-            debugUI = new MapPanel(this.map);
-            JFrame frame = new JFrame();
-            frame.setResizable(false);
-            frame.setVisible(true);
-            frame.setLocationRelativeTo(null);
-            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            //
-            frame.setContentPane(debugUI);
-            frame.pack();
+            debugUI = new MapFrame(this.map);
+
         }
     }
 

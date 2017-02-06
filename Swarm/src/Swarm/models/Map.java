@@ -15,6 +15,7 @@ import Swarm.map.Cell;
  */
 public class Map {
     private String mapName;
+    private int turn;
     private int h,w;
     private int idCounter = 0;
     private Cell[][] cells;
@@ -286,7 +287,13 @@ public class Map {
         this.cells = cells;
     }
 
+    public int getTurn() {
+        return turn;
+    }
 
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
 
 
 

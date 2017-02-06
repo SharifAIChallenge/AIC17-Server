@@ -208,6 +208,7 @@ public class SwarmGameLogic implements GameLogic {
 
     @Override
     public void simulateEvents(Event[] environmentEvent, Event[][] clientsEvent) {
+        map.setTurn(map.getTurn()+1);
 
         diff = new Diff();
 
@@ -327,8 +328,10 @@ public class SwarmGameLogic implements GameLogic {
                         Fish fish = attacks[i][j][ind].get(k);
                         /**
                          * CALC cost of queen in both cells ??
+                         * BUG
+                         * BUG
                          */
-                        if (fish.isQueen() && attacks[i][j][1-ind].size() > 0 /* && !fishChanges.containsKey(fish.getId())*/) {
+                        if (fish.isQueen() && attacks[i][j][1-ind].size() > 0 && !fishChanges.containsKey(fish.getId())) {
                             fishChanges.put(fish.getId(), "delete");
                             queens[ind]++;
                             // handle later
@@ -351,13 +354,15 @@ public class SwarmGameLogic implements GameLogic {
                         }
                         if((attacks[i][j][1-ind].size()-queens[1-ind])==1){
                             if( !fishChanges.containsKey(lastNormalFish[1-ind]) );
-                            fishChanges.put(lastNormalFish[1-ind].getId(), "move");
+                                fishChanges.put(lastNormalFish[1-ind].getId(), "move");
                         }
                     }
                 }
                 if(queens[0]>0 && queens[1]>0){
-                    score[0] += gc.getKillBothQueenScore();
-                    score[1] += gc.getKillBothQueenScore();
+                    int[] tempA = {map.getScore()[0]+gc.getKillBothQueenScore(),map.getScore()[1]+gc.getKillBothQueenScore()};
+                    map.setScore(tempA);
+                    //score[0] += gc.getKillBothQueenScore();
+                    //score[1] += gc.getKillBothQueenScore();
                 }
                 else if( (queens[0]==0 && queens[1]>0)){
                     changeScores(1,gc.getKillQueenScore());
@@ -390,9 +395,10 @@ public class SwarmGameLogic implements GameLogic {
                     }
                     else if(str.equals("move")) {
                         ///// define nextCell of fish & content of oldCell
-                        boolean moved = true;
-                        if(fish.getPosition().equals(nextCell[ind].get(i))) {
-                            moved = false;
+                        boolean moved = false;
+                        if(!fish.getPosition().equals(nextCell[ind].get(i))) {
+                            moved = true;
+                            fish.setPower(fish.getPower()+1);
                         }
                         //ATTENTION TARTIB MOHEM DAR OBJECT CELL
                         if(fish.equals(fish.getPosition().getContent()) && moved) {
@@ -425,10 +431,18 @@ public class SwarmGameLogic implements GameLogic {
                             Food food = (Food) nextCell[ind].get(i).getContent();
 
                             if(fish.isQueen()) {
-                                score[ind] += gc.getQueenFoodScore();
+                                int tempA[] = new int[2];
+                                tempA[ind] = map.getScore()[ind]+gc.getQueenFoodScore();
+                                tempA[1-ind] = map.getScore()[1-ind];
+                                map.setScore(tempA);
+                                //score[ind] += gc.getQueenFoodScore();
                             }
                             else {
-                                score[ind] += gc.getFishFoodScore();
+                                int tempA[] = new int[2];
+                                tempA[ind] = map.getScore()[ind]+gc.getFishFoodScore();
+                                tempA[1-ind] = map.getScore()[1-ind];
+                                map.setScore(tempA);
+                                //score[ind] += gc.getFishFoodScore();
                             }
                             fish.setPregnant(true);
 
@@ -613,8 +627,12 @@ public class SwarmGameLogic implements GameLogic {
     }
 
     private void changeScores(int ind, int val){
-        score[ind]-=val;
-        score[1-ind]+=val;
+        int tempA[] = new int[2];
+        tempA[ind] = map.getScore()[ind] - val;
+        tempA[1-ind] = map.getScore()[1-ind] + val;
+        map.setScore(tempA);
+        //score[ind]-=val;
+        //score[1-ind]+=val;
     }
     private int makeValidIndex(int val, int mod){
         return (val+mod)%mod;

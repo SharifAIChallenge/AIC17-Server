@@ -8,25 +8,40 @@ public class Fish extends GameObject {
     private int teamNumber; // 0 or 1
     private int direction; // 0: right, 1:up, 2:left, 3: down
 
-    private boolean queen;
     private int colorNumber; // 0 or 1
+    private int power = 0;
 
+    private boolean queen;
     private boolean sick = false;
-    private int sickAge;
-    private int power;
-    private boolean pregnant;
+    private boolean pregnant = false;
 
-    public Fish(int id, Cell position, int teamNumber, int direction, boolean queen, int colorNumber) {
+    /**
+     * this.power = 0;
+     * this.sick = false;
+     * this.pregnant = false
+     */
+
+    public Fish(int id, Cell position, int teamNumber, int direction, int colorNumber, boolean queen) {
         super(id, position);
         this.teamNumber = teamNumber;
         this.direction = direction;
-        this.queen = queen;
         this.colorNumber = colorNumber;
-        //
-        this.sickAge = 0;
-        this.power = 0;
-        this.pregnant = false;
+        this.queen = queen;
+
     }
+
+    //    public Fish(int id, Cell position, int teamNumber, int direction, boolean queen, int colorNumber) {
+//        super(id, position);
+//        this.teamNumber = teamNumber;
+//        this.direction = direction;
+//        this.queen = queen;
+//        this.colorNumber = colorNumber;
+//        //
+//        this.sickAge = 0;
+//        this.power = 0;
+//        this.pregnant = false;
+//    }
+
 
     public void setTeamNumber(int teamNumber) {
         this.teamNumber = teamNumber;
@@ -66,14 +81,6 @@ public class Fish extends GameObject {
 
     public void setPower(int power) {
         this.power = power;
-    }
-
-    public int getSickAge() {
-        return sickAge;
-    }
-
-    public void setSickAge(int sickAge) {
-        this.sickAge = sickAge;
     }
 
     public boolean isPregnant() {

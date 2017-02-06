@@ -25,32 +25,32 @@ public class GameConstants {
    // private int changeColorLimit;
    // private int kStep;
     // or :
-    private int colorCost;
+    private int colorCost = 10;
     //
-    private int sickCost;
-    private int UpdateCost;
-    private int detMoveCost;
+    private int sickCost = 10;
+    private int UpdateCost = 10;
+    private int detMoveCost = 50;
 
-    private int killQueenScore;
-    private int killBothQueenScore;
-    private int killFishScore;
-    private int queenCollisionScore;
-    private int fishFoodScore;
-    private int queenFoodScore;
-    private int sickLifeTime;
+    private int killQueenScore = 1500;
+    private int killBothQueenScore = 1000;
+    private int killFishScore = 300;
+    private int queenCollisionScore = 0;
+    private int fishFoodScore = 100;
+    private int queenFoodScore = 200;
+    private int sickLifeTime = 2;
 
-    private int powerRatio;
-    private double endRatio;
+    private int powerRatio = 2;
+    private double endRatio = 0.7;
 
     private int disobeyPointerTeam0;
     private int disobeyPointerTeam1;
     private int disobeyNum;
     private double disobeyRatio;
 
-    private int foodValidTime;
-    private int trashValidTime;
+    private int foodValidTime = 4;
+    private int trashValidTime = 4;
 
-
+    public GameConstants(){}
 
     public long getTurnTimeout() {
         return turnTimeout;

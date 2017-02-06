@@ -1,24 +1,31 @@
 package Swarm.models;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by vahid 4/2/17
  */
 public class Diff {
-    int[][][] changes;
-    ArrayList<Integer>[] addFish = new ArrayList[8];
-    ArrayList<Integer>[] add = new ArrayList[4];
-    ArrayList<Integer>[] del = new ArrayList[1];
-    ArrayList<Integer>[] mov = new ArrayList[2];
-    ArrayList<Integer>[] alter = new ArrayList[3];
+    private class Change {
+        private Character type;
+        private ArrayList<List<Integer>> args;
+
+        public Change(Character type, ArrayList<List<Integer>> args) {
+            this.type = type;
+            this.args = args;
+        }
+    }
+    ArrayList<List<Integer>> add = new ArrayList<>();
+    ArrayList<List<Integer>> del = new ArrayList<>();
+    ArrayList<List<Integer>> mov = new ArrayList<>();
+    ArrayList<List<Integer>> alter = new ArrayList<>();
     int type0Num;
     int type1Num;
     int type2Num;
     int type3Num;
 
     public Diff() {
-        this.changes =new int[4][][];
         this.type0Num = 0;
         this.type1Num = 0;
         this.type2Num = 0;
@@ -26,86 +33,56 @@ public class Diff {
     }
 
     public void addFish(int id, int type, int x, int y, int dir, int color, int queen, int team){
-        addFish[0].add(id);
-        addFish[1].add(0);
-        addFish[2].add(x);
-        addFish[3].add(y);
-        addFish[4].add(dir);
-        addFish[5].add(color);
-        addFish[6].add(queen);
-        addFish[7].add(team);
+        ArrayList<Integer> addFish = new ArrayList<>();
+        addFish.add(id);
+        addFish.add(0);
+        addFish.add(x);
+        addFish.add(y);
+        addFish.add(dir);
+        addFish.add(color);
+        addFish.add(queen);
+        addFish.add(team);
+        add.add(addFish);
     }
 
     public void add(int id, int type, int x, int y){
-        add[0].add(id);
-        add[1].add(type);
-        add[2].add(x);
-        add[3].add(y);
+        ArrayList<Integer> addItem = new ArrayList<>();
+        addItem.add(id);
+        addItem.add(type);
+        addItem.add(x);
+        addItem.add(y);
+        add.add(addItem);
     }
 
     public void del(int id){
-        del[0].add(id);
+        ArrayList<Integer> delItem = new ArrayList<>();
+        delItem.add(id);
+        del.add(delItem);
     }
 
 
     public void mov(int id, int m){
-        mov[0].add(id);
-        mov[1].add(m);
+        ArrayList<Integer> movItem = new ArrayList<>();
+        movItem.add(id);
+        movItem.add(m);
+        mov.add(movItem);
     }
 
     public void alter(int id, int color, int sick){
-        alter[0].add(id);
-        alter[1].add(color);
-        alter[2].add(sick);
-        changes[3][type3Num][0] = id;
-        changes[3][type3Num][1] = color;
-        changes[3][type3Num][2] = sick;
-        type3Num++;
+        ArrayList<Integer> alterItem = new ArrayList<>();
+        alterItem.add(id);
+        alterItem.add(color);
+        alterItem.add(sick);
+        alter.add(alterItem);
     }
 
-    public int[][][] getChanges() {
-        changes = new int[4][][];
-        changes[0] = new int[add[0].size()+addFish[0].size()][8];
-
-        for (int i = 0; i < add[0].size(); i++) {
-            for (int j = 0; j < 4; j++) {
-                changes[0][i][j] = add[j].get(i);
-            }
-
-        }
-
-        for (int i = add[0].size(); i < add[0].size()+addFish[0].size(); i++) {
-            for (int j = 0; j < 8; j++) {
-                changes[0][i][j] = addFish[j].get(i);
-            }
-
-        }
-
-        changes[1] = new int[del[0].size()][1];
-
-        for (int i = 0; i < del[0].size(); i++) {
-            changes[1][i][0] = del[0].get(i);
-        }
-
-        changes[2] = new int[mov[0].size()][2];
-        for (int i = 0; i < mov[0].size(); i++) {
-            changes[2][i][0] = mov[0].get(i);
-            changes[2][i][1] = mov[1].get(i);
-        }
-
-        changes[3] = new int[alter[0].size()][3];
-        for (int i = 0; i < alter[0].size(); i++) {
-            for (int j = 0; j < 3; j++) {
-
-                changes[3][i][j] = alter[j].get(i);
-            }
-        }
-
+    public Change[] getChanges() {
+        Change[] changes = new Change[4];
+        changes[0] = new Change('a', add);
+        changes[1] = new Change('d', del);
+        changes[2] = new Change('m', mov);
+        changes[3] = new Change('c', alter);
         return changes;
-    }
-
-    public void setChanges(int[][][] changes) {
-        this.changes = changes;
     }
 
     public int getType0Num() {

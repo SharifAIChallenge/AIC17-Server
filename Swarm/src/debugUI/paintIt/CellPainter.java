@@ -1,4 +1,4 @@
-package debugUI.images.paintIt;
+package debugUI.paintIt;
 
 import Swarm.map.Cell;
 import Swarm.objects.Fish;
@@ -10,7 +10,6 @@ import debugUI.control.ImageDataBase;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
-
 /*
 written by miladink
  */
@@ -108,7 +107,7 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
         }
         //---adding the trash image
         Trash trash = null;
-        if(content instanceof Trash)
+        if(content instanceof  Trash)
             trash = (Trash)content;
         if(trash!= null){
             int trash_i = hash(cell.getColumn() + cellSize + cell.getRow())%4;

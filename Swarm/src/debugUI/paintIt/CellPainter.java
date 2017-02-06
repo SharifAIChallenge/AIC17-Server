@@ -49,8 +49,12 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
 
         //writing the power of fish on it
         Font font = new Font("Consolas", Font.BOLD, 15);
+        g2d.setFont(font);
+        g2d.setColor(Color.LIGHT_GRAY);
         if(cell.getContent() instanceof Fish) {
-            g2d.drawString(Integer.toString(((Fish) cell.getContent()).getPower()), cellSize/2, cellSize/2  );
+
+            String str = Integer.toString(((Fish) cell.getContent()).getPower());
+            g2d.drawString(str, (cellSize - g2d.getFontMetrics().stringWidth(str)) / 2, (cellSize - g2d.getFontMetrics().getHeight()));
             g2d.setColor(Color.YELLOW);
         }
         }

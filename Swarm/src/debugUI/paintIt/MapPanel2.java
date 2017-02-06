@@ -30,6 +30,7 @@ public class MapPanel2 extends JPanel{
 
     private Map gameMap;
     private int cellSize;
+
     private ZipOutputStream out;
     private ArrayList<BufferedImage> shots = new ArrayList<>();
     private int needle = 0;
@@ -94,6 +95,7 @@ public class MapPanel2 extends JPanel{
     public void setMap(Map gameMap){
         this.gameMap = gameMap;
         updatePaint();
+
     }
     private void updatePaint(){
         //---we will draw on this image and then draw this image on the JPanel
@@ -136,7 +138,9 @@ public class MapPanel2 extends JPanel{
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
         }
+
         try {
             out.closeEntry();
             out.close();
@@ -145,16 +149,16 @@ public class MapPanel2 extends JPanel{
         }
 
     }
+
+
     public static void main(String[] args) {
         Cell cells[][] = new Cell[10][10];
         for(int i = 0; i<10; i++)
             for(int j = 0; j<10; j++) {
                 cells[i][j] = new Cell();
                 int randomNum = ThreadLocalRandom.current().nextInt(0, 1 + 1);
-                if((randomNum%2)==0) {
-                    cells[i][j].setContent(new Fish(i, cells[i][j], 0, 0, true, 0));
-                    ((Fish)cells[i][j].getContent()).setPower(229);
-                }
+                if((randomNum%2)==0)
+                    cells[i][j].setContent(new Fish(i,cells[i][j],0,0,true,0));
                 cells[i][j].setRow(i);
                 cells[i][j].setColumn(j);
             }

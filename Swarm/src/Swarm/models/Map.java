@@ -34,7 +34,8 @@ public class Map {
 
 
 
-
+    public Map(){
+    }
 
     public Map(File mapFile) {
         this.mapName = mapFile.getName();

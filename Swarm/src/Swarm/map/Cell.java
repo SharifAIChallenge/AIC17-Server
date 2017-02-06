@@ -5,9 +5,10 @@ import Swarm.objects.GameObject;
 import Swarm.objects.Net;
 import Swarm.objects.Teleport;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Cell {
+public class Cell implements Serializable {
 
 
     public Teleport getTeleport() {

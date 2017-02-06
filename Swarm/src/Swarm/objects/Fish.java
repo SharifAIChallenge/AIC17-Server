@@ -1,7 +1,9 @@
 package Swarm.objects;
 import Swarm.map.Cell;
 
-public class Fish extends GameObject {
+import java.io.Serializable;
+
+public class Fish extends GameObject implements Serializable {
 
     // property :
 

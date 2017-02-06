@@ -1,9 +1,12 @@
 package Swarm.objects;
 import Swarm.map.Cell;
+
+import java.io.Serializable;
+
 /**
  * Created by yourname on 2/4/17.
  */
-public class Teleport extends GameObject {
+public class Teleport extends GameObject implements Serializable{
 
     private Cell pair;
 

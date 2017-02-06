@@ -367,9 +367,12 @@ public class SwarmGameLogic implements GameLogic {
                          * BUG
                          * BUG
                          */
-                        if (fish.isQueen() && attacks[i][j][1-ind].size() > 0 && !fishChanges.containsKey(fish.getId())) {
-                            fishChanges.put(fish.getId(), "delete");
+                        if(fish.isQueen()){
                             queens[ind]++;
+                        }
+                        if (fish.isQueen() && attacks[i][j][1-ind].size() > 0) {
+                            fishChanges.put(fish.getId(), "delete");
+                            //queens[ind]++;
                             // handle later
                             //score[ind] -= gc.getKillQueenScore();
                         }

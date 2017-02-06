@@ -20,6 +20,9 @@ import util.Log;
 import javax.swing.*;
 import java.util.*;
 
+import static Swarm.SwarmGameLogic.PARAM_MAP;
+import static Swarm.SwarmGameLogic.PARAM_SHOW_DEBUG_UI;
+
 
 /**
  * Created by pezzati on 1/28/16.
@@ -116,6 +119,25 @@ public class TestLogic {
     }
 
     public void init() {
+        this.map = new Map(PARAM_MAP.getValue());
+        this.H = this.map.getH();
+        this.W = this.map.getW();
+        this.fishes = this.map.getFishes();
+        this.tempObjects = this.map.getTempObjects();
+        this.cells = this.map.getCells();
+        this.idCounter = this.map.getIdCounter();
+        this.teleports = this.map.getTeleports();
+        this.gc = this.map.getConstants();
+        this.idCounter = this.map.getIdCounter();
+        this.score = this.map.getScore();
+
+        initialize();
+
+    }
+
+
+    /*
+    public void init() {
         //this.map = new Map(PARAM_MAP.getValue());
         idCounter = 1;
         H = 5;
@@ -155,7 +177,7 @@ public class TestLogic {
         initialize();
 
     }
-
+*/
 
     private void initialize(){
 
@@ -201,7 +223,11 @@ public class TestLogic {
         //map.setTurn(map.getTurn()+1);
 
 //        diff = new Diff();
-
+        for(int ind=0;ind<2;ind++){
+            for(int i=0;i<fishes[ind].size();i++){
+                System.out.println(fishes[ind].get(i).getId());
+            }
+        }
         nextCell[0].clear();
         nextCell[1].clear();
 
@@ -356,7 +382,7 @@ public class TestLogic {
                         nextCell[ind].remove(i);
                         // queens --
                         if(fish.isQueen())
-                            numberOfQueens[ind]--;
+//                            numberOfQueens[ind]--;
                         //DIFF.delete();
 //                        diff.del(fish.getId());
                         // cell

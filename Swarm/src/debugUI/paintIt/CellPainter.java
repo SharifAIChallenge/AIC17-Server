@@ -33,8 +33,8 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
         //---drawing the color linking the input and output teleport to each other
         Color color  = new Color(100, 255, 100);
         if(cell.getTeleport()!=null) {
-            int R = (hash(cell.getColumn() + cell.getTeleport().getPair().getRow())) % 256;
-            int G = (hash(cell.getRow() + cell.getTeleport().getPair().getColumn())) % 256;
+            int R = (hash(cell.getRow() + cell.getTeleport().getPair().getRow())) % 256;
+            int G = (hash(cell.getColumn() + cell.getTeleport().getPair().getColumn())) % 256;
             int B = (hash(R + G)) % 256;
             System.out.println(B);
             color = new Color(R, G, B);

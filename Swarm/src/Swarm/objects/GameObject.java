@@ -10,7 +10,7 @@ public abstract class GameObject implements Serializable {
 
     private int id;
     private Cell position;
-    private int deadTime;
+    private int deadTime = -1;
 
     public GameObject(int id, Cell position){
         this.id = id;

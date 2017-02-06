@@ -172,6 +172,7 @@ public class Map implements Serializable{
 
         for (int i = 0; i < nets.length; i++) {
             Net net = new Net(nets[i][0],cells[nets[i][1]][nets[i][2]]);
+            net.setDeadTime(constants.getNetValidTime());
 
             this.tempObjects.add(net);
 

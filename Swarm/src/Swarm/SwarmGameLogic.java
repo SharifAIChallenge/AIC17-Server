@@ -95,6 +95,7 @@ public class SwarmGameLogic implements GameLogic {
     private ArrayList <GameObject> tempObjects;
     private ArrayList <Teleport> teleports;
     ArrayList<Cell>[] nextCell;
+    ArrayList<Integer>[] nextMove;
     //HashMap<Integer,Integer> detMoves = new HashMap<>();
     ArrayList<Event>[] detMoves;
     private Cell[][] cells;
@@ -220,7 +221,7 @@ public class SwarmGameLogic implements GameLogic {
                 for(int i=0;i<3;i++){
                     for(int j=0;j<2;j++){
                         for(int k=0;k<3;k++){
-                            update[ind][c][i][j][k] = 0;
+                            update[ind][c][i][j][k] = 1;
                         }
                     }
                 }
@@ -235,6 +236,10 @@ public class SwarmGameLogic implements GameLogic {
         nextCell[0] = new ArrayList<>();
         nextCell[1] = new ArrayList<>();
 
+        nextMove = new ArrayList[2];
+        nextMove[0] = new ArrayList<>();
+        nextMove[1] = new ArrayList<>();
+
         numberOfQueens = new int[2];
         for(int ind=0;ind<2;ind++) {
             for (int i = 0; i < fishes[ind].size(); i++) {
@@ -248,12 +253,19 @@ public class SwarmGameLogic implements GameLogic {
 
     @Override
     public void simulateEvents(Event[] environmentEvent, Event[][] clientsEvent) {
+        if(map.getTurn() == 0) {
+            map.setTurn(map.getTurn()+1);
+            return;
+        }
         map.setTurn(map.getTurn()+1);
 
         diff = new Diff();
 
         nextCell[0].clear();
         nextCell[1].clear();
+
+        nextMove[0].clear();
+        nextMove[1].clear();
 
         detMoves[0].clear();
         detMoves[1].clear();
@@ -320,28 +332,27 @@ public class SwarmGameLogic implements GameLogic {
         // NEXTCELL ACCORDING TO FISHES
         for(int ind=0;ind<gc.getTeamNum();ind++){
             for(int i=0;i<fishes[ind].size();i++){
-                int curId = fishes[ind].get(i).getId();
                 nextCell[ind].add(getNextCellViaUpdate(fishes[ind].get(i)));
             }
         }
-
-        // DESTINATIONS
-        for(int ind=0;ind<gc.getTeamNum();ind++){
-            for(int i=0; i<detMoves[ind].size(); i++){
-                /**
-                 * handle correct type
-                 */
-                int id = Integer.parseInt(detMoves[ind].get(i).getArgs()[0]),
-                        mv = Integer.parseInt(detMoves[ind].get(i).getArgs()[1]);
-                for(int j=0;j<fishes[ind].size();j++){
-                    if(fishes[ind].get(j).getId() == id){
-                        nextCell[ind].set(j, getNextCellViaMove(fishes[ind].get(j), mv));
-                        //score[ind] -= gc.getDetMoveCost();
-                        changeScores(ind, gc.getDetMoveCost());
-                    }
-                }
-            }
-        }
+//
+//        // DESTINATIONS
+//        for(int ind=0;ind<gc.getTeamNum();ind++){
+//            for(int i=0; i<detMoves[ind].size(); i++){
+//                /**
+//                 * handle correct type
+//                 */
+//                int id = Integer.parseInt(detMoves[ind].get(i).getArgs()[0]),
+//                        mv = Integer.parseInt(detMoves[ind].get(i).getArgs()[1]);
+//                for(int j=0;j<fishes[ind].size();j++){
+//                    if(fishes[ind].get(j).getId() == id){
+//                        nextCell[ind].set(j, getNextCellViaMove(fishes[ind].get(j), mv));
+//                        //score[ind] -= gc.getDetMoveCost();
+//                        changeScores(ind, gc.getDetMoveCost());
+//                    }
+//                }
+//            }
+//        }
 
         // ATTACKS !!!
         for(int i=0;i<H;i++) {
@@ -373,13 +384,48 @@ public class SwarmGameLogic implements GameLogic {
                             }
                             fishChanges.put(fish.getId(), "delete");
                         }
-                        if(attacks[i][j][1-ind].size()==1){
+                        if(attacks[i][j][1-ind].size()==1 && !fishChanges.containsKey(attacks[i][j][1-ind].get(0).getId())){
                             fishChanges.put(attacks[i][j][1-ind].get(0).getId(), "move");
                         }
                     }
-                    if(attacks[i][j][ind].size()==0 && attacks[i][j][1-ind].size()==1){
+                    if(attacks[i][j][ind].size()==0 && attacks[i][j][1-ind].size()==1  && !fishChanges.containsKey(attacks[i][j][1-ind].get(0).getId())){
                         fishChanges.put(attacks[i][j][1-ind].get(0).getId(), "move");
                     }
+                }
+            }
+        }
+
+        // NET DEATH
+
+        for(int i=0;i<H;i++){
+            for(int j=0;j<W;j++){
+                // NET death just for fish ?
+                if(cells[i][j].getContent() instanceof Fish) {
+                    if(isNetDeadTime(cells[i][j])){
+                        Fish fish = (Fish) cells[i][j].getContent();
+                        fishChanges.put(fish.getId(), "delete");
+                        //fishes[fish.getTeamNumber()].remove(fish);
+                        //diff.del(fish.getId());
+                        //cells[i][j].setContent(null);
+                    }
+
+                }
+            }
+        }
+
+        // SICK DEATH
+
+        for(int ind=0; ind<gc.getTeamNum(); ind++){
+            if(fishes[ind].size() == 0) {
+                continue;
+            }
+            for(int i=fishes[ind].size()-1;i>=0;i--){
+                if(fishes[ind].get(i).getDeadTime() == turn) {
+                    Fish fish = fishes[ind].get(i);
+                    fishChanges.put(fish.getId(), "delete");
+                    //diff.del(fish.getId());
+                    //cells[fish.getPosition().getRow()][fish.getPosition().getColumn()].setContent(null);
+                    //fishes[fish.getTeamNumber()].remove(fish);
                 }
             }
         }
@@ -398,6 +444,7 @@ public class SwarmGameLogic implements GameLogic {
                     if(str.equals("delete")) {
                         fishes[ind].remove(i);
                         nextCell[ind].remove(i);
+                        nextMove[ind].remove(i);
                         // queens --
                         if(fish.isQueen())
                             numberOfQueens[ind]--;
@@ -472,7 +519,8 @@ public class SwarmGameLogic implements GameLogic {
                         /**
                          * mv r dir
                          */
-                        diff.mov(fish.getId(),1);
+                        diff.mov(fish.getId(),nextMove[ind].get(i));
+
                     }
                 }
             }
@@ -500,39 +548,6 @@ public class SwarmGameLogic implements GameLogic {
                     if (newBorn[ind][i][j] && cells[i][j].getContent() == null) {
                         makeBabyFish(cells[i][j], motherFish[ind][i][j]);
                     }
-                }
-            }
-        }
-
-        // NET DEATH
-
-        for(int i=0;i<H;i++){
-            for(int j=0;j<W;j++){
-                // NET death just for fish ?
-                if(cells[i][j].getContent() instanceof Fish) {
-                    if(isNetDeadTime(cells[i][j])){
-                        Fish fish = (Fish) cells[i][j].getContent();
-                        fishes[fish.getTeamNumber()].remove(fish);
-                        diff.del(fish.getId());
-                        cells[i][j].setContent(null);
-                    }
-
-                }
-            }
-        }
-
-        // SICK DEATH
-
-        for(int ind=0; ind<gc.getTeamNum(); ind++){
-            if(fishes[ind].size() == 0) {
-                continue;
-            }
-            for(int i=fishes[ind].size()-1;i>=0;i--){
-                if(fishes[ind].get(i).getDeadTime() == turn) {
-                    Fish fish = fishes[ind].get(i);
-                    diff.del(fish.getId());
-                    cells[fish.getPosition().getRow()][fish.getPosition().getColumn()].setContent(null);
-                    fishes[fish.getTeamNumber()].remove(fish);
                 }
             }
         }
@@ -620,6 +635,8 @@ public class SwarmGameLogic implements GameLogic {
          */
         // set direction & return next
         mv = update[fish.getTeamNumber()][fish.getColorNumber()][right][head][left];
+
+        nextMove[fish.getTeamNumber()].add(mv);
 
         return getNextCellViaMove(fish, mv);
 

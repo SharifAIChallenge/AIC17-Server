@@ -6,6 +6,9 @@
 *.iml
 *.class
 
+out
+output
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 

@@ -151,8 +151,10 @@ public class MapPanel2 extends JPanel{
             for(int j = 0; j<10; j++) {
                 cells[i][j] = new Cell();
                 int randomNum = ThreadLocalRandom.current().nextInt(0, 1 + 1);
-                if((randomNum%2)==0)
-                    cells[i][j].setContent(new Fish(i,cells[i][j],0,0,true,0));
+                if((randomNum%2)==0) {
+                    cells[i][j].setContent(new Fish(i, cells[i][j], 0, 0, true, 0));
+                    ((Fish)cells[i][j].getContent()).setPower(229);
+                }
                 cells[i][j].setRow(i);
                 cells[i][j].setColumn(j);
             }

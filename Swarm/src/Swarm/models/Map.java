@@ -116,7 +116,7 @@ public class Map {
                     cells[i][j].setColumn(j);
                 }
             }
-            this.constants = mapJson.constants;
+            //this.constants = mapJson.constants;
 
             makeFish(mapJson.fishes);
             makeFood(mapJson.foods);

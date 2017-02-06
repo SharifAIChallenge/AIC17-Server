@@ -15,7 +15,7 @@ import Swarm.map.Cell;
  */
 public class Map {
     private int idCounter = 0;
-    private GameConstants constants;
+    private GameConstants constants = new GameConstants();
     private ArrayList<Teleport> teleports = new ArrayList<>();
     private int[][] initialTrashes;
     private int[][] initialNets;
@@ -32,7 +32,7 @@ public class Map {
     }
 
     private int h,w;
-    private ArrayList<Fish>[] fishes;
+    private ArrayList<Fish>[] fishes ;
     private ArrayList<GameObject> tempObjects = new ArrayList<>();
 
     private int[] score = new int[2];
@@ -51,6 +51,10 @@ public class Map {
     private void makeFish(int[][] fishes) {
 
         initialFishes = fishes;
+        idCounter += fishes.length;
+        this.fishes = new ArrayList[2];
+        this.fishes[0] = new ArrayList<>();
+        this.fishes[1] = new ArrayList<>();
 
         /*
         [id, x, y, direction, color, queen, sick, team]
@@ -108,15 +112,15 @@ public class Map {
             this.w = mapJson.w;
             this.h = mapJson.h;
 
-            cells= new Cell[w][];
-            for (int i = 0; i < h; i++) {
-                for (int j = 0; j < w; j++) {
+            cells= new Cell[w][h];
+            for (int i = 0; i < w; i++) {
+                for (int j = 0; j < h; j++) {
                     cells[i][j] = new Cell();
                     cells[i][j].setRow(i);
                     cells[i][j].setColumn(j);
                 }
             }
-            this.constants = mapJson.constants;
+            //this.constants = mapJson.constants;
 
             makeFish(mapJson.fishes);
             makeFood(mapJson.foods);
@@ -148,12 +152,13 @@ public class Map {
 
     private void makeTeleport(int[][] teleports) {
         initialTeleports = teleports;
+        idCounter+=teleports.length;
         HashMap<Integer,Integer> idPair = new HashMap<>();
         for (int i = 0; i < teleports.length; i++) {
             Teleport teleport1 = new Teleport(teleports[i][0],cells[teleports[i][1]][teleports[i][2]]);
             idPair.put(teleports[i][0],teleports[i][3]);
             this.teleports.add(teleport1);
-            cells[teleports[i][0]][teleports[i][1]].setTeleport(teleport1);
+            cells[teleports[i][1]][teleports[i][2]].setTeleport(teleport1);
         }
         for (int i = 0; i < teleports.length; i++) {
             int id = this.teleports.get(i).getId();
@@ -167,8 +172,9 @@ public class Map {
 
     private void makeNets(int[][] nets) {
         initialNets = nets;
+        idCounter+=nets.length;
         for (int i = 0; i < nets.length; i++) {
-            Net net = new Net(idCounter,cells[nets[i][0]][nets[i][1]]);
+            Net net = new Net(nets[i][0],cells[nets[i][1]][nets[i][2]]);
             idCounter++;
             this.tempObjects.add(net);
             cells[nets[i][1]][nets[i][2]].setNet(net);
@@ -178,8 +184,9 @@ public class Map {
 
     private void makeTrash(int[][] trashes) {
         initialTrashes = trashes;
+        idCounter+=trashes.length;
         for (int i = 0; i < trashes.length; i++) {
-            Trash trash = new Trash(idCounter,cells[trashes[i][0]][trashes[i][1]]);
+            Trash trash = new Trash(trashes[i][0],cells[trashes[i][1]][trashes[i][2]]);
             idCounter++;
             this.tempObjects.add(trash);
             cells[trashes[i][1]][trashes[i][2]].setContent(trash);
@@ -189,9 +196,9 @@ public class Map {
 
     private void makeFood(int[][] foods) {
         initialFoods = foods;
-
+        idCounter+=foods.length;
         for (int i = 0; i < foods.length; i++) {
-            Food food = new Food(idCounter,cells[foods[i][0]][foods[i][1]]);
+            Food food = new Food(foods[i][0],cells[foods[i][1]][foods[i][2]]);
             idCounter++;
             this.tempObjects.add(food);
             cells[foods[i][1]][foods[i][2]].setContent(food);
@@ -222,8 +229,8 @@ public class Map {
         private int[][] foods;
         private int[][] trashes;
         private int[][] teleports;
-        private int[][] constants;
         private int[][] nets;
+       // private int[][] constants;
     }
 
 

@@ -414,6 +414,9 @@ public class SwarmGameLogic implements GameLogic {
         }
         // DELETION && MOVES
         for(int ind=0;ind<gc.getTeamNum();ind++) {
+            if(fishes[ind].size() == 0) {
+                continue;
+            }
             for(int i=fishes[ind].size()-1;i>=0;i--) {
                 if(fishChanges.containsKey(fishes[ind].get(i).getId())) {
                     String str = fishChanges.get(fishes[ind].get(i).getId());
@@ -535,23 +538,28 @@ public class SwarmGameLogic implements GameLogic {
         // SICK DEATH
 
         for(int ind=0; ind<gc.getTeamNum(); ind++){
-            for(int i=0;i<fishes[ind].size();i++){
+            if(fishes[ind].size() == 0) {
+                continue;
+            }
+            for(int i=fishes[ind].size()-1;i>=0;i--){
                 if(fishes[ind].get(i).getDeadTime() == turn) {
                     Fish fish = fishes[ind].get(i);
-                    fishes[fish.getTeamNumber()].remove(fish);
                     diff.del(fish.getId());
                     cells[fish.getPosition().getRow()][fish.getPosition().getColumn()].setContent(null);
+                    fishes[fish.getTeamNumber()].remove(fish);
                 }
             }
         }
 
         // FOOD & TRASH & NET
 
-        for(int i=0; i<tempObjects.size(); i++) {
-            if(tempObjects.get(i).getDeadTime() == turn) {
-                tempObjects.remove(i);
-                diff.del(tempObjects.get(i).getId());
-                cells[tempObjects.get(i).getPosition().getRow()][tempObjects.get(i).getPosition().getColumn()].setContent(null);
+        if(tempObjects.size() > 0) {
+            for(int i=tempObjects.size()-1; i>=0; i--) {
+                if(tempObjects.get(i).getDeadTime() == turn) {
+                    diff.del(tempObjects.get(i).getId());
+                    cells[tempObjects.get(i).getPosition().getRow()][tempObjects.get(i).getPosition().getColumn()].setContent(null);
+                    tempObjects.remove(i);
+                }
             }
         }
 
@@ -695,7 +703,7 @@ public class SwarmGameLogic implements GameLogic {
     @Override
     public void generateOutputs() {
         if (PARAM_SHOW_DEBUG_UI.getValue() == Boolean.TRUE) {
-            debugUI = new MapFrame(this.map);
+            debugUI.setMap(this.map);
         }
         /*
         if (debugUI != null) {

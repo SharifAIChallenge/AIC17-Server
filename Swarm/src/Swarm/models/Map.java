@@ -104,7 +104,7 @@ public class Map {
             }
 
 
-            Fish fish = new Fish(fishes[i][0],cells[fishes[i][1]][fishes[i][2]], fishes[i][7],fishes[i][3],b,fishes[i][4]);
+            Fish fish = new Fish(fishes[i][0],cells[fishes[i][1]][fishes[i][2]], fishes[i][7],fishes[i][3],fishes[i][4],b);
 
             this.fishes[fish.getTeamNumber()].add(fish);
 

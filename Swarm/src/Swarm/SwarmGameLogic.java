@@ -149,9 +149,8 @@ public class SwarmGameLogic implements GameLogic {
         this.teleports = this.map.getTeleports();
         this.gc = this.map.getConstants();
         this.idCounter = this.map.getIdCounter();
-        this.update = new int[gc.getTeamNum()][2][3][2][3];
         this.score = this.map.getScore();
-        this.numberOfQueens =  new int[gc.getTeamNum()];
+
         initialize();
 
         if (PARAM_SHOW_DEBUG_UI.getValue() == Boolean.TRUE) {
@@ -185,13 +184,15 @@ public class SwarmGameLogic implements GameLogic {
         return msg;
     }
 
-    public void initialize(){
+    private void initialize(){
 
         //handle map.getScore()[0];
 
         fishChanges = new HashMap<>();
         fishAlters = new HashSet<>();
         attacks = new ArrayList[H][W][2];
+        this.numberOfQueens =  new int[gc.getTeamNum()];
+        this.update = new int[gc.getTeamNum()][2][3][2][3];
 
         for(int i=0;i<H;i++) {
             for (int j = 0; j < W; j++) {

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import Swarm.map.Cell;
 /**
@@ -14,7 +15,13 @@ import Swarm.map.Cell;
  */
 public class Map {
     private int idCounter = 0;
+    private GameConstants constants;
     private ArrayList<Teleport> teleports = new ArrayList<>();
+    private int[][] initialTrashes;
+    private int[][] initialNets;
+    private int[][] initialTeleports;
+    private int[][] initialFoods;
+    private int[][] initialFishes;
 
     public int getIdCounter() {
         return idCounter;
@@ -42,6 +49,9 @@ public class Map {
     }
 
     private void makeFish(int[][] fishes) {
+
+        initialFishes = fishes;
+
         /*
         [id, x, y, direction, color, queen, sick, team]
          */
@@ -50,9 +60,9 @@ public class Map {
             if(fishes[i][5] == 1){
                 b = true;
             }
-            Fish fish = new Fish(idCounter,cells[fishes[i][0]][fishes[i][1]], fishes[i][6],fishes[i][2],b,fishes[i][3]);
 
-            idCounter++;
+
+            Fish fish = new Fish(fishes[i][0],cells[fishes[i][1]][fishes[i][2]], fishes[i][7],fishes[i][3],b,fishes[i][4]);
 
             if(fish.getTeamNumber() == 0)
                 this.fishes[0].add(fish);
@@ -81,6 +91,14 @@ public class Map {
         this.tempObjects = tempObjects;
     }
 
+    public GameConstants getConstants() {
+        return constants;
+    }
+
+    public void setConstants(GameConstants constants) {
+        this.constants = constants;
+    }
+
     public Map(File mapFile) {
         this.mapName = mapFile.getName();
 
@@ -98,6 +116,7 @@ public class Map {
                     cells[i][j].setColumn(j);
                 }
             }
+            this.constants = mapJson.constants;
 
             makeFish(mapJson.fishes);
             makeFood(mapJson.foods);
@@ -124,23 +143,26 @@ public class Map {
     }
 
     private void makeTeleport(int[][] teleports) {
+        initialTeleports = teleports;
+        HashMap<Integer,Integer> idPair = new HashMap<>();
         for (int i = 0; i < teleports.length; i++) {
-            Teleport teleport1 = new Teleport(idCounter,cells[teleports[i][0]][teleports[i][1]]);
-            idCounter++;
-            Teleport teleport2 = new Teleport(idCounter,cells[teleports[i][2]][teleports[i][3]]);
-            idCounter++;
-            teleport1.setPair(cells[teleports[i][2]][teleports[i][3]]);
-            teleport2.setPair(cells[teleports[i][0]][teleports[i][1]]);
-
-            this.tempObjects.add(teleport1);
-            this.tempObjects.add(teleport2);
+            Teleport teleport1 = new Teleport(teleports[i][0],cells[teleports[i][1]][teleports[i][2]]);
+            idPair.put(teleports[i][0],teleports[i][3]);
+            this.teleports.add(teleport1);
             cells[teleports[i][0]][teleports[i][1]].setTeleport(teleport1);
-            cells[teleports[i][2]][teleports[i][3]].setTeleport(teleport2);
-
+        }
+        for (int i = 0; i < teleports.length; i++) {
+            int id = this.teleports.get(i).getId();
+            for (int j = 0; j < teleports.length; j++) {
+                if(idPair.get(id).equals(this.teleports.get(j).getId())){
+                    this.teleports.get(i).setPair(this.teleports.get(j).getPosition());
+                }
+            }
         }
     }
 
     private void makeNets(int[][] nets) {
+        initialNets = nets;
         for (int i = 0; i < nets.length; i++) {
             Net net = new Net(idCounter,cells[nets[i][0]][nets[i][1]]);
             idCounter++;
@@ -151,6 +173,7 @@ public class Map {
     }
 
     private void makeTrash(int[][] trashes) {
+        initialTrashes = trashes;
         for (int i = 0; i < trashes.length; i++) {
             Trash trash = new Trash(idCounter,cells[trashes[i][0]][trashes[i][1]]);
             idCounter++;
@@ -161,6 +184,7 @@ public class Map {
     }
 
     private void makeFood(int[][] foods) {
+        initialFoods = foods;
 
         for (int i = 0; i < foods.length; i++) {
             Food food = new Food(idCounter,cells[foods[i][0]][foods[i][1]]);
@@ -169,6 +193,22 @@ public class Map {
             cells[foods[i][1]][foods[i][2]].setContent(food);
 
         }
+    }
+
+    public int[][] getInitialFishes() {
+        return initialFishes;
+    }
+
+    public int[][] getInitialTrashes() {
+        return initialTrashes;
+    }
+
+    public int[][] getInitialNets() {
+        return initialNets;
+    }
+
+    public int[][] getInitialTeleports() {
+        return initialTeleports;
     }
 
     private class MapJson {
@@ -216,4 +256,11 @@ public class Map {
         this.mapName = mapName;
     }
 
+
+
+
+
+    public int[][] getInitialFoods() {
+        return initialFoods;
+    }
 }

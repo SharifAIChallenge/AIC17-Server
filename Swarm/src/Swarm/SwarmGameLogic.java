@@ -77,7 +77,7 @@ public class SwarmGameLogic implements GameLogic {
     private int idCounter;
     private int H,W;
     Map map;
-    GameConstants gc = map.getGameConstants();
+    GameConstants gc ;
     int[][][][][] update = new int[gc.getTeamNum()][2][3][2][3];
 
     int[] rowHeadDir = {0, -1,  0, 1};
@@ -146,31 +146,37 @@ public class SwarmGameLogic implements GameLogic {
         this.fishes = this.map.getFishes();
         this.tempObjects = this.map.getTempObjects();
         this.cells = this.map.getCells();
-        this.IDCounter = this.map.getIdCounter();
+        this.idCounter = this.map.getIdCounter();
         this.teleports = this.map.getTeleports();
+        this.gc = this.map.getConstants();
+
+
+
+
     }
 
+    /*
+    It is remained :getUIInitialMessage
+     */
     @Override
     public Message getUIInitialMessage() {
-        Object[] args = {this.context.getMap().getVertexNum(), maxLow, maxNormal,
-                this.context.getMap().getAdjacencyList(), this.context.getUIDiffList(),
-                Configs.CLIENT_CONFIGS.get(0).getName(), Configs.CLIENT_CONFIGS.get(1).getName()};
-        String name = Message.NAME_INIT;
-        return new Message(name, args);
+
     }
 
     @Override
     public Message[] getClientInitialMessages() {
-        GameConstants constants = context.getMap().getGameConstants();
+        GameConstants constants = this.map.getConstants();
         constants.setTurnTimeout(PARAM_TURN_TIMEOUT.getValue());
 
         Message[] msg = new Message[2];
         String name0 = Message.NAME_INIT;
-        Object[] args0 = {constants, 0, this.context.getMap().getAdjacencyList(), this.context.getDiffList(0, maxLow, maxNormal)};
+        Object[] args0 = {0,this.map.getW(),this.map.getH(),this.map.getInitialFishes(), this.map.getInitialFoods(),
+                this.map.getInitialTrashes(), this.map.getInitialNets(),this.map.getInitialTeleports(), constants};
         msg[0] = new Message(name0, args0);
 
         String name1 = Message.NAME_INIT;
-        Object[] args1 = {constants, 1, this.context.getMap().getAdjacencyList(), this.context.getDiffList(1, maxLow, maxNormal)};
+        Object[] args1 = {1,this.map.getW(),this.map.getH(),this.map.getInitialFishes(), this.map.getInitialFoods(),
+                this.map.getInitialTrashes(), this.map.getInitialNets(),this.map.getInitialTeleports(), constants};
         msg[1] = new Message(name1, args1);
         return msg;
     }
@@ -629,6 +635,9 @@ public class SwarmGameLogic implements GameLogic {
     }
 
 
+    /*
+    it is remained :generateOutputs
+     */
     @Override
     public void generateOutputs() {
         if (debugUI != null) {
@@ -643,6 +652,9 @@ public class SwarmGameLogic implements GameLogic {
         return uiMessage;
     }
 
+    /*
+    It is remained:getStatusMessage
+     */
     @Override
     public Message getStatusMessage() {
         int[] armyCount = this.context.getDiffer().getPrevArmyCount();
@@ -674,11 +686,11 @@ public class SwarmGameLogic implements GameLogic {
     public Message[] getClientMessages() {
         Message[] messages = new Message[2];
         String name0 = Message.NAME_TURN;
-        Object[] args0 = {this.context.getTurn(), this.context.getDiffList(0, maxLow, maxNormal)};
+        Object[] args0 = {this.turn, this.score, this.diff.getChanges()};
         messages[0] = new Message(name0, args0);
 
         String name1 = Message.NAME_TURN;
-        Object[] args1 = {this.context.getTurn(), this.context.getDiffList(1, maxLow, maxNormal)};
+        Object[] args1 = {this.turn, this.score, this.diff.getChanges()};
         messages[1] = new Message(name1, args1);
 
         return messages;
@@ -689,6 +701,9 @@ public class SwarmGameLogic implements GameLogic {
         return new Event[0];
     }
 
+    /*
+    isGameFinished is remained
+     */
     @Override
     public boolean isGameFinished() {
         return (this.context.getMap().isFinished() || this.context.getTurn() >= this.context.getMap().getGameConstants().getTurns());
@@ -696,8 +711,10 @@ public class SwarmGameLogic implements GameLogic {
 
     @Override
     public void terminate() {
+        /*
         if (debugUI != null) {
             debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), null, getStatusMessage(), null, null);
         }
+        */
     }
 }

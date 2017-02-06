@@ -4,9 +4,10 @@ package Swarm.models;
  * Copyright (C) 2016 Hadi
  */
 public class GameConstants {
-    private int turns;
+
     private long turnTimeout;
-    private int mapSize;
+    private int w;
+    private int h;
     private int teamNum = 2;
     private int teleportNum;
     private int initFishNum;
@@ -50,13 +51,6 @@ public class GameConstants {
     private int trashValidTime;
 
 
-    public int getTurns() {
-        return turns;
-    }
-
-    public void setTurns(int turns) {
-        this.turns = turns;
-    }
 
     public long getTurnTimeout() {
         return turnTimeout;
@@ -66,13 +60,7 @@ public class GameConstants {
         this.turnTimeout = turnTimeout;
     }
 
-    public int getMapSize() {
-        return mapSize;
-    }
 
-    public void setMapSize(int mapSize) {
-        this.mapSize = mapSize;
-    }
 
     public int getTeamNum() {
         return teamNum;
@@ -297,4 +285,21 @@ public class GameConstants {
     public void setKillBothQueenScore(int killBothQueenScore) {
         this.killBothQueenScore = killBothQueenScore;
     }
+
+    public int getW() {
+        return w;
+    }
+
+    public void setW(int w) {
+        this.w = w;
+    }
+
+    public int getH() {
+        return h;
+    }
+
+    public void setH(int h) {
+        this.h = h;
+    }
+
 }

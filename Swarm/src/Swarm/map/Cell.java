@@ -9,6 +9,23 @@ import java.util.ArrayList;
 
 public class Cell {
 
+
+    public Teleport getTeleport() {
+        return teleport;
+    }
+
+    public void setTeleport(Teleport teleport) {
+        this.teleport = teleport;
+    }
+
+    public Net getNet() {
+        return net;
+    }
+
+    public void setNet(Net net) {
+        this.net = net;
+    }
+
     private Teleport teleport;
     private Net net;
     private int row, column;
@@ -58,21 +75,6 @@ public class Cell {
         this.column = column;
     }
 
-    public Teleport getTeleport() {
-        return teleport;
-    }
-
-    public void setTeleport(Teleport teleport) {
-        this.teleport = teleport;
-    }
-
-    public Net getNet() {
-        return net;
-    }
-
-    public void setNet(Net net) {
-        this.net = net;
-    }
 
 
 

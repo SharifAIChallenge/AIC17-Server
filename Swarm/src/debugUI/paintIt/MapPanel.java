@@ -137,7 +137,6 @@ public class MapPanel extends JPanel{
         //open the JFrame frame
         MapFrame mapFrame = new MapFrame(map);
         mapFrame.gameOver();
-
     }
     */
 }

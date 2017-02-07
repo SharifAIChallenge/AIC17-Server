@@ -10,34 +10,31 @@ import java.util.ArrayList;
 public class Cell {
 
 
-    public Teleport getTeleport() {
-        return teleport;
+    private int row, column;
+    private GameObject content = null;
+    private Teleport teleport = null;
+    private Net net = null;
+    //private int contentAge = 0;
+
+    // constructors
+    public Cell(){
+
     }
 
-    public void setTeleport(Teleport teleport) {
+    public Cell(int row, int column, GameObject content, Teleport teleport, Net net) {
+        this.row = row;
+        this.column = column;
+        this.content = content;
         this.teleport = teleport;
-    }
-
-    public Net getNet() {
-        return net;
-    }
-
-    public void setNet(Net net) {
         this.net = net;
     }
 
-    private Teleport teleport;
-    private Net net;
-    private int row, column;
-    private GameObject content;
-    private int contentAge = 0;
-
-    // constructors
-
-    public Cell() {
-
+    public Cell(int row, int column, GameObject content, Teleport teleport) {
+        this.row = row;
+        this.column = column;
+        this.content = content;
+        this.teleport = teleport;
     }
-
 
     /// getter & setter
 
@@ -48,16 +45,6 @@ public class Cell {
     public void setContent(GameObject content) {
         this.content = content;
     }
-
-    public int getContentAge() {
-        return contentAge;
-    }
-
-    public void setContentAge(int contentAge) {
-        this.contentAge = contentAge;
-    }
-
-
 
     public int getRow() {
         return row;
@@ -75,6 +62,22 @@ public class Cell {
         this.column = column;
     }
 
+
+    public Teleport getTeleport() {
+        return teleport;
+    }
+
+    public void setTeleport(Teleport teleport) {
+        this.teleport = teleport;
+    }
+
+    public Net getNet() {
+        return net;
+    }
+
+    public void setNet(Net net) {
+        this.net = net;
+    }
 
 
 

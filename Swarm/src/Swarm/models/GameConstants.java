@@ -6,10 +6,18 @@ package Swarm.models;
 public class GameConstants {
 
     private long turnTimeout;
+    private int w;
+    private int h;
+    private int teamNum = 2;
+    private int teleportNum;
+    private int initFishNum;
+    private int initQueenNum;
+
     private double foodProb;
     private double trashProb;
     private double netProb;
 
+    private int netActiveTime;
     private int netValidTime;
 
     //
@@ -17,31 +25,29 @@ public class GameConstants {
    // private int changeColorLimit;
    // private int kStep;
     // or :
-    private int colorCost;
+    private int colorCost = 10;
     //
-    private int sickCost;
-    private int UpdateCost;
-    private int detMoveCost;
+    private int sickCost = 10;
+    private int UpdateCost = 10;
+    private int detMoveCost = 50;
 
+    private int killQueenScore = 1500;
+    private int killBothQueenScore = 1000;
+    private int killFishScore = 300;
+    private int queenCollisionScore = 0;
+    private int fishFoodScore = 100;
+    private int queenFoodScore = 200;
+    private int sickLifeTime = 2;
 
-    private int teamNum =2;
-    private int killQueenScore;
-    private int killBothQueenScore;
-    private int killFishScore;
-    private int queenCollisionScore;
-    private int fishFoodScore;
-    private int queenFoodScore;
-    private int sickLifeTime;
-
-    private int powerRatio;
-    private double endRatio;
+    private int powerRatio = 2;
+    private double endRatio = 0.7;
 
     private int disobeyNum;
 
-    private int foodValidTime;
-    private int trashValidTime;
+    private int foodValidTime = 4;
+    private int trashValidTime = 4;
 
-
+    public GameConstants(){}
 
     public long getTurnTimeout() {
         return turnTimeout;
@@ -53,6 +59,37 @@ public class GameConstants {
 
 
 
+    public int getTeamNum() {
+        return teamNum;
+    }
+
+    public void setTeamNum(int teamNum) {
+        this.teamNum = teamNum;
+    }
+
+    public int getTeleportNum() {
+        return teleportNum;
+    }
+
+    public void setTeleportNum(int teleportNum) {
+        this.teleportNum = teleportNum;
+    }
+
+    public int getInitFishNum() {
+        return initFishNum;
+    }
+
+    public void setInitFishNum(int initFishNum) {
+        this.initFishNum = initFishNum;
+    }
+
+    public int getInitQueenNum() {
+        return initQueenNum;
+    }
+
+    public void setInitQueenNum(int initQueenNum) {
+        this.initQueenNum = initQueenNum;
+    }
 
     public double getFoodProb() {
         return foodProb;
@@ -78,7 +115,13 @@ public class GameConstants {
         this.netProb = netProb;
     }
 
+    public int getNetActiveTime() {
+        return netActiveTime;
+    }
 
+    public void setNetActiveTime(int netActiveTime) {
+        this.netActiveTime = netActiveTime;
+    }
 
     public int getNetValidTime() {
         return netValidTime;
@@ -216,14 +259,6 @@ public class GameConstants {
 
     public void setKillBothQueenScore(int killBothQueenScore) {
         this.killBothQueenScore = killBothQueenScore;
-    }
-
-    public int getTeamNum() {
-        return teamNum;
-    }
-
-    public void setTeamNum(int teamNum) {
-        this.teamNum = teamNum;
     }
 
 

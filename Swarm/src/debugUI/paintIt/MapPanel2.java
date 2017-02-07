@@ -150,9 +150,8 @@ public class MapPanel2 extends JPanel{
 
     }
 
-/*
-    public static void main(String[] args) {
 
+    public static void main(String[] args) {
         Cell cells[][] = new Cell[10][10];
         for(int i = 0; i<10; i++)
             for(int j = 0; j<10; j++) {
@@ -180,5 +179,4 @@ public class MapPanel2 extends JPanel{
         mapFrame.gameOver();
 
     }
-    */
 }

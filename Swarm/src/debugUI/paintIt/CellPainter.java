@@ -52,7 +52,7 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
         if(cell.getContent() instanceof Fish) {
 
             String str = Integer.toString(((Fish) cell.getContent()).getPower());
-            g2d.drawString(str, (cellSize - g2d.getFontMetrics().stringWidth(str)) / 2, (cellSize - g2d.getFontMetrics().getHeight()));
+            g2d.drawString(str, (cellSize - g2d.getFontMetrics().stringWidth(str)) / 2, cellSize);
             g2d.setColor(Color.YELLOW);
         }
 
@@ -63,6 +63,9 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
         ArrayList<ImageToDraw> ret = new ArrayList<>();
         //---load the images if they are not loaded
         if(floor == null) {
+            trashImages.clear();
+            foodImages.clear();
+            fishImages.clear();
             String theme_str = Integer.toString(theme)+"/";
             floor = ImageDataBase.getImageScaled(theme_str+"floor.png", cellSize, cellSize);
             slipper = ImageDataBase.getImageScaled(theme_str+"slipper.png", 3*cellSize, 3*cellSize);

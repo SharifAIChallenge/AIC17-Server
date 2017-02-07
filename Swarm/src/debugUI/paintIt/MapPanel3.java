@@ -25,8 +25,8 @@ public class MapPanel3 extends JPanel{
     private Map gameMap;
     private int cellSize;
     private boolean isEnded = false;
-    private int theme = 0;
-    private int themeNumbers = 2;
+    private int theme = 2;
+    private int themeNumbers = 3;
     private float alpha = 0.0f;
     JButton saveButton;
     private boolean isLive = false;
@@ -225,24 +225,7 @@ public class MapPanel3 extends JPanel{
         if(needle.get()+1<shots.size()){
             needle.incrementAndGet();
             System.out.println(ii++);
-            Timer timer1 = new Timer(30, new ActionListener() {
-                private int k  = 0;
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if(k==0)
-                        alpha=0.0f;
-                    k++;
-                    alpha +=(1/(timeInterval/50.0));
-                    alpha = Math.min(alpha, 1.0f);
-                    repaint();
-                    if(k==(int)(timeInterval/50.0)) {
-                        alpha = 1.0f;
-                        repaint();
-                        ((Timer) e.getSource()).stop();
-                    }
-                }
-            });
-            timer1.start();
+            ahead();
 
         }
         else {
@@ -301,9 +284,31 @@ public class MapPanel3 extends JPanel{
         Color colors[] = new Color[themeNumbers];
         colors[0] = Color.decode("#606c68");
         colors[1] = Color.decode("#e9cef3");
+        colors[2] = Color.decode("#757575");
         if(colors.length>theme)
             return colors[theme];
         else
             return Color.BLACK;
+    }
+
+    public void ahead(){
+        Timer timer1 = new Timer(30, new ActionListener() {
+            private int k  = 0;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(k==0)
+                    alpha=0.0f;
+                k++;
+                alpha +=(1/(timeInterval/50.0));
+                alpha = Math.min(alpha, 1.0f);
+                repaint();
+                if(k==(int)(timeInterval/50.0)) {
+                    alpha = 1.0f;
+                    repaint();
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        timer1.start();
     }
 }

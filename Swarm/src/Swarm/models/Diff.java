@@ -1,10 +1,17 @@
 package Swarm.models;
 
+import java.util.ArrayList;
+
 /**
  * Created by vahid 4/2/17
  */
 public class Diff {
     int[][][] changes;
+    ArrayList<Integer>[] addFish = new ArrayList[8];
+    ArrayList<Integer>[] add = new ArrayList[4];
+    ArrayList<Integer>[] del = new ArrayList[1];
+    ArrayList<Integer>[] mov = new ArrayList[2];
+    ArrayList<Integer>[] alter = new ArrayList[3];
     int type0Num;
     int type1Num;
     int type2Num;
@@ -19,38 +26,37 @@ public class Diff {
     }
 
     public void addFish(int id, int type, int x, int y, int dir, int color, int queen, int team){
-        changes[0][type0Num][0] = id;
-        changes[0][type0Num][1] = 0;
-        changes[0][type0Num][2] = x;
-        changes[0][type0Num][3] = y;
-        changes[0][type0Num][4] = dir;
-        changes[0][type0Num][5] = color;
-        changes[0][type0Num][6] = queen;
-        changes[0][type0Num][7] = team;
-        type0Num++;
+        addFish[0].add(id);
+        addFish[1].add(0);
+        addFish[2].add(x);
+        addFish[3].add(y);
+        addFish[4].add(dir);
+        addFish[5].add(color);
+        addFish[6].add(queen);
+        addFish[7].add(team);
     }
 
     public void add(int id, int type, int x, int y){
-        changes[0][type0Num][0] = id;
-        changes[0][type0Num][1] = type;
-        changes[0][type0Num][2] = x;
-        changes[0][type0Num][3] = y;
-        type0Num++;
+        add[0].add(id);
+        add[1].add(type);
+        add[2].add(x);
+        add[3].add(y);
     }
 
     public void del(int id){
-        changes[1][type1Num][0] = id;
-        type1Num++;
+        del[0].add(id);
     }
 
 
     public void mov(int id, int m){
-        changes[2][type2Num][0] = id;
-        changes[2][type2Num][1] = m;
-        type2Num++;
+        mov[0].add(id);
+        mov[1].add(m);
     }
 
     public void alter(int id, int color, int sick){
+        alter[0].add(id);
+        alter[1].add(color);
+        alter[2].add(sick);
         changes[3][type3Num][0] = id;
         changes[3][type3Num][1] = color;
         changes[3][type3Num][2] = sick;
@@ -58,6 +64,43 @@ public class Diff {
     }
 
     public int[][][] getChanges() {
+        changes = new int[4][][];
+        changes[0] = new int[add[0].size()+addFish[0].size()][8];
+
+        for (int i = 0; i < add[0].size(); i++) {
+            for (int j = 0; j < 4; j++) {
+                changes[0][i][j] = add[j].get(i);
+            }
+
+        }
+
+        for (int i = add[0].size(); i < add[0].size()+addFish[0].size(); i++) {
+            for (int j = 0; j < 8; j++) {
+                changes[0][i][j] = addFish[j].get(i);
+            }
+
+        }
+
+        changes[1] = new int[del[0].size()][1];
+
+        for (int i = 0; i < del[0].size(); i++) {
+            changes[1][i][0] = del[0].get(i);
+        }
+
+        changes[2] = new int[mov[0].size()][2];
+        for (int i = 0; i < mov[0].size(); i++) {
+            changes[2][i][0] = mov[0].get(i);
+            changes[2][i][1] = mov[1].get(i);
+        }
+
+        changes[3] = new int[alter[0].size()][3];
+        for (int i = 0; i < alter[0].size(); i++) {
+            for (int j = 0; j < 3; j++) {
+
+                changes[3][i][j] = alter[j].get(i);
+            }
+        }
+
         return changes;
     }
 

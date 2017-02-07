@@ -8,10 +8,7 @@ import model.Event;
 import Swarm.models.GameConstants;
 import Swarm.models.Map;
 import network.data.Message;
-import server.config.BooleanParam;
-import server.config.Configs;
-import server.config.FileParam;
-import server.config.IntegerParam;
+import server.config.*;
 import server.core.GameLogic;
 import server.core.GameServer;
 import Swarm.map.Cell;
@@ -274,15 +271,15 @@ public class SwarmGameLogic implements GameLogic {
         map.setTurn(map.getTurn()+1);
 
 
-        System.out.println("TUUUUUUUUUUUUURN" + map.getTurn());
-        for(int i=0;i<H;i++){
-            for(int j=0;j<W;j++){
-                Cell cell = cells[i][j];
-                System.out.println(i + " " + j);
-                System.out.println(cell.getContent());
-                System.out.println(cell.getNet());
-            }
-        }
+//        System.out.println("TUUUUUUUUUUUUURN" + map.getTurn());
+//        for(int i=0;i<H;i++){
+//            for(int j=0;j<W;j++){
+//                Cell cell = cells[i][j];
+//                System.out.println(i + " " + j);
+//                System.out.println(cell.getContent());
+//                System.out.println(cell.getNet());
+//            }
+//        }
 
         /*for(int ind=0;ind<2;ind++){
             for(int i=0;i<fishes[ind].size();i++){
@@ -746,7 +743,7 @@ public class SwarmGameLogic implements GameLogic {
                             food.setDeadTime( foodValidTime+ turn);
                             this.tempObjects.add(food);
                             cells[i][j].setContent(food);
-                            diff.add(idCounter++, 1, i, j);
+                            diff.add(food.getId(), 1, i, j);
                         }
                         else {
                             double r1 = Math.random();
@@ -755,7 +752,7 @@ public class SwarmGameLogic implements GameLogic {
                                 trash.setDeadTime(trashValidTime + turn);
                                 this.tempObjects.add(trash);
                                 cells[i][j].setContent(trash);
-                                diff.add(idCounter++, 2, i, j);
+                                diff.add(trash.getId(), 2, i, j);
                             }
                         }
                 }
@@ -766,7 +763,7 @@ public class SwarmGameLogic implements GameLogic {
                         net.setDeadTime(netValidTime+turn);
                         this.tempObjects.add(net);
                         cells[i][j].setNet(net);
-                        diff.add(idCounter++, 3, i, j);
+                        diff.add(net.getId(), 3, i, j);
                     }
                 }
 

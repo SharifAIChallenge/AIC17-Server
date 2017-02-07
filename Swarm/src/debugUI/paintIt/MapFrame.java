@@ -32,14 +32,26 @@ public class MapFrame extends JFrame {
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(Color.LIGHT_GRAY);
-        JButton button1 = new JButton("pause/play(or space)");
-        button1.addActionListener(e -> mapPanel.setLive(!mapPanel.isLive()));
+        JButton button1 = new JButton("play/pause(or space)");
+        button1.addActionListener(e -> {
+            mapPanel.setLive(!mapPanel.isLive());
+            mapPanel.requestFocus();
+        });
         JButton button2 = new JButton("next step");
-        button2.addActionListener(e -> mapPanel.increaseNeedle());
+        button2.addActionListener(e -> {
+            mapPanel.increaseNeedle();
+            mapPanel.requestFocus();
+        });
         JButton button3 = new JButton("previous step");
-        button3.addActionListener(e -> mapPanel.subtractNeedle());
+        button3.addActionListener(e -> {
+            mapPanel.subtractNeedle();
+            mapPanel.requestFocus();
+        });
         JButton button4 = new JButton("save Images");
-        button4.addActionListener(e -> mapPanel.saveImages());
+        button4.addActionListener(e -> {
+            mapPanel.saveImages();
+            mapPanel.requestFocus();
+        });
         button4.setEnabled(false);
         JButton button5 = new JButton("change theme");
         JPanel centerPanel = new JPanel();
@@ -55,7 +67,7 @@ public class MapFrame extends JFrame {
                 bPanel2.setBackground(mapPanel.getThemeBackGround());
                 buttonPanel.setBackground(mapPanel.getThemeBackGround());
                 CellPainter.changeTheme();
-
+                mapPanel.requestFocus();
             }
         });
         mapPanel.saveButton = button4;

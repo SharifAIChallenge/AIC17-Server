@@ -196,8 +196,13 @@ public class MapPanel2 extends JPanel{
             for(int j = 0; j<10; j++) {
                 cells[i][j] = new Cell();
                 int randomNum = ThreadLocalRandom.current().nextInt(0, 1 + 1);
-                if((randomNum%2)==0)
-                    cells[i][j].setContent(new Fish(i,cells[i][j],0,0,0,true));
+                if((randomNum%2)==0) {
+                    int rand1 = ThreadLocalRandom.current().nextInt(0, 1 + 1);
+                    int rand2 = ThreadLocalRandom.current().nextInt(0, 1 + 1);
+                    int rand3 = ThreadLocalRandom.current().nextInt(0, 1 + 1);
+                    int rand4 = ThreadLocalRandom.current().nextInt(0, 1 + 1);
+                    cells[i][j].setContent(new Fish(i, cells[i][j], rand1, rand2, rand3, rand4==0));
+                }
                 cells[i][j].setRow(i);
                 cells[i][j].setColumn(j);
             }

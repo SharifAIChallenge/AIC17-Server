@@ -9,6 +9,8 @@ import debugUI.control.ImageDataBase;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
+
 /*
 written by miladink
  */
@@ -40,7 +42,7 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
             g2d.setColor(color);
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.fillOval(0, 0, (int)(cellSize*0.3), (int)(cellSize*0.3));
+            g2d.fillOval(0, 0, (int)(cellSize*0.4), (int)(cellSize*0.4));
             g2d.setColor(temp_color);//restore the color before to the g2d
             //---circles for the input output teleport ended
         }
@@ -48,7 +50,8 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
         //writing the power of fish on it
         Font font = new Font("Consolas", Font.BOLD, 20);
         g2d.setFont(font);
-        g2d.setColor(Color.MAGENTA);
+        //g2d.setColor(Color.decode("#e0e0e2"));
+        g2d.setColor(Color.BLACK);
         if(cell.getContent() instanceof Fish) {
 
             String str = Integer.toString(((Fish) cell.getContent()).getPower());
@@ -85,6 +88,10 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
 
         GameObject content = cell.getContent();
         //---adding the fish image
+        if(cell.getTeleport()!=null) {
+            ret.add(new ImageToDraw(teleport_in));
+        }
+
         Fish fish = null;
         if(content instanceof Fish)
             fish = (Fish)content;
@@ -110,9 +117,7 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
 
         //if(cell.getNet()!= null)//TODO:maybe you should return this
         //    ret.add(new ImageToDraw(slipper));
-        if(cell.getTeleport()!=null) {
-            ret.add(new ImageToDraw(teleport_in));
-        }
+
         //---adding the trash image
         Trash trash = null;
         if(content instanceof  Trash)
@@ -168,8 +173,27 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
     }
     static void drawNet(Cell cell, int cellSize, Graphics2D g2d, int theme){
         //draw the net
+        int randomNum = hash(cell.getRow()+cell.getColumn())%4;
+        //int randomNum = 3;
         if(cell.getNet()!= null) {
+            AffineTransform st = new AffineTransform();
+            AffineTransform en = new AffineTransform();
+            switch (randomNum) {
+                case 1:
+                    st.rotate(Math.PI / 2, cellSize/2, cellSize/2);
+                    en.rotate(-1.0 * Math.PI / 2, cellSize/2, cellSize/2);
+                    break;
+                case 2:
+                    st.rotate(Math.PI, cellSize/2, cellSize/2);
+                    en.rotate(-1.0*Math.PI, cellSize/2, cellSize/2);
+                    break;
+                case 3:
+                    st.rotate(3*Math.PI/2, cellSize/2, cellSize/2);
+                    en.rotate(-3.0*Math.PI/2, cellSize/2, cellSize/2);
+                    break;
+            }
             g2d.setColor(new Color(0, 0, 0, 135));
+            g2d.transform(st);
             g2d.translate(-cellSize, -cellSize);
             Composite composite = g2d.getComposite();
             int rule = AlphaComposite.SRC_OVER;
@@ -182,6 +206,10 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
             g2d.drawImage(slipper, 0, 0, null);
             g2d.setComposite(composite);
             g2d.translate(cellSize, cellSize);
+            g2d.transform(en);
+
+
+
         }
     }
 

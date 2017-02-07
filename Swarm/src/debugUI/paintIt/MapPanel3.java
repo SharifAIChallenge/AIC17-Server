@@ -224,7 +224,7 @@ public class MapPanel3 extends JPanel{
     void increaseNeedle(){
         if(needle.get()+1<shots.size()){
             needle.incrementAndGet();
-            System.out.println(ii++);
+            //System.out.println(ii++);
             ahead();
 
         }

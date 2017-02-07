@@ -467,15 +467,6 @@ public class SwarmGameLogic implements GameLogic {
         }
 
 
-        // Alters
-        for(int ind=0;ind<2;ind++){
-            for(int i=0;i<fishes[ind].size();i++){
-                if(fishAlters.contains(fishes[ind].get(i))){
-                    Fish fish = fishes[ind].get(i);
-                    diff.alter(fish.getId(), fish.getPosition().getRow(),fish.getPosition().getColumn(),fish.getColorNumber(),(fish.isSick())?1:0);
-                }
-            }
-        }
 
         ///
         Set entrySet = fishChanges.entrySet();
@@ -485,6 +476,7 @@ public class SwarmGameLogic implements GameLogic {
 
         // Iterate through HashMap entries(Key-Value pairs)
         while(it.hasNext()){
+
             java.util.Map.Entry me = (java.util.Map.Entry)it.next();
             String str = (String) me.getValue();
             int id = (int) me.getKey();
@@ -536,7 +528,22 @@ public class SwarmGameLogic implements GameLogic {
 
         // ADD RANDOM THINGS
         addRandomTempObject();
-        // update power
+
+        // Alters
+        for(int ind=0;ind<2;ind++){
+            for(int i=0;i<fishes[ind].size();i++){
+                if(fishAlters.contains(fishes[ind].get(i))){
+                    Fish fish = fishes[ind].get(i);
+                    diff.alterFish(fish.getId(), fish.getPosition().getRow(),fish.getPosition().getColumn(),fish.getColorNumber(),(fish.isSick())?1:0);
+                }
+            }
+        }
+        for(int i=0;i<tempObjects.size();i++){
+            if(fishAlters.contains(tempObjects.get(i).getId())){
+                diff.alterItem(tempObjects.get(i).getId(), tempObjects.get(i).getPosition().getRow(), tempObjects.get(i).getPosition().getColumn());
+
+            }
+        }
 
         //uiMessage = new Message(Message.NAME_TURN, uiMessages.toArray());
     }

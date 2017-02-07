@@ -1,10 +1,7 @@
 package debugUI.paintIt;
 import Swarm.map.Cell;
 import Swarm.models.Map;
-import Swarm.objects.Fish;
-import Swarm.objects.Food;
-import Swarm.objects.Teleport;
-import Swarm.objects.Trash;
+import Swarm.objects.*;
 import debugUI.DeepCopyMaker;
 
 import javax.imageio.ImageIO;
@@ -30,14 +27,15 @@ public class MapPanel3 extends JPanel{
     private boolean isEnded = false;
     private int theme = 0;
     private int themeNumbers = 2;
+    private float alpha = 0.0f;
     JButton saveButton;
-
     private boolean isLive = false;
     private boolean saveTried = false;
-    private int timeInterval = 500;
+    private int timeInterval = 1000;
     private ZipOutputStream out;
     private ArrayList<Map> shots = new ArrayList<>();
     private AtomicInteger needle = new AtomicInteger(0);
+    private int ii = 0;
 
     MapPanel3(Map gameMap){
         this.gameMap = gameMap;
@@ -63,12 +61,10 @@ public class MapPanel3 extends JPanel{
                 if(e.getKeyCode()==39) {
                     if(shots.size()>needle.get()+1)
                         increaseNeedle();
-                    thisMap.repaint();
                 }
                 else if(e.getKeyCode() == 37){
                     if(needle.get()>0)
-                        needle.decrementAndGet();
-                    thisMap.repaint();
+                        subtractNeedle();
                 }
                 else if(e.getKeyCode()==32){
                     isLive = !(isLive);
@@ -92,7 +88,6 @@ public class MapPanel3 extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 if(thisMap.isLive) {
                     increaseNeedle();
-                    thisMap.repaint();
                 }
 
             }
@@ -105,8 +100,30 @@ public class MapPanel3 extends JPanel{
         super.paintComponent(g);
         //---draw the image which sign is on, on the panel
         Graphics2D g2d = (Graphics2D)g;
-        if(needle.get()!=-1 && shots.size()>0) {
-            g2d.drawImage(draw(shots.get(needle.get())), 0, 0, null);
+        if (needle.get() != -1 && shots.size() > 0) {
+            BufferedImage image1 = draw(shots.get(needle.get()));
+            BufferedImage image2 = null;
+            if(needle.get()>1)
+                image2 = draw(shots.get(needle.get()-1));
+
+            Composite composite = g2d.getComposite();
+            int rule = AlphaComposite.SRC_OVER;
+            Composite comp;
+
+            g2d.setComposite(composite);
+            if(image2!=null) {
+                comp = AlphaComposite.getInstance(rule , 1);
+                g2d.setComposite(comp);
+                g2d.drawImage(image2, 0, 0, null);
+            }
+            g2d.setComposite(composite);
+
+
+
+            comp = AlphaComposite.getInstance(rule , alpha);
+            g2d.setComposite(comp);
+            g2d.drawImage(image1, 0, 0, null);
+
         }
         //---the resulted image is now drawn on the panel
     }
@@ -207,7 +224,26 @@ public class MapPanel3 extends JPanel{
     void increaseNeedle(){
         if(needle.get()+1<shots.size()){
             needle.incrementAndGet();
-            repaint();
+            System.out.println(ii++);
+            Timer timer1 = new Timer(30, new ActionListener() {
+                private int k  = 0;
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if(k==0)
+                        alpha=0.0f;
+                    k++;
+                    alpha +=(1/(timeInterval/50.0));
+                    alpha = Math.min(alpha, 1.0f);
+                    repaint();
+                    if(k==(int)(timeInterval/50.0)) {
+                        alpha = 1.0f;
+                        repaint();
+                        ((Timer) e.getSource()).stop();
+                    }
+                }
+            });
+            timer1.start();
+
         }
         else {
             return;

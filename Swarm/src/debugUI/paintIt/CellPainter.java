@@ -1,10 +1,9 @@
 package debugUI.paintIt;
 
 import Swarm.map.Cell;
-import Swarm.objects.Fish;
-import Swarm.objects.Food;
-import Swarm.objects.GameObject;
-import Swarm.objects.Trash;
+import Swarm.models.GameConstants;
+import Swarm.models.Map;
+import Swarm.objects.*;
 import debugUI.control.ImageDataBase;
 
 import java.awt.*;
@@ -171,7 +170,11 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
             g2d.translate(-cellSize, -cellSize);
             Composite composite = g2d.getComposite();
             int rule = AlphaComposite.SRC_OVER;
-            Composite comp = AlphaComposite.getInstance(rule , 0.8f );
+            //to make the slipper darker if it is reaching the floor
+            Net net = (Net)cell.getNet();
+            float alpha = 0.8f;
+            //double alpha -(net.getDeadTime() - turn)/5;//TODO:important how many turns to die?
+            Composite comp = AlphaComposite.getInstance(rule , alpha);
             g2d.setComposite(comp);
             g2d.drawImage(slipper, 0, 0, null);
             g2d.setComposite(composite);

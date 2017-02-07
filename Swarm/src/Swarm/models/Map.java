@@ -125,14 +125,20 @@ public class Map implements Serializable{
         [id, x, y, direction, color, queen, sick, team]
          */
         for (int i = 0; i < fishes.length; i++) {
-            boolean b = false;
+            boolean bQueen = false;
+            boolean bSick = false;
             if(fishes[i][5] == 1){
-                b = true;
+                bQueen = true;
             }
 
+            if(fishes[i][6] == 1){
+                bSick = true;
+            }
 
-            Fish fish = new Fish(fishes[i][0],cells[fishes[i][1]][fishes[i][2]], fishes[i][7],fishes[i][3],fishes[i][4],b);
-
+            Fish fish = new Fish(fishes[i][0],cells[fishes[i][1]][fishes[i][2]], fishes[i][7],fishes[i][3],fishes[i][4],bSick,bQueen);
+            if(bSick) {
+                fish.setDeadTime(this.constants.getSickLifeTime());
+            }
             this.fishes[fish.getTeamNumber()].add(fish);
 
             cells[fishes[i][1]][fishes[i][2]].setContent(fish);
@@ -188,7 +194,7 @@ public class Map implements Serializable{
 
         for (int i = 0; i < trashes.length; i++) {
             Trash trash = new Trash(trashes[i][0],cells[trashes[i][1]][trashes[i][2]]);
-
+            trash.setDeadTime(this.constants.getTrashValidTime());
             this.tempObjects.add(trash);
             cells[trashes[i][1]][trashes[i][2]].setContent(trash);
 
@@ -202,6 +208,7 @@ public class Map implements Serializable{
         for (int i = 0; i < foods.length; i++) {
 
             Food food = new Food(foods[i][0],cells[foods[i][1]][foods[i][2]]);
+            food.setDeadTime(this.constants.getFoodValidTime());
             this.tempObjects.add(food);
             cells[foods[i][1]][foods[i][2]].setContent(food);
 

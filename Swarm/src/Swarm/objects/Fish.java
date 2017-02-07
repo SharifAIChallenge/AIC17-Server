@@ -32,6 +32,16 @@ public class Fish extends GameObject implements Serializable {
 
     }
 
+    public Fish(int id, Cell position, int teamNumber, int direction, int colorNumber,boolean sick, boolean queen) {
+        super(id, position);
+        this.teamNumber = teamNumber;
+        this.direction = direction;
+        this.colorNumber = colorNumber;
+        this.queen = queen;
+        this.sick = sick;
+
+    }
+
     //    public Fish(int id, Cell position, int teamNumber, int direction, boolean queen, int colorNumber) {
 //        super(id, position);
 //        this.teamNumber = teamNumber;

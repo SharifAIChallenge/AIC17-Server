@@ -524,7 +524,7 @@ public class SwarmGameLogic implements GameLogic {
         }
 
         // ADD RANDOM THINGS
-
+        addRandomTempObject();
         // update power
 
         //uiMessage = new Message(Message.NAME_TURN, uiMessages.toArray());
@@ -610,6 +610,48 @@ public class SwarmGameLogic implements GameLogic {
          */
         //diff.mov(fish.getId(),nxtMove);
 
+    }
+
+    private void addRandomTempObject() {
+        int foodValidTime = this.map.getConstants().getFoodValidTime();
+        int trashValidTime = this.map.getConstants().getTrashValidTime();
+        int netValidTime = this.map.getConstants().getNetValidTime();
+        int turn = this.map.getTurn();
+        for (int i = 0; i < this.W ;i++) {
+            for (int j = 0; j < this.H; j++) {
+
+                if(cells[i][j].getContent() == null){
+
+
+                        double r0 = Math.random();
+                        if(r0 < this.map.getConstants().getFoodProb()){
+                            Food food = new Food(idCounter++,cells[i][j]);
+                            food.setDeadTime( foodValidTime+ turn);
+                            this.tempObjects.add(food);
+                            cells[i][j].setContent(food);
+                        }
+                        else {
+                            double r1 = Math.random();
+                            if(r1 < this.map.getConstants().getTrashProb()){
+                                Trash trash = new Trash(idCounter++,cells[i][j]);
+                                trash.setDeadTime(trashValidTime + turn);
+                                this.tempObjects.add(trash);
+                                cells[i][j].setContent(trash);
+                            }
+                        }
+                }
+                if(cells[i][j].getNet() == null) {
+                    double r2 = Math.random();
+                    if (r2 < this.map.getConstants().getNetProb()) {
+                        Net net = new Net(idCounter++, cells[i][j]);
+                        net.setDeadTime(netValidTime+turn);
+                        this.tempObjects.add(net);
+                        cells[i][j].setNet(net);
+                    }
+                }
+
+            }
+        }
     }
 
     private boolean isNetDeadTime(Cell cell){

@@ -108,6 +108,7 @@ public class SwarmGameLogic implements GameLogic {
     private int numberOfQueens[];
     HashMap<Integer, String> fishChanges;
     HashSet<Integer> fishAlters = new HashSet<>();
+    HashSet<Integer> teleportChecked = new HashSet<>();
     //private int turn;
     private Message uiMessage;
 
@@ -196,11 +197,12 @@ public class SwarmGameLogic implements GameLogic {
     }
 
     private void initialize(){
-
+        idCounter++;
         //handle map.getScore()[0];
         nextMoveMap = new HashMap<>();
         fishChanges = new HashMap<>();
         fishAlters = new HashSet<>();
+        teleportChecked = new HashSet<>();
 
         attacks = new ArrayList[H][W][2];
         this.numberOfQueens =  new int[gc.getTeamNum()];
@@ -288,7 +290,7 @@ public class SwarmGameLogic implements GameLogic {
         fishChanges.clear();
         fishAlters.clear();
         nextMoveMap.clear();
-
+        teleportChecked.clear();
         // get argomans and make what we want
         for(int ind=0;ind < gc.getTeamNum(); ind++){
             for(int i=0;i<clientsEvent[ind].length;i++){
@@ -528,6 +530,46 @@ public class SwarmGameLogic implements GameLogic {
 
         // ADD RANDOM THINGS
         addRandomTempObject();
+
+        // TELEPORT SWITCH
+        for(int i=0;i<teleports.size();i++){
+            Teleport teleport = teleports.get(i);
+            Teleport pairTeleport = teleport.getPair().getTeleport();
+            Cell cell = teleport.getPosition();
+            Cell pairCell = pairTeleport.getPosition();
+            GameObject content = cell.getContent();
+            GameObject pairContent = pairCell.getContent();
+            if(!teleportChecked.contains(teleport.getId()) &&
+                    !teleportChecked.contains(pairTeleport.getId())){
+                teleportChecked.add(teleport.getId());
+                // SWAP
+                cell.setContent(pairContent);
+                pairCell.setContent(content);
+                content.setPosition(pairCell);
+                pairContent.setPosition(cell);
+                fishAlters.add(content.getId());
+                fishAlters.add(pairContent.getId());
+            }
+
+        }
+
+        // Alters
+        for(int ind=0;ind<2;ind++){
+            for(int i=0;i<fishes[ind].size();i++){
+                if(fishAlters.contains(fishes[ind].get(i).getId())){
+                    Fish fish = fishes[ind].get(i);
+                    diff.alterFish(fish.getId(), fish.getPosition().getRow(), fish.getPosition().getColumn(), fish.getColorNumber(),(fish.isSick())?1:0);
+                }
+            }
+        }
+        for(int i=0;i<tempObjects.size();i++){
+            if(fishAlters.contains(tempObjects.get(i).getId())){
+                diff.alterItem(tempObjects.get(i).getId(), tempObjects.get(i).getPosition().getRow(), tempObjects.get(i).getPosition().getColumn());
+
+            }
+        }
+
+
 
         // Alters
         for(int ind=0;ind<2;ind++){
@@ -794,12 +836,14 @@ public class SwarmGameLogic implements GameLogic {
         fish.setDirection(dir);
 
         ///////////// TELEPORT
+       /*
         Cell destination;
-        if(cells[row][col].getContent() instanceof Teleport){
-            destination = ((Teleport) cells[row][col].getContent()).getPair();
+        if(cells[row][col].getTeleport() instanceof Teleport){
+            destination = ((Teleport) cells[row][col].getTeleport()).getPair();
             row = destination.getRow();
             col = destination.getColumn();
         }
+        */
 
         attacks[row][col][fish.getTeamNumber()].add(fish);
 

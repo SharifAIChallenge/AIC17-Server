@@ -92,6 +92,7 @@ public class MapPanel3 extends JPanel{
                     increaseNeedle();
                     thisMap.repaint();
                 }
+
             }
         });
         timer1.start();
@@ -130,12 +131,21 @@ public class MapPanel3 extends JPanel{
         //---settings set
         //---draw each cell individually
         Cell cells[][] = gameMap.getCells();
+        ArrayList<Cell> cells_net = new ArrayList<>();
         for(int i = 0; i<cells.length;i++) {
             for (int j = 0; j < cells[0].length; j++) {
                 gTemp2d.translate(j * cellSize, i * cellSize);
                 CellPainter.paint(cells[i][j], cellSize, gTemp2d);
                 gTemp2d.translate(-j * cellSize, -i * cellSize);
+                if(cells[i][j].getNet()!=null)
+                    cells_net.add(cells[i][j]);
             }
+        }
+
+        for(Cell cell_temp: cells_net) {
+            gTemp2d.translate(cell_temp.getColumn() * cellSize, cell_temp.getRow() * cellSize);
+            CellPainter.drawNet(cells[cell_temp.getRow()][cell_temp.getColumn()], cellSize, gTemp2d);
+            gTemp2d.translate(-cell_temp.getColumn() * cellSize, -cell_temp.getRow() * cellSize);
         }
         //---each cell is drawn
         return shot;
@@ -224,5 +234,21 @@ public class MapPanel3 extends JPanel{
 
     public void setEnded(boolean ended) {
         isEnded = ended;
+    }
+
+    public Map getGameMap() {
+        return gameMap;
+    }
+
+    public void setGameMap(Map gameMap) {
+        this.gameMap = gameMap;
+    }
+
+    public int getTurn(){
+        return shots.size();
+    }
+
+    public AtomicInteger getNeedle() {
+        return needle;
     }
 }

@@ -1,10 +1,7 @@
 package debugUI.paintIt;
 import Swarm.map.Cell;
 import Swarm.models.Map;
-import Swarm.objects.Fish;
-import Swarm.objects.Food;
-import Swarm.objects.Teleport;
-import Swarm.objects.Trash;
+import Swarm.objects.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -206,10 +203,16 @@ public class MapPanel2 extends JPanel{
             }
         cells[0][7].setTeleport(new Teleport(1, cells[0][7], cells[8][9]));
         cells[8][9].setTeleport(new Teleport(1, cells[8][9], cells[0][7]));
+        cells[5][6].setNet(new Net(1, cells[5][6]));
+        cells[7][6].setNet(new Net(1, cells[5][6]));
         Map map = new Map();
         map.setCells(cells);
         map.setW(cells.length);
         map.setH(cells[0].length);
+        int grades[] = new int[2];
+        grades[0] = 1;
+        grades[1] = 10;
+        map.setScore(grades);
         MapFrame mapFrame = new MapFrame(map);
         cells[5][5].setContent(new Food(1, cells[5][5]));
         mapFrame.setMap(map);
@@ -247,5 +250,13 @@ public class MapPanel2 extends JPanel{
     }
     public void setLive(boolean live) {
         isLive = live;
+    }
+
+    public AtomicInteger getNeedle() {
+        return needle;
+    }
+
+    public void setNeedle(AtomicInteger needle) {
+        this.needle = needle;
     }
 }

@@ -132,7 +132,7 @@ public class MapPanel2 extends JPanel{
         for(int i = 0; i<cells.length;i++) {
             for (int j = 0; j < cells[0].length; j++) {
                 gTemp2d.translate(j * cellSize, i * cellSize);
-                CellPainter.paint(cells[i][j], cellSize, gTemp2d);
+                //CellPainter.paint(cells[i][j], cellSize, gTemp2d);//TODO:correct this
                 gTemp2d.translate(-j * cellSize, -i * cellSize);
             }
         }

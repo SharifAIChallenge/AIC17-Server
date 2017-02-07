@@ -22,8 +22,8 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
     static private ArrayList<Image> trashImages = new ArrayList<>();
     static private ArrayList<Image> foodImages = new ArrayList<>();
 
-    static void paint(Cell cell, int cellSize, Graphics2D g2d) {
-        ArrayList<ImageToDraw> drawList = getImage(cell, cellSize);
+    static void paint(Cell cell, int cellSize, Graphics2D g2d, int theme) {
+        ArrayList<ImageToDraw> drawList = getImage(cell, cellSize, theme);
         for (ImageToDraw image : drawList) {
             g2d.transform(image.getSt());
             g2d.drawImage(image.getImage(), 0, 0, cellSize, cellSize, null);
@@ -61,19 +61,20 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
 
     }
 
-    private static ArrayList<ImageToDraw> getImage(Cell cell, int cellSize){
+    private static ArrayList<ImageToDraw> getImage(Cell cell, int cellSize, int theme){
         ArrayList<ImageToDraw> ret = new ArrayList<>();
         //---load the images if they are not loaded
         if(floor == null) {
-            floor = ImageDataBase.getImageScaled("floor.png", cellSize, cellSize);
-            slipper = ImageDataBase.getImageScaled("slipper.png", 3*cellSize, 3*cellSize);
-            teleport_in = ImageDataBase.getImageScaled("teleport_in.png", cellSize, cellSize);
+            String theme_str = Integer.toString(theme)+"/";
+            floor = ImageDataBase.getImageScaled(theme_str+"floor.png", cellSize, cellSize);
+            slipper = ImageDataBase.getImageScaled(theme_str+"slipper.png", 3*cellSize, 3*cellSize);
+            teleport_in = ImageDataBase.getImageScaled(theme_str+"teleport_in.png", cellSize, cellSize);
             for(int i = 0; i<4; i++)//we assume we have 4 trash images
-                trashImages.add(ImageDataBase.getImageScaled("trash"+Integer.toString(i)+".png", cellSize, cellSize));
+                trashImages.add(ImageDataBase.getImageScaled(theme_str+"trash"+Integer.toString(i)+".png", cellSize, cellSize));
             for(int i = 0; i<4; i++)//we assume we have 4 food images
-                foodImages.add(ImageDataBase.getImageScaled("food"+Integer.toString(i)+".png", cellSize, cellSize));
+                foodImages.add(ImageDataBase.getImageScaled(theme_str+"food"+Integer.toString(i)+".png", cellSize, cellSize));
             for(int i = 0; i<16; i++)//we assume we have 4 food images
-                fishImages.add(ImageDataBase.getImageScaled(Integer.toString(i)+".png", cellSize, cellSize));
+                fishImages.add(ImageDataBase.getImageScaled(theme_str+Integer.toString(i)+".png", cellSize, cellSize));
         }
         //--needed images are loaded now
         ret.add(new ImageToDraw(floor));//we always have floor
@@ -164,7 +165,7 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
 
 
     }
-    static void drawNet(Cell cell, int cellSize, Graphics2D g2d){
+    static void drawNet(Cell cell, int cellSize, Graphics2D g2d, int theme){
         //draw the net
         if(cell.getNet()!= null) {
             g2d.setColor(new Color(0, 0, 0, 135));
@@ -177,5 +178,9 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
             g2d.setComposite(composite);
             g2d.translate(cellSize, cellSize);
         }
+    }
+
+    public static void changeTheme(){
+        floor = null;
     }
 }

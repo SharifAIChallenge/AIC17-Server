@@ -20,7 +20,7 @@ public class EditorUtilSet extends JPanel{
         container.add(panel,gbc);
     }
 
-    public static void      addComponentY(int y,double weightY, JComponent component,Container container){
+    public static void addComponentY(int y,double weightY, JComponent component,Container container){
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = y;
@@ -29,7 +29,7 @@ public class EditorUtilSet extends JPanel{
         gbc.gridwidth = 1;
         //gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.BOTH;
-        //gbc.insets = new Insets(,100,20,100);
+        //gbc.insets = new Insets(10,100,20,100);
         container.add(component,gbc);
     }
 
@@ -67,9 +67,9 @@ public class EditorUtilSet extends JPanel{
         gbc.gridy = 0;
         gbc.weightx = weightX;
         gbc.weighty = 1;
-        gbc.anchor = GridBagConstraints.CENTER;
+        //gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(5,5,5,5);
+        //gbc.insets = new Insets(5,5,5,5);
         container.add(component,gbc);
     }
 

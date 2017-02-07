@@ -41,6 +41,23 @@ public class MapFrame extends JFrame {
         JButton button4 = new JButton("save Images");
         button4.addActionListener(e -> mapPanel.saveImages());
         button4.setEnabled(false);
+        JButton button5 = new JButton("change theme");
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new GridBagLayout());
+        JPanel bPanel1 = new JPanel();
+
+        JPanel bPanel2 = new JPanel();
+        button5.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mapPanel.changeTheme();
+                bPanel1.setBackground(mapPanel.getThemeBackGround());
+                bPanel2.setBackground(mapPanel.getThemeBackGround());
+                buttonPanel.setBackground(mapPanel.getThemeBackGround());
+                CellPainter.changeTheme();
+
+            }
+        });
         mapPanel.saveButton = button4;
 
         JPanel textPanel = new JPanel();
@@ -69,11 +86,21 @@ public class MapFrame extends JFrame {
         EditorUtilSet.addComponentX(1, 1, button2, buttonPanel);
         EditorUtilSet.addComponentX(2, 1, button3, buttonPanel);
         EditorUtilSet.addComponentX(3, 1, button4, buttonPanel);
+        EditorUtilSet.addComponentX(4, 1, button5, buttonPanel);
 
-        EditorUtilSet.addComponentY(0, 1, textPanel, motherPanel);
-        EditorUtilSet.addComponentY(1, 1, mapPanel, motherPanel);
-        EditorUtilSet.addComponentY(2, 1, buttonPanel, motherPanel);
-
+        //EditorUtilSet.addComponentY(0, 1, textPanel, motherPanel);
+        //EditorUtilSet.addComponentY(1, 1, mapPanel, motherPanel);
+        //EditorUtilSet.addComponentY(2, 1, buttonPanel, motherPanel);
+        buttonPanel.setBackground(mapPanel.getThemeBackGround());
+        bPanel1.setBackground(mapPanel.getThemeBackGround());
+        bPanel2.setBackground(mapPanel.getThemeBackGround());
+        EditorUtilSet.addComponentX(0, 50, bPanel1, centerPanel);
+        EditorUtilSet.addComponentX(1, 1, mapPanel, centerPanel);
+        EditorUtilSet.addComponentX(2, 50, bPanel2, centerPanel);
+        motherPanel.setLayout(new BorderLayout());
+        motherPanel.add(textPanel, BorderLayout.NORTH);
+        motherPanel.add(centerPanel, BorderLayout.CENTER);
+        motherPanel.add(buttonPanel, BorderLayout.SOUTH);
         //the end
         this.setContentPane(motherPanel);
         this.pack();

@@ -28,6 +28,8 @@ public class MapPanel3 extends JPanel{
     private Map gameMap;
     private int cellSize;
     private boolean isEnded = false;
+    private int theme = 0;
+    private int themeNumbers = 2;
     JButton saveButton;
 
     private boolean isLive = false;
@@ -135,7 +137,7 @@ public class MapPanel3 extends JPanel{
         for(int i = 0; i<cells.length;i++) {
             for (int j = 0; j < cells[0].length; j++) {
                 gTemp2d.translate(j * cellSize, i * cellSize);
-                CellPainter.paint(cells[i][j], cellSize, gTemp2d);
+                CellPainter.paint(cells[i][j], cellSize, gTemp2d, theme);
                 gTemp2d.translate(-j * cellSize, -i * cellSize);
                 if(cells[i][j].getNet()!=null)
                     cells_net.add(cells[i][j]);
@@ -144,7 +146,7 @@ public class MapPanel3 extends JPanel{
 
         for(Cell cell_temp: cells_net) {
             gTemp2d.translate(cell_temp.getColumn() * cellSize, cell_temp.getRow() * cellSize);
-            CellPainter.drawNet(cells[cell_temp.getRow()][cell_temp.getColumn()], cellSize, gTemp2d);
+            CellPainter.drawNet(cells[cell_temp.getRow()][cell_temp.getColumn()], cellSize, gTemp2d, theme);
             gTemp2d.translate(-cell_temp.getColumn() * cellSize, -cell_temp.getRow() * cellSize);
         }
         //---each cell is drawn
@@ -250,5 +252,21 @@ public class MapPanel3 extends JPanel{
 
     public AtomicInteger getNeedle() {
         return needle;
+    }
+
+    public void changeTheme(){
+        theme+=1;
+        theme = theme%themeNumbers;
+        repaint();
+    }
+
+    public Color getThemeBackGround(){
+        Color colors[] = new Color[themeNumbers];
+        colors[0] = Color.decode("#606c68");
+        colors[1] = Color.decode("#e9cef3");
+        if(colors.length>theme)
+            return colors[theme];
+        else
+            return Color.BLACK;
     }
 }

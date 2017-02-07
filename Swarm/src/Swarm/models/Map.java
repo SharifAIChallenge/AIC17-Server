@@ -71,30 +71,30 @@ public class Map implements Serializable{
 
     }
 
-    private GameConstants makeConstants(int[] constants) {
+    private GameConstants makeConstants(double[] constants) {
 
         GameConstants gameConstants = new GameConstants();
-        gameConstants.setTurnTimeout(constants[0]);
+        gameConstants.setTurnTimeout((int)constants[0]);
         gameConstants.setFoodProb(constants[1]);
         gameConstants.setTrashProb(constants[2]);
         gameConstants.setNetProb(constants[3]);
-        gameConstants.setNetValidTime(constants[4]);
-        gameConstants.setColorCost(constants[5]);
-        gameConstants.setSickCost(constants[6]);
-        gameConstants.setUpdateCost(constants[7]);
-        gameConstants.setDetMoveCost(constants[8]);
-        gameConstants.setKillQueenScore(constants[9]);
-        gameConstants.setKillBothQueenScore(constants[10]);
-        gameConstants.setKillFishScore(constants[11]);
-        gameConstants.setQueenCollisionScore(constants[12]);
-        gameConstants.setFishFoodScore(constants[13]);
-        gameConstants.setQueenFoodScore(constants[14]);
-        gameConstants.setSickLifeTime(constants[15]);
-        gameConstants.setPowerRatio(constants[16]);
+        gameConstants.setNetValidTime((int)constants[4]);
+        gameConstants.setColorCost((int)constants[5]);
+        gameConstants.setSickCost((int)constants[6]);
+        gameConstants.setUpdateCost((int)constants[7]);
+        gameConstants.setDetMoveCost((int)constants[8]);
+        gameConstants.setKillQueenScore((int)constants[9]);
+        gameConstants.setKillBothQueenScore((int)constants[10]);
+        gameConstants.setKillFishScore((int)constants[11]);
+        gameConstants.setQueenCollisionScore((int)constants[12]);
+        gameConstants.setFishFoodScore((int)constants[13]);
+        gameConstants.setQueenFoodScore((int)constants[14]);
+        gameConstants.setSickLifeTime((int)constants[15]);
+        gameConstants.setPowerRatio((int)constants[16]);
         gameConstants.setEndRatio(constants[17]);
-        gameConstants.setDisobeyNum(constants[18]);
-        gameConstants.setFoodValidTime(constants[19]);
-        gameConstants.setTrashValidTime(constants[20]);
+        gameConstants.setDisobeyNum((int)constants[18]);
+        gameConstants.setFoodValidTime((int)constants[19]);
+        gameConstants.setTrashValidTime((int)constants[20]);
         return gameConstants;
 
     }
@@ -108,7 +108,7 @@ public class Map implements Serializable{
         private int[][] trashes;
         private int[][] teleports;
         private int[][] nets;
-        private int[] constants;
+        private double[] constants;
     }
 
 

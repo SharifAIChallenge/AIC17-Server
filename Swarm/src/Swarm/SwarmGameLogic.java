@@ -419,6 +419,17 @@ public class SwarmGameLogic implements GameLogic {
             }
         }
 
+        // SICK ZOMBIE
+        for(int ind=0;ind<2;ind++){
+            for(int i=0;i<fishes[ind].size();i++){
+                Fish fish = fishes[ind].get(i);
+                if(fish.isSick()){
+                    sickZombie(fish, i);
+                }
+            }
+        }
+
+
         // NET DEATH
 
         for(int i=0;i<H;i++){
@@ -528,6 +539,32 @@ public class SwarmGameLogic implements GameLogic {
         // update power
 
         //uiMessage = new Message(Message.NAME_TURN, uiMessages.toArray());
+    }
+
+    private void sickZombie(Fish fish, int k){
+        int row = fish.getPosition().getRow(),neighbourRow;
+        int col = fish.getPosition().getColumn(),neighbourCol;
+        int[] tempA = new int[2];
+        int ind;
+        tempA[0] = map.getScore()[0];
+        tempA[1] = map.getScore()[1];
+        for(int i=-1;i<=1;i++){
+            for(int j=-1;j<=1;j++){
+
+                /**
+                 * getDeadTime == turn is true ?
+                 */
+
+                neighbourRow = makeValidIndex(row+i,H);
+                neighbourCol = makeValidIndex(col+j,W);
+                if(cells[neighbourRow][neighbourCol].getContent() instanceof Fish &&
+                        !((Fish) cells[neighbourRow][neighbourCol].getContent()).isSick()){
+                    ind = ((Fish) cells[neighbourRow][neighbourCol].getContent()).getTeamNumber();
+                    tempA[1-ind] += gc.getSickCost();
+                }
+            }
+        }
+        map.setScore(tempA);
     }
 
     private void deleteFish(Fish fish, int i){
@@ -749,7 +786,7 @@ public class SwarmGameLogic implements GameLogic {
         }
         fish.setDirection(dir);
 
-        //
+        ///////////// TELEPORT
         Cell destination;
         if(cells[row][col].getContent() instanceof Teleport){
             destination = ((Teleport) cells[row][col].getContent()).getPair();
@@ -764,7 +801,7 @@ public class SwarmGameLogic implements GameLogic {
 
     private void changeScores(int ind, int val){
         int tempA[] = new int[2];
-        tempA[ind] = map.getScore()[ind] - val;
+        //tempA[ind] = map.getScore()[ind] - val;
         tempA[1-ind] = map.getScore()[1-ind] + val;
         map.setScore(tempA);
         //score[ind]-=val;
@@ -851,17 +888,16 @@ public class SwarmGameLogic implements GameLogic {
         finalScore[1] = map.getScore()[1];
         if(numberOfQueens[0]==0 && numberOfQueens[1] >0){
             finalScore[0]=0;
-            finalScore[1]=map.getScore()[1];
-
         }
         else if(numberOfQueens[1]==0 && numberOfQueens[0] >0){
             finalScore[1]=0;
-            finalScore[0]=map.getScore()[1];
         }
         map.setScore(finalScore);
         int population = fishes[0].size() + fishes[1].size();
-        if(numberOfQueens[0]==0 || numberOfQueens[1]==0 /*|| population > gc.getEndRatio()*(W*H)*/)
+        if(numberOfQueens[0]==0 || numberOfQueens[1]==0 /*|| population > gc.getEndRatio()*(W*H)*/) {
+            System.out.println("FIIIINISH");
             return true;
+        }
         return false;
     }
 

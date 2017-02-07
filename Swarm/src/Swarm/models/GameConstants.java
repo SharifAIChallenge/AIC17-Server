@@ -6,18 +6,10 @@ package Swarm.models;
 public class GameConstants {
 
     private long turnTimeout;
-    private int w;
-    private int h;
-    private int teamNum = 2;
-    private int teleportNum;
-    private int initFishNum;
-    private int initQueenNum;
-
     private double foodProb;
     private double trashProb;
     private double netProb;
 
-    private int netActiveTime;
     private int netValidTime;
 
     //
@@ -31,6 +23,8 @@ public class GameConstants {
     private int UpdateCost;
     private int detMoveCost;
 
+
+    private int teamNum =2;
     private int killQueenScore;
     private int killBothQueenScore;
     private int killFishScore;
@@ -42,10 +36,7 @@ public class GameConstants {
     private int powerRatio;
     private double endRatio;
 
-    private int disobeyPointerTeam0;
-    private int disobeyPointerTeam1;
     private int disobeyNum;
-    private double disobeyRatio;
 
     private int foodValidTime;
     private int trashValidTime;
@@ -62,37 +53,6 @@ public class GameConstants {
 
 
 
-    public int getTeamNum() {
-        return teamNum;
-    }
-
-    public void setTeamNum(int teamNum) {
-        this.teamNum = teamNum;
-    }
-
-    public int getTeleportNum() {
-        return teleportNum;
-    }
-
-    public void setTeleportNum(int teleportNum) {
-        this.teleportNum = teleportNum;
-    }
-
-    public int getInitFishNum() {
-        return initFishNum;
-    }
-
-    public void setInitFishNum(int initFishNum) {
-        this.initFishNum = initFishNum;
-    }
-
-    public int getInitQueenNum() {
-        return initQueenNum;
-    }
-
-    public void setInitQueenNum(int initQueenNum) {
-        this.initQueenNum = initQueenNum;
-    }
 
     public double getFoodProb() {
         return foodProb;
@@ -118,13 +78,7 @@ public class GameConstants {
         this.netProb = netProb;
     }
 
-    public int getNetActiveTime() {
-        return netActiveTime;
-    }
 
-    public void setNetActiveTime(int netActiveTime) {
-        this.netActiveTime = netActiveTime;
-    }
 
     public int getNetValidTime() {
         return netValidTime;
@@ -230,21 +184,6 @@ public class GameConstants {
         this.endRatio = endRatio;
     }
 
-    public int getDisobeyPointerTeam0() {
-        return disobeyPointerTeam0;
-    }
-
-    public void setDisobeyPointerTeam0(int disobeyPointerTeam0) {
-        this.disobeyPointerTeam0 = disobeyPointerTeam0;
-    }
-
-    public int getDisobeyPointerTeam1() {
-        return disobeyPointerTeam1;
-    }
-
-    public void setDisobeyPointerTeam1(int disobeyPointerTeam1) {
-        this.disobeyPointerTeam1 = disobeyPointerTeam1;
-    }
 
     public int getDisobeyNum() {
         return disobeyNum;
@@ -254,13 +193,6 @@ public class GameConstants {
         this.disobeyNum = disobeyNum;
     }
 
-    public double getDisobeyRatio() {
-        return disobeyRatio;
-    }
-
-    public void setDisobeyRatio(double disobeyRatio) {
-        this.disobeyRatio = disobeyRatio;
-    }
 
     public int getFoodValidTime() {
         return foodValidTime;
@@ -286,20 +218,13 @@ public class GameConstants {
         this.killBothQueenScore = killBothQueenScore;
     }
 
-    public int getW() {
-        return w;
+    public int getTeamNum() {
+        return teamNum;
     }
 
-    public void setW(int w) {
-        this.w = w;
+    public void setTeamNum(int teamNum) {
+        this.teamNum = teamNum;
     }
 
-    public int getH() {
-        return h;
-    }
-
-    public void setH(int h) {
-        this.h = h;
-    }
 
 }

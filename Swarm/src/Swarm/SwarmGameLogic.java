@@ -163,7 +163,15 @@ public class SwarmGameLogic implements GameLogic {
      */
     @Override
     public Message getUIInitialMessage() {
-        return null;
+        GameConstants constants = this.map.getConstants();
+        constants.setTurnTimeout(PARAM_TURN_TIMEOUT.getValue());
+
+        Message msg;
+        String name0 = Message.NAME_INIT;
+        Object[] args0 = {0,this.map.getW(),this.map.getH(),this.map.getInitialFishes(), this.map.getInitialFoods(),
+                this.map.getInitialTrashes(), this.map.getInitialNets(),this.map.getInitialTeleports(), constants};
+        msg = new Message(name0, args0);
+        return msg;
     }
 
     @Override
@@ -173,12 +181,13 @@ public class SwarmGameLogic implements GameLogic {
 
         Message[] msg = new Message[2];
         String name0 = Message.NAME_INIT;
-        Object[] args0 = {0,this.map.getW(),this.map.getH(),this.map.getInitialFishes(), this.map.getInitialFoods(),
+        int[] size = {this.map.getW(),this.map.getH()};
+        Object[] args0 = {0,size,this.map.getInitialFishes(), this.map.getInitialFoods(),
                 this.map.getInitialTrashes(), this.map.getInitialNets(),this.map.getInitialTeleports(), constants};
         msg[0] = new Message(name0, args0);
 
         String name1 = Message.NAME_INIT;
-        Object[] args1 = {1,this.map.getW(),this.map.getH(),this.map.getInitialFishes(), this.map.getInitialFoods(),
+        Object[] args1 = {1,size,this.map.getInitialFishes(), this.map.getInitialFoods(),
                 this.map.getInitialTrashes(), this.map.getInitialNets(),this.map.getInitialTeleports(), constants};
         msg[1] = new Message(name1, args1);
         return msg;
@@ -656,6 +665,9 @@ public class SwarmGameLogic implements GameLogic {
      */
     @Override
     public void generateOutputs() {
+        if (PARAM_SHOW_DEBUG_UI.getValue() == Boolean.TRUE) {
+            debugUI = new MapFrame(this.map);
+        }
         /*
         if (debugUI != null) {
             debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), lastClientEvents, getStatusMessage(), movesDest2, movesSize2);
@@ -667,7 +679,11 @@ public class SwarmGameLogic implements GameLogic {
 
     @Override
     public Message getUIMessage() {
-        return uiMessage;
+       Message messages;
+        String name0 = Message.NAME_TURN;
+        Object[] args0 = {this.turn, this.score, this.diff.getChanges()};
+        messages = new Message(name0, args0);
+        return messages;
     }
 
     /*

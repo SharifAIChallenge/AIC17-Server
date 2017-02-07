@@ -53,8 +53,8 @@ public class Map {
                     cells[i][j].setColumn(j);
                 }
             }
-            //this.constants = mapJson.constants;
-            this.score = new int[this.constants.getTeamNum()];
+            this.constants = makeConstants(mapJson.constants);
+            this.score = new int[2];
 
             makeFish(mapJson.fishes);
             makeFood(mapJson.foods);
@@ -62,13 +62,38 @@ public class Map {
             makeNets(mapJson.nets);
 
             makeTeleport(mapJson.teleports);
-            /*
-            makeConstant(mapJson.constants);
-            */
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+    }
+
+    private GameConstants makeConstants(int[] constants) {
+
+        GameConstants gameConstants = new GameConstants();
+        gameConstants.setTurnTimeout(constants[0]);
+        gameConstants.setFoodProb(constants[1]);
+        gameConstants.setTrashProb(constants[2]);
+        gameConstants.setNetProb(constants[3]);
+        gameConstants.setNetValidTime(constants[4]);
+        gameConstants.setColorCost(constants[5]);
+        gameConstants.setSickCost(constants[6]);
+        gameConstants.setUpdateCost(constants[7]);
+        gameConstants.setDetMoveCost(constants[8]);
+        gameConstants.setKillQueenScore(constants[9]);
+        gameConstants.setKillBothQueenScore(constants[10]);
+        gameConstants.setKillFishScore(constants[11]);
+        gameConstants.setQueenCollisionScore(constants[12]);
+        gameConstants.setFishFoodScore(constants[13]);
+        gameConstants.setQueenFoodScore(constants[14]);
+        gameConstants.setSickLifeTime(constants[15]);
+        gameConstants.setPowerRatio(constants[16]);
+        gameConstants.setEndRatio(constants[17]);
+        gameConstants.setDisobeyNum(constants[18]);
+        gameConstants.setFoodValidTime(constants[19]);
+        gameConstants.setTrashValidTime(constants[20]);
+        return gameConstants;
 
     }
 
@@ -81,7 +106,7 @@ public class Map {
         private int[][] trashes;
         private int[][] teleports;
         private int[][] nets;
-        // private int[][] constants;
+        private int[] constants;
     }
 
 

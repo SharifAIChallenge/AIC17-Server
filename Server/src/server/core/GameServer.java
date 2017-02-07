@@ -163,6 +163,9 @@ public class GameServer {
      * runnable code template. This template is composed by the multiple steps in every turn of the game.
      * </p>
      */
+    /*
+    this is main
+     */
     private class Loop implements Runnable {
 
         private boolean shutdownRequest = false;

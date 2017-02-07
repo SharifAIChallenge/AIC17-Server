@@ -25,6 +25,7 @@ public class Map implements Serializable{
     private int[][] initialTeleports;
     private int[][] initialFoods;
     private int[][] initialFishes;
+    private double[] initialConstants;
     private int[] score;
 
 
@@ -72,7 +73,7 @@ public class Map implements Serializable{
     }
 
     private GameConstants makeConstants(double[] constants) {
-
+        initialConstants = constants;
         GameConstants gameConstants = new GameConstants();
         gameConstants.setTurnTimeout((int)constants[0]);
         gameConstants.setFoodProb(constants[1]);
@@ -97,6 +98,14 @@ public class Map implements Serializable{
         gameConstants.setTrashValidTime((int)constants[20]);
         return gameConstants;
 
+    }
+
+    public double[] getInitialConstants() {
+        return initialConstants;
+    }
+
+    public void setInitialConstants(double[] initialConstants) {
+        this.initialConstants = initialConstants;
     }
 
 

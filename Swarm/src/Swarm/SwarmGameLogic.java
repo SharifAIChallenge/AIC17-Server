@@ -185,12 +185,12 @@ public class SwarmGameLogic implements GameLogic {
         String name0 = Message.NAME_INIT;
         int[] size = {this.map.getW(),this.map.getH()};
         Object[] args0 = {0,size,this.map.getInitialFishes(), this.map.getInitialFoods(),
-                this.map.getInitialTrashes(), this.map.getInitialNets(),this.map.getInitialTeleports(), constants};
+                this.map.getInitialTrashes(), this.map.getInitialNets(),this.map.getInitialTeleports(), this.map.getInitialConstants()};
         msg[0] = new Message(name0, args0);
 
         String name1 = Message.NAME_INIT;
         Object[] args1 = {1,size,this.map.getInitialFishes(), this.map.getInitialFoods(),
-                this.map.getInitialTrashes(), this.map.getInitialNets(),this.map.getInitialTeleports(), constants};
+                this.map.getInitialTrashes(), this.map.getInitialNets(),this.map.getInitialTeleports(), this.map.getInitialConstants()};
         msg[1] = new Message(name1, args1);
         return msg;
     }

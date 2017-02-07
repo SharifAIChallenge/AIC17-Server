@@ -36,7 +36,6 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
             int R = (hash(cell.getRow() + cell.getTeleport().getPair().getRow())) % 256;
             int G = (hash(cell.getColumn() + cell.getTeleport().getPair().getColumn())) % 256;
             int B = (hash(R + G)) % 256;
-            System.out.println(B);
             color = new Color(R, G, B);
             Color temp_color = g2d.getColor();//store the color before
             g2d.setColor(color);

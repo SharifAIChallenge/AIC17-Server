@@ -98,6 +98,7 @@ public class MapPanel3 extends JPanel{
             }
         });
         timer1.start();
+        this.isLive = true;
     }
     @Override
     protected synchronized void paintComponent(Graphics g){

@@ -1,9 +1,14 @@
 package debugUI.control;
+import debugUI.DeepCopyMaker;
+
 import javax.imageio.ImageIO;
+import javax.imageio.spi.ServiceRegistry;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 
 /**
@@ -11,6 +16,7 @@ import java.util.HashMap;
  */
 public class ImageDataBase {
     HashMap<String,Image> images = new HashMap<String, Image>();
+    private static String imagePath;
     private static ImageDataBase imageDataBase = new ImageDataBase();
     private ImageDataBase(){}
     public static Image getImage(String imageFilePath){
@@ -34,18 +40,21 @@ public class ImageDataBase {
 
     }
     public static Image addImage(String imageFilePath) {
-        imageFilePath = alterAddress(imageFilePath);
+        //imageFilePath = alterAddress(imageFilePath);
         Image image = null;
+        //image = ImageIO.read(new File(imageFilePath));
+        //image = ImageIO.read(in);
+        InputStream in = DeepCopyMaker.class.getResourceAsStream("images/"+imageFilePath);
         try {
-            image = ImageIO.read(new File(imageFilePath));
-            imageDataBase.images.put(imageFilePath,image);
-        } catch (IOException ie) {
-            System.err.println(imageFilePath);
-            ie.printStackTrace();
+            image = ImageIO.read(in);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        imageDataBase.images.put(imageFilePath,image);
         return image;
     }
     private static String alterAddress(String imageFilePath){
+
         String result = "Swarm/src/debugUI/images/" + imageFilePath;
         return result;
     }

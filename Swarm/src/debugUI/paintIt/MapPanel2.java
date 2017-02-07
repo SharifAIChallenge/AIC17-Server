@@ -2,16 +2,15 @@ package debugUI.paintIt;
 import Swarm.map.Cell;
 import Swarm.models.Map;
 import Swarm.objects.*;
+import debugUI.DeepCopyMaker;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -191,6 +190,7 @@ public class MapPanel2 extends JPanel{
         this.setPreferredSize(new Dimension(width,height));
     }
     public static void main(String[] args) {
+
         Cell cells[][] = new Cell[10][10];
         for(int i = 0; i<10; i++)
             for(int j = 0; j<10; j++) {

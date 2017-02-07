@@ -472,7 +472,7 @@ public class SwarmGameLogic implements GameLogic {
             for(int i=0;i<fishes[ind].size();i++){
                 if(fishAlters.contains(fishes[ind].get(i))){
                     Fish fish = fishes[ind].get(i);
-                    diff.alter(fish.getId(), fish.getColorNumber(),(fish.isSick())?1:0);
+                    diff.alter(fish.getId(), fish.getPosition().getRow(),fish.getPosition().getColumn(),fish.getColorNumber(),(fish.isSick())?1:0);
                 }
             }
         }

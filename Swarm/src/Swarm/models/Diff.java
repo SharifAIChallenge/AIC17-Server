@@ -68,9 +68,11 @@ public class Diff {
         mov.add(movItem);
     }
 
-    public void alter(int id, int color, int sick){
+    public void alter(int id,int x,int y, int color, int sick){
         ArrayList<Integer> alterItem = new ArrayList<>();
         alterItem.add(id);
+        alterItem.add(x);
+        alterItem.add(y);
         alterItem.add(color);
         alterItem.add(sick);
         alter.add(alterItem);

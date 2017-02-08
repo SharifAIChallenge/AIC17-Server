@@ -102,7 +102,6 @@ public class SwarmGameLogic implements GameLogic {
     private int[][][] mark;
     private Cell[][][] moves;
     private boolean[][][] moves_valid;
-//    private ArrayList[][][] moves_r;
     private int[][][] dfs_reverse_data;
 
     private boolean firstTurn = false;
@@ -450,6 +449,7 @@ public class SwarmGameLogic implements GameLogic {
                     if (powerSum[1-ind] > 2 * powerSum[ind] && attacks[i][j][ind].size()>0) {
                         for (int k = 0; k < attacks[i][j][ind].size(); k++) {
                             for (Fish f : attacks[i][j][1-ind]) {
+                                // mark as candidate move
                                 moves[1-ind][f.getPosition().getRow()][f.getPosition().getColumn()] = cells[i][j];
 //                                moves_r[1-ind][i][j].add(f.getPosition());
                             }
@@ -523,7 +523,7 @@ public class SwarmGameLogic implements GameLogic {
             int total_chain = 0;
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
-                    if (moves[t][r][c] == null && mark[t][r][c] != 0 && moves_r[t][r][c].size() > 0) {
+                    if (moves[t][r][c] == null && mark[t][r][c] != 0) {
                         total_chain += dfs_reverse(t, r, c);
                     }
                     mark[t][r][c] = 1;
@@ -531,12 +531,12 @@ public class SwarmGameLogic implements GameLogic {
             }
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
-                    if (moves[t][r][c] != null && mark[t][r][c] != 0 && moves_r[t][r][c].size() > 0) {
+                    if (moves[t][r][c] != null && mark[t][r][c] != 0) {
                         total_chain += dfs_loop(t, r, c, 0);
                     }
                 }
             }
-
+            System.out.println("Total chain: " + total_chain);
         }
     }
 
@@ -545,14 +545,22 @@ public class SwarmGameLogic implements GameLogic {
             return dfs_reverse_data[t][r][c];
         mark[t][r][c] = 1;
         int max = 0;
+        int maxr = 0, maxc = 0;
         for (int i = -1; i < 1; i++) {
             for (int j = -1; j < 1; j++) {
                 int row = makeValidIndex(r + i, H);
                 int col = makeValidIndex(c + j, W);
-                if (moves[t][row][col] == cells[r][c])
-                    max = Math.max(max, dfs_reverse(t, row, col));
+                if (moves[t][row][col] == cells[r][c]){
+                    int val = dfs_reverse(t, row, col);
+                    if (val > max) {
+                        max = val;
+                        maxr = row;
+                        maxc = col;
+                    }
+                }
             }
         }
+        moves_valid[t][maxr][maxc] = true;
         dfs_reverse_data[t][r][c] = max + 1;
         return max + 1;
     }
@@ -560,16 +568,20 @@ public class SwarmGameLogic implements GameLogic {
     private int dfs_loop(int t, int r, int c, int d) {
         if (mark[t][r][c] != 0)
             return 0;
-        mark[t][r][c] = d + 1;
+        mark[t][r][c] = d;
         if (moves[t][r][c] == null)
             return 0;
         int r2 = moves[t][r][c].getRow();
         int c2 = moves[t][r][c].getColumn();
         int dl = dfs_loop(t, r2, c2, d + 1);
-        if (dl > 0)
-            return dl;
-        if (mark[t][r2][c2] != d + 2)
-            return d + 2 - mark[t][r2][c2];
+        if (dl > 0) {
+            moves_valid[t][r][c] = true;
+            return dl - 1;
+        }
+        if (mark[t][r2][c2] != d + 1) {
+            moves_valid[t][r][c] = true;
+            return d + 1 - mark[t][r2][c2];
+        }
         return 0;
     }
 

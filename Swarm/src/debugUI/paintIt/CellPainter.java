@@ -154,7 +154,7 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
         if(fish.isSick()) {
             number += 8;
         }
-        if(fish.getColorNumber()==0){
+        if(fish.getColorNumber()==1){
             number+= 4;
         }
         return number;

@@ -34,8 +34,14 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
         //---drawing the color linking the input and output teleport to each other
         Color color  = new Color(100, 255, 100);
         if(cell.getTeleport()!=null) {
-            int R = (hash(cell.getRow() + cell.getTeleport().getPair().getRow())) % 256;
-            int G = (hash(cell.getColumn() + cell.getTeleport().getPair().getColumn())) % 256;
+            int row1= cell.getRow();
+            int row2= cell.getTeleport().getPair().getRow();
+            int col1= cell.getColumn();
+            int col2= cell.getTeleport().getPair().getColumn();
+            int id1 = cell.getTeleport().getId();
+            int id2 = cell.getTeleport().getPair().getTeleport().getId();
+            int R = (hash(row1*row2 + id1 + id2)) % 256;
+            int G = (hash(col1*col2 + id1 + id2)) % 256;
             int B = (hash(R + G)) % 256;
             color = new Color(R, G, B);
             Color temp_color = g2d.getColor();//store the color before
@@ -48,7 +54,7 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
         }
 
         //writing the power of fish on it
-        Font font = new Font("Consolas", Font.BOLD, 20);
+        Font font = new Font("Consolas", Font.BOLD, (int)(cellSize*0.3));
         g2d.setFont(font);
         //g2d.setColor(Color.decode("#e0e0e2"));
         g2d.setColor(Color.BLACK);
@@ -99,17 +105,17 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
             AffineTransform st = new AffineTransform();
             AffineTransform en = new AffineTransform();
             switch (fish.getDirection()) {
-                case 1:
+                case 0:
                     st.rotate(Math.PI / 2, cellSize/2, cellSize/2);
                     en.rotate(-1.0 * Math.PI / 2, cellSize/2, cellSize/2);
                     break;
                 case 2:
-                    st.rotate(Math.PI, cellSize/2, cellSize/2);
-                    en.rotate(-1.0*Math.PI, cellSize/2, cellSize/2);
+                    st.rotate(-1.0*Math.PI / 2, cellSize/2, cellSize/2);
+                    en.rotate(Math.PI / 2, cellSize/2, cellSize/2);
                     break;
                 case 3:
-                    st.rotate(3*Math.PI/2, cellSize/2, cellSize/2);
-                    en.rotate(-3.0*Math.PI/2, cellSize/2, cellSize/2);
+                    st.rotate(-1.0*Math.PI, cellSize/2, cellSize/2);
+                    en.rotate(Math.PI, cellSize/2, cellSize/2);
                     break;
             }
             ret.add(new ImageToDraw(getFishImage(fish, cellSize), st, en));
@@ -160,12 +166,13 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
         return number;
     }
     private static int hash(int num){
+        num+=4567;
         int power = 1;
         int ans = 0;
         while(num > 0){
             ans += (num%2)*power;
             num = num/2;
-            power =power * 397;
+            power =power * 3978654;
         }
         return Math.abs(ans);
 

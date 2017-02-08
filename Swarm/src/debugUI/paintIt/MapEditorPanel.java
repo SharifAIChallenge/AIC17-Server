@@ -3,6 +3,7 @@ import Swarm.map.Cell;
 import Swarm.models.Map;
 import Swarm.objects.*;
 import debugUI.DeepCopyMaker;
+import network.Json;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -19,36 +20,33 @@ import java.util.zip.ZipOutputStream;
 /*
 written by miladink
  */
-public class MapPanel3 extends JPanel{
+public class MapEditorPanel extends JPanel{
 
-    private final Timer timer1;
+    MapEditorFrame frame = null;
     private Map gameMap;
     private int cellSize;
-    private boolean isEnded = false;
     private int theme = 2;
     private int themeNumbers = 5;
-    private float alpha = 0.0f;
-    JButton saveButton;
-    private boolean isLive = false;
-    private boolean saveTried = false;
-    private int timeInterval = 1000;
-    private ZipOutputStream out;
-    private ArrayList<Map> shots = new ArrayList<>();
-    private AtomicInteger needle = new AtomicInteger(0);
+    private boolean teleport_Phase2 = false;
+    private boolean sick = false;
+    private boolean queen = false;
+    private int team = 0;
+    private int color = 0;
+    private  int direction = 0;
+    private int counter = 0;
+    private GameObject gameObject;
+    private Cell lastCell;
 
-    MapPanel3(Map gameMap){
-        this.gameMap = gameMap;
-        try {
-            shots.add((Map)DeepCopyMaker.makeDeepCopy(gameMap));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        setCellSize();
+
+    MapEditorPanel(MapEditorFrame frame, Map gameMap){
+        this.frame = frame;
         //---enter the map and the first shot will be taken
         this.setMap(gameMap);
+        lastCell = gameMap.getCells()[0][0];
+        setCellSize();
         this.setFocusable(true);
         this.requestFocus();
-        MapPanel3 thisMap = this;
+        MapEditorPanel thisMap = this;
         this.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -57,17 +55,30 @@ public class MapPanel3 extends JPanel{
 
             @Override
             public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode()==39) {
-                    if(shots.size()>needle.get()+1)
-                        increaseNeedle();
+                //TODO:
+                if(e.getKeyCode() == 39){
+                    direction+=3;
+                    direction%=4;
                 }
                 else if(e.getKeyCode() == 37){
-                    if(needle.get()>0)
-                        subtractNeedle();
+                    direction+=1;
+                    direction%=4;
+                }else if(e.getKeyChar() == 's'){
+                    sick = !sick;
+                }else if(e.getKeyChar() == 'q'){
+                    queen = !queen;
+                }else if(e.getKeyChar() == 't'){
+                    team = 1 - team;
+                }else if(e.getKeyChar() == 'c'){
+                    color = 1 - color;
                 }
-                else if(e.getKeyCode()==32){
-                    isLive = !(isLive);
+                //it is they are!
+                if(lastCell.getContent() instanceof Fish){
+                    Fish fish = new Fish(counter++,lastCell, team, direction, color, queen);
+                    fish.setSick(sick);
+                    lastCell.setContent(fish);
                 }
+                repaint();
             }
 
             @Override
@@ -80,59 +91,74 @@ public class MapPanel3 extends JPanel{
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 thisMap.requestFocus();
-            }
-        });
-        timer1 = new Timer(timeInterval, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(thisMap.isLive) {
-                    increaseNeedle();
+                int y = e.getX();//it is true but look weird I know
+                int x = e.getY();//it is true but look weird I know
+                x = x/cellSize;
+                y = y/cellSize;
+                Cell cell = gameMap.getCells()[x][y];
+                String selected = frame.getSelected();
+                if(!selected.equals("teleport")) {
+                    if(teleport_Phase2) {
+                        teleport_Phase2 = false;
+                        lastCell.setTeleport(null);
+                    }
                 }
+                if(teleport_Phase2){
+                    if(cell.getTeleport() == null) {
+                        lastCell.getTeleport().setPair(cell);
+                        cell.setTeleport(new Teleport(counter++, cell, lastCell));
+                        teleport_Phase2 = false;
+                    }
+                }else
+                {
 
+                    if(selected.equals("roach")){
+                        Fish fish = new Fish(counter++,lastCell, team, direction, color, queen);
+                        fish.setSick(sick);
+                        cell.setContent(fish);
+
+                    }
+                    else if(selected.equals("trash")){
+                        cell.setContent(new Trash(counter++, cell));
+                    }
+                    else if(selected.equals("food")){
+                        cell.setContent(new Food(counter++, cell));
+                    }
+                    else if(selected.equals("teleport")){
+                        if(cell.getTeleport() == null) {
+                            cell.setTeleport(new Teleport(counter++, cell, cell));
+                            teleport_Phase2 = true;
+                        }
+                    }else if(selected.equals("slipper")){
+                        cell.setNet(new Net(counter++, cell));
+                    }else if(selected.equals("eraser")){
+                        cell.setContent(null);
+                        if(cell.getTeleport()!=null) {
+                            Cell cell1 = cell.getTeleport().getPair();
+                            cell1.setTeleport(null);
+                            cell.setTeleport(null);
+                        }
+                        cell.setNet(null);
+                    }
+                }
+                //TODO:calculate in which cell this click is happened
+                //TODO:put the content in the cell if there is a content
+                //TODO:if it is erase, deleteIt
+                lastCell = cell;
+                thisMap.repaint();
             }
         });
-        timer1.start();
-        this.isLive = true;
     }
     @Override
     protected synchronized void paintComponent(Graphics g){
         super.paintComponent(g);
         //---draw the image which sign is on, on the panel
         Graphics2D g2d = (Graphics2D)g;
-        if (needle.get() != -1 && shots.size() > 0) {
-            BufferedImage image1 = draw(shots.get(needle.get()));
-            BufferedImage image2 = null;
-            if(needle.get()>1)
-                image2 = draw(shots.get(needle.get()-1));
-
-            Composite composite = g2d.getComposite();
-            int rule = AlphaComposite.SRC_OVER;
-            Composite comp;
-
-            g2d.setComposite(composite);
-            if(image2!=null) {
-                comp = AlphaComposite.getInstance(rule , 1);
-                g2d.setComposite(comp);
-                g2d.drawImage(image2, 0, 0, null);
-            }
-            g2d.setComposite(composite);
-
-
-
-            comp = AlphaComposite.getInstance(rule , alpha);
-            g2d.setComposite(comp);
-            g2d.drawImage(image1, 0, 0, null);
-
-        }
+        g2d.drawImage(draw(gameMap), null, null);
         //---the resulted image is now drawn on the panel
     }
     public void setMap(Map gameMap){
         this.gameMap = gameMap;
-        try {
-            shots.add((Map)(DeepCopyMaker.makeDeepCopy(gameMap)));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
     }
     private BufferedImage draw(Map gameMap){
@@ -169,47 +195,28 @@ public class MapPanel3 extends JPanel{
         //---each cell is drawn
         return shot;
     }
-    void gameOver(){//TODO:call this before you exit
-        //---open the zip file for storing the images
-        isEnded = true;
-        if(saveButton != null)
-            saveButton.setEnabled(true);
-    }
-    void saveImages(){
-        saveTried = true;
+
+    void saveMap(){
         FileDialog fileDialog = new FileDialog((Frame) null, "Save Recorded Images", FileDialog.SAVE);
         fileDialog.setFilenameFilter((dir, name) -> name.matches(".*\\.zip"));
         fileDialog.setMultipleMode(false);
-        fileDialog.setFile("history.zip");
+        fileDialog.setFile("1.map");
         fileDialog.setVisible(true);
         File[] files = fileDialog.getFiles();
         if (files.length != 1)
             return;
         File f = files[0];
+        MapJsonExtra jsonExtra = new MapJsonExtra(gameMap);
+        String json = Json.GSON.toJson(jsonExtra);
         try {
-            out = new ZipOutputStream(new FileOutputStream(f));
+            PrintWriter printWriter = new PrintWriter(f);
+            printWriter.print(json);
+            printWriter.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        for(int i = 0; i<shots.size(); i++) {
-            ZipEntry ze = new ZipEntry(Integer.toString(i) + ".png");
-            try {
-                out.putNextEntry(ze);
-                ImageIO.write(draw(shots.get(i)), "png", out);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-
-        try {
-            out.closeEntry();
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
+
     private void setCellSize(){
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int cellWidth = Math.min(80, (int)(screenSize.getWidth()*0.8)/gameMap.getW());//to be sure that width will not violate 600
@@ -220,42 +227,6 @@ public class MapPanel3 extends JPanel{
         this.setSize(new Dimension(width, height));
         this.setPreferredSize(new Dimension(width,height));
     }
-    void increaseNeedle(){
-        if(needle.get()+1<shots.size()){
-            needle.incrementAndGet();
-            //System.out.println(ii++);
-            ahead();
-
-        }
-        else {
-            return;
-        }
-        if(needle.get() == shots.size()-1 && isEnded) {
-            if(!saveTried)
-                saveImages();
-            timer1.stop();
-        }
-    }
-    void subtractNeedle(){
-        if(needle.get()>1) {
-            needle.getAndDecrement();
-            repaint();
-        }
-    }
-    boolean isLive() {
-        return isLive;
-    }
-    void setLive(boolean live) {
-        isLive = live;
-    }
-
-    public boolean isEnded() {
-        return isEnded;
-    }
-
-    public void setEnded(boolean ended) {
-        isEnded = ended;
-    }
 
     public Map getGameMap() {
         return gameMap;
@@ -263,14 +234,6 @@ public class MapPanel3 extends JPanel{
 
     public void setGameMap(Map gameMap) {
         this.gameMap = gameMap;
-    }
-
-    public int getTurn(){
-        return shots.size();
-    }
-
-    public AtomicInteger getNeedle() {
-        return needle;
     }
 
     public void changeTheme(){
@@ -292,24 +255,30 @@ public class MapPanel3 extends JPanel{
             return Color.BLACK;
     }
 
-    public void ahead(){
-        Timer timer1 = new Timer(30, new ActionListener() {
-            private int k  = 0;
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(k==0)
-                    alpha=0.0f;
-                k++;
-                alpha +=(1/(timeInterval/50.0));
-                alpha = Math.min(alpha, 1.0f);
-                repaint();
-                if(k==(int)(timeInterval/50.0)) {
-                    alpha = 1.0f;
-                    repaint();
-                    ((Timer) e.getSource()).stop();
-                }
-            }
-        });
-        timer1.start();
+    public GameObject makeGameObject(){
+        //TODO:
+        String selected = frame.getSelected();
+        if(selected.equals("roach")){
+           return new Fish(counter++,gameMap.getCells()[0][0], team, direction, color, queen);
+        }
+        else if(selected.equals("trash")){
+            return new Trash(counter++, gameMap.getCells()[0][0]);
+        }
+        else if(selected.equals("food")){
+            return new Food(counter++, gameMap.getCells()[0][0]);
+        }
+        else if(selected.equals("teleport")){
+            return new Teleport(counter++, gameMap.getCells()[0][0], lastCell);
+        }
+        return null;
     }
+
+    private void addToCell(GameObject gameObject, int i, int j){
+        Cell cell = gameMap.getCells()[i][j];
+        //if(gameObject instanceof Net)
+    }
+    public static void main(String[] args) {
+        MapEditorFrame frame = new MapEditorFrame();
+    }
+
 }

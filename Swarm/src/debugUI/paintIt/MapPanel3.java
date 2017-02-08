@@ -25,8 +25,8 @@ public class MapPanel3 extends JPanel{
     private Map gameMap;
     private int cellSize;
     private boolean isEnded = false;
-    private int theme = 2;
-    private int themeNumbers = 6;
+    private int theme = 0;
+    private int themeNumbers = 2;
     private float alpha = 0.0f;
     JButton saveButton;
     private boolean isLive = false;
@@ -280,7 +280,7 @@ public class MapPanel3 extends JPanel{
     }
 
     public Color getThemeBackGround(){
-        Color colors[] = new Color[themeNumbers];
+        Color colors[] = new Color[Math.max(themeNumbers,6)];
         colors[0] = Color.decode("#606c68");
         colors[1] = Color.decode("#e9cef3");
         colors[2] = Color.decode("#757575");

@@ -191,9 +191,9 @@ public class MapPanel2 extends JPanel{
     }
     public static void main(String[] args) {
 
-        Cell cells[][] = new Cell[30][30];
-        for(int i = 0; i<30; i++)
-            for(int j = 0; j<30; j++) {
+        Cell cells[][] = new Cell[10][10];
+        for(int i = 0; i<10; i++)
+            for(int j = 0; j<10; j++) {
                 cells[i][j] = new Cell();
                 int randomNum = ThreadLocalRandom.current().nextInt(0, 1 + 1);
                 if((randomNum%2)==0) {
@@ -228,9 +228,9 @@ public class MapPanel2 extends JPanel{
                 cells[i][j].setContent(new Trash(1, cells[i][j]));
                 mapFrame.setMap(map);
             }
-        for(int i = 0; i<6000; i++){
-            int rand5 = ThreadLocalRandom.current().nextInt(0, 30);
-            int rand6 = ThreadLocalRandom.current().nextInt(0, 30);
+        for(int i = 0; i<600; i++){
+            int rand5 = ThreadLocalRandom.current().nextInt(0, 10);
+            int rand6 = ThreadLocalRandom.current().nextInt(0, 10);
             int rand7 = ThreadLocalRandom.current().nextInt(0, 10);
             int rand8 = ThreadLocalRandom.current().nextInt(0, 10);
             rand7 = (rand5+1)%10;

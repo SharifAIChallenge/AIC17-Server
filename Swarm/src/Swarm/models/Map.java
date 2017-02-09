@@ -48,9 +48,9 @@ public class Map implements Serializable{
             this.w = mapJson.w;
             this.h = mapJson.h;
 
-            cells= new Cell[w][h];
-            for (int i = 0; i < w; i++) {
-                for (int j = 0; j < h; j++) {
+            cells= new Cell[h][w];
+            for (int i = 0; i < h; i++) {
+                for (int j = 0; j < w; j++) {
                     cells[i][j] = new Cell();
                     cells[i][j].setRow(i);
                     cells[i][j].setColumn(j);
@@ -237,25 +237,16 @@ public class Map implements Serializable{
         return tempObjects;
     }
 
-    public void setTempObjects(ArrayList<GameObject> tempObjects) {
-        this.tempObjects = tempObjects;
-    }
 
     public GameConstants getConstants() {
         return constants;
     }
 
-    public void setConstants(GameConstants constants) {
-        this.constants = constants;
-    }
 
     public ArrayList<Teleport> getTeleports() {
         return teleports;
     }
 
-    public void setTeleports(ArrayList<Teleport> teleports) {
-        this.teleports = teleports;
-    }
 
 
     public int[][] getInitialFishes() {
@@ -283,9 +274,8 @@ public class Map implements Serializable{
         return mapName;
     }
 
-    public void setMapName(String mapName) {
-        this.mapName = mapName;
-    }
+
+
 
 
     public int getH() {
@@ -319,9 +309,7 @@ public class Map implements Serializable{
         return idCounter;
     }
 
-    public void setIdCounter(int idCounter) {
-        this.idCounter = idCounter;
-    }
+
 
     public Cell[][] getCells() {
         return cells;

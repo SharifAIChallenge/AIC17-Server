@@ -453,7 +453,7 @@ public class SwarmGameLogic implements GameLogic {
                                 moves[1-ind][f.getPosition().getRow()][f.getPosition().getColumn()] = cells[i][j];
 //                                moves_r[1-ind][i][j].add(f.getPosition());
                             }
-                            Fish fish =attacks[i][j][ind].get(k);
+                            Fish fish = attacks[i][j][ind].get(k);
                             //score[ind] -= gc.getKillFishScore();
                             if(fish.isQueen() && !fishChanges.containsKey(fish.getId())) {
                                 changeScores(ind, gc.getKillQueenScore());
@@ -493,13 +493,14 @@ public class SwarmGameLogic implements GameLogic {
 
     private void stageDeleteAndMove() {
         Log.i(TAG, "changes: " + fishChanges.toString());
-        // DELETION && MOVES
-        for (int ind = 0; ind < gc.getTeamNum(); ind++) {
-            if (fishes[ind].size() == 0) {
+
+        // Handle Deletions & (Conflicting & Non Conflicting) Moves
+        for (int t = 0; t < gc.getTeamNum(); t++) {
+            if (fishes[t].size() == 0) {
                 continue;
             }
-            for (int i = fishes[ind].size() - 1; i >= 0; i--) {
-                Fish fish = fishes[ind].get(i);
+            for (int i = fishes[t].size() - 1; i >= 0; i--) {
+                Fish fish = fishes[t].get(i);
                 if (fishChanges.containsKey(fish.getId())) {
                     String str = fishChanges.get(fish.getId());
                     if (str.equals("delete")) {
@@ -507,19 +508,6 @@ public class SwarmGameLogic implements GameLogic {
                     }
                 }
             }
-            for (int i = fishes[ind].size() - 1; i >= 0; i--) {
-                Fish fish = fishes[ind].get(i);
-                if (fishChanges.containsKey(fish.getId())) {
-                    String str = fishChanges.get(fish.getId());
-                    if (str.equals("move")) {
-                        moveFish(fish, nextCell[ind].get(i));
-                    }
-                }
-            }
-        }
-
-        // Handle (Conflicting & Non Conflicting) Moves
-        for (int t = 0; t < 2; t++) {
             int total_chain = 0;
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
@@ -537,7 +525,24 @@ public class SwarmGameLogic implements GameLogic {
                 }
             }
             System.out.println("Total chain: " + total_chain);
+            for (int r = 0; r < H; r++) {
+                for (int c = 0; c < W; c++) {
+                    if (moves_valid[t][r][c])
+                        fishChanges.put(cells[r][c].getContent().getId(), "move");
+                }
+            }
+            for (int i = fishes[t].size() - 1; i >= 0; i--) {
+                Fish fish = fishes[t].get(i);
+                if (fishChanges.containsKey(fish.getId())) {
+                    String str = fishChanges.get(fish.getId());
+                    if (str.equals("move")) {
+                        moveFish(fish, nextCell[t].get(i));
+                    }
+                }
+            }
         }
+
+
     }
 
     private int dfs_reverse(int t, int r, int c) {
@@ -545,7 +550,7 @@ public class SwarmGameLogic implements GameLogic {
             return dfs_reverse_data[t][r][c];
         mark[t][r][c] = 1;
         int max = 0;
-        int maxr = 0, maxc = 0;
+        int has_max = 0, maxr = 0, maxc = 0;
         for (int i = -1; i < 1; i++) {
             for (int j = -1; j < 1; j++) {
                 int row = makeValidIndex(r + i, H);
@@ -553,6 +558,7 @@ public class SwarmGameLogic implements GameLogic {
                 if (moves[t][row][col] == cells[r][c]){
                     int val = dfs_reverse(t, row, col);
                     if (val > max) {
+                        has_max = 1;
                         max = val;
                         maxr = row;
                         maxc = col;
@@ -560,7 +566,8 @@ public class SwarmGameLogic implements GameLogic {
                 }
             }
         }
-        moves_valid[t][maxr][maxc] = true;
+        if (has_max == 1)
+            moves_valid[t][maxr][maxc] = true;
         dfs_reverse_data[t][r][c] = max + 1;
         return max + 1;
     }

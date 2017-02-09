@@ -523,15 +523,15 @@ public class SwarmGameLogic implements GameLogic {
             int total_chain = 0;
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
-                    if (moves[t][r][c] == null && mark[t][r][c] != 0) {
+                    if (moves[t][r][c] == null && mark[t][r][c] == 0) {
                         total_chain += dfs_reverse(t, r, c);
+                        mark[t][r][c] = 1;
                     }
-                    mark[t][r][c] = 1;
                 }
             }
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
-                    if (moves[t][r][c] != null && mark[t][r][c] != 0) {
+                    if (moves[t][r][c] != null && mark[t][r][c] == 0) {
                         total_chain += dfs_loop(t, r, c, 0);
                     }
                 }

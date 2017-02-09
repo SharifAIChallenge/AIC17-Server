@@ -1,15 +1,16 @@
 package debugUI.paintIt;
 
 import Swarm.map.Cell;
-import Swarm.objects.Fish;
-import Swarm.objects.Food;
-import Swarm.objects.GameObject;
-import Swarm.objects.Trash;
+import Swarm.models.GameConstants;
+import Swarm.models.Map;
+import Swarm.objects.*;
 import debugUI.control.ImageDataBase;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
+
 /*
 written by miladink
  */
@@ -22,8 +23,8 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
     static private ArrayList<Image> trashImages = new ArrayList<>();
     static private ArrayList<Image> foodImages = new ArrayList<>();
 
-    static void paint(Cell cell, int cellSize, Graphics2D g2d) {
-        ArrayList<ImageToDraw> drawList = getImage(cell, cellSize);
+    static void paint(Cell cell, int cellSize, Graphics2D g2d, int theme) {
+        ArrayList<ImageToDraw> drawList = getImage(cell, cellSize, theme);
         for (ImageToDraw image : drawList) {
             g2d.transform(image.getSt());
             g2d.drawImage(image.getImage(), 0, 0, cellSize, cellSize, null);
@@ -33,45 +34,57 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
         //---drawing the color linking the input and output teleport to each other
         Color color  = new Color(100, 255, 100);
         if(cell.getTeleport()!=null) {
-            int R = (hash(cell.getRow() + cell.getTeleport().getPair().getRow())) % 256;
-            int G = (hash(cell.getColumn() + cell.getTeleport().getPair().getColumn())) % 256;
+            int row1= cell.getRow();
+            int row2= cell.getTeleport().getPair().getRow();
+            int col1= cell.getColumn();
+            int col2= cell.getTeleport().getPair().getColumn();
+            int id1 = cell.getTeleport().getId();
+            int id2 = cell.getTeleport().getPair().getTeleport().getId();
+            int R = (hash(row1*row2 + id1 + id2)) % 256;
+            int G = (hash(col1*col2 + id1 + id2)) % 256;
             int B = (hash(R + G)) % 256;
-            System.out.println(B);
             color = new Color(R, G, B);
             Color temp_color = g2d.getColor();//store the color before
             g2d.setColor(color);
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.fillOval(0, 0, (int)(cellSize*0.3), (int)(cellSize*0.3));
+            g2d.fillOval(0, 0, (int)(cellSize*0.4), (int)(cellSize*0.4));
             g2d.setColor(temp_color);//restore the color before to the g2d
             //---circles for the input output teleport ended
         }
 
         //writing the power of fish on it
-        Font font = new Font("Consolas", Font.BOLD, 15);
+        Font font = new Font("Consolas", Font.BOLD, (int)(cellSize*0.3));
         g2d.setFont(font);
-        g2d.setColor(Color.LIGHT_GRAY);
+        //g2d.setColor(Color.decode("#e0e0e2"));
+        g2d.setColor(Color.BLACK);
         if(cell.getContent() instanceof Fish) {
 
             String str = Integer.toString(((Fish) cell.getContent()).getPower());
-            g2d.drawString(str, (cellSize - g2d.getFontMetrics().stringWidth(str)) / 2, (cellSize - g2d.getFontMetrics().getHeight()));
+            g2d.drawString(str, (cellSize - g2d.getFontMetrics().stringWidth(str)) / 2, cellSize);
             g2d.setColor(Color.YELLOW);
         }
-        }
 
-    private static ArrayList<ImageToDraw> getImage(Cell cell, int cellSize){
+
+    }
+
+    private static ArrayList<ImageToDraw> getImage(Cell cell, int cellSize, int theme){
         ArrayList<ImageToDraw> ret = new ArrayList<>();
         //---load the images if they are not loaded
         if(floor == null) {
-            floor = ImageDataBase.getImageScaled("floor.png", cellSize, cellSize);
-            slipper = ImageDataBase.getImageScaled("slipper.png", cellSize, cellSize);
-            teleport_in = ImageDataBase.getImageScaled("teleport_in.png", cellSize, cellSize);
+            trashImages.clear();
+            foodImages.clear();
+            fishImages.clear();
+            String theme_str = Integer.toString(theme)+"/";
+            floor = ImageDataBase.getImageScaled(theme_str+"floor.png", cellSize, cellSize);
+            slipper = ImageDataBase.getImageScaled(theme_str+"slipper.png", 3*cellSize, 3*cellSize);
+            teleport_in = ImageDataBase.getImageScaled(theme_str+"teleport_in.png", cellSize, cellSize);
             for(int i = 0; i<4; i++)//we assume we have 4 trash images
-                trashImages.add(ImageDataBase.getImageScaled("trash"+Integer.toString(i)+".png", cellSize, cellSize));
+                trashImages.add(ImageDataBase.getImageScaled(theme_str+"trash"+Integer.toString(i)+".png", cellSize, cellSize));
             for(int i = 0; i<4; i++)//we assume we have 4 food images
-                foodImages.add(ImageDataBase.getImageScaled("food"+Integer.toString(i)+".png", cellSize, cellSize));
+                foodImages.add(ImageDataBase.getImageScaled(theme_str+"food"+Integer.toString(i)+".png", cellSize, cellSize));
             for(int i = 0; i<16; i++)//we assume we have 4 food images
-                fishImages.add(ImageDataBase.getImageScaled(Integer.toString(i)+".png", cellSize, cellSize));
+                fishImages.add(ImageDataBase.getImageScaled(theme_str+Integer.toString(i)+".png", cellSize, cellSize));
         }
         //--needed images are loaded now
         ret.add(new ImageToDraw(floor));//we always have floor
@@ -81,6 +94,10 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
 
         GameObject content = cell.getContent();
         //---adding the fish image
+        if(cell.getTeleport()!=null) {
+            ret.add(new ImageToDraw(teleport_in));
+        }
+
         Fish fish = null;
         if(content instanceof Fish)
             fish = (Fish)content;
@@ -104,11 +121,9 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
             ret.add(new ImageToDraw(getFishImage(fish, cellSize), st, en));
         }
 
-        if(cell.getNet()!= null)
-            ret.add(new ImageToDraw(slipper));
-        if(cell.getTeleport()!=null) {
-            ret.add(new ImageToDraw(teleport_in));
-        }
+        //if(cell.getNet()!= null)//TODO:maybe you should return this
+        //    ret.add(new ImageToDraw(slipper));
+
         //---adding the trash image
         Trash trash = null;
         if(content instanceof  Trash)
@@ -145,21 +160,67 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
         if(fish.isSick()) {
             number += 8;
         }
-        if(fish.getColorNumber()==0){
+        if(fish.getColorNumber()==1){
             number+= 4;
         }
         return number;
     }
     private static int hash(int num){
+        num+=4567;
         int power = 1;
         int ans = 0;
         while(num > 0){
             ans += (num%2)*power;
             num = num/2;
-            power =power * 397;
+            power =power * 3978654;
         }
         return Math.abs(ans);
 
 
+    }
+    static void drawNet(Cell cell, int cellSize, Graphics2D g2d, int theme){
+        //draw the net
+        int randomNum = hash(cell.getRow()+cell.getColumn())%4;
+        //int randomNum = 3;
+        if(cell.getNet()!= null) {
+            AffineTransform st = new AffineTransform();
+            AffineTransform en = new AffineTransform();
+            switch (randomNum) {
+                case 1:
+                    st.rotate(Math.PI / 2, cellSize/2, cellSize/2);
+                    en.rotate(-1.0 * Math.PI / 2, cellSize/2, cellSize/2);
+                    break;
+                case 2:
+                    st.rotate(Math.PI, cellSize/2, cellSize/2);
+                    en.rotate(-1.0*Math.PI, cellSize/2, cellSize/2);
+                    break;
+                case 3:
+                    st.rotate(3*Math.PI/2, cellSize/2, cellSize/2);
+                    en.rotate(-3.0*Math.PI/2, cellSize/2, cellSize/2);
+                    break;
+            }
+            g2d.setColor(new Color(0, 0, 0, 135));
+            g2d.transform(st);
+            g2d.translate(-cellSize, -cellSize);
+            Composite composite = g2d.getComposite();
+            int rule = AlphaComposite.SRC_OVER;
+            //to make the slipper darker if it is reaching the floor
+            Net net = (Net)cell.getNet();
+            float alpha = 0.8f;
+            //double alpha -(net.getDeadTime() - turn)/5;//TODO:important how many turns to die?
+            Composite comp = AlphaComposite.getInstance(rule , alpha);
+            g2d.setComposite(comp);
+            g2d.drawImage(slipper, 0, 0, null);
+            g2d.setComposite(composite);
+            g2d.translate(cellSize, cellSize);
+            g2d.transform(en);
+
+
+
+        }
+    }
+
+    public static void changeTheme(){
+        floor = null;
     }
 }

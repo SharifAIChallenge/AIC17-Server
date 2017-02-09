@@ -1,20 +1,16 @@
 package debugUI.paintIt;
 import Swarm.map.Cell;
 import Swarm.models.Map;
-import Swarm.objects.Fish;
-import Swarm.objects.Food;
-import Swarm.objects.Teleport;
-import Swarm.objects.Trash;
+import Swarm.objects.*;
+import debugUI.DeepCopyMaker;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -135,7 +131,7 @@ public class MapPanel2 extends JPanel{
         for(int i = 0; i<cells.length;i++) {
             for (int j = 0; j < cells[0].length; j++) {
                 gTemp2d.translate(j * cellSize, i * cellSize);
-                CellPainter.paint(cells[i][j], cellSize, gTemp2d);
+                //CellPainter.paint(cells[i][j], cellSize, gTemp2d);//TODO:correct this
                 gTemp2d.translate(-j * cellSize, -i * cellSize);
             }
         }
@@ -194,22 +190,36 @@ public class MapPanel2 extends JPanel{
         this.setPreferredSize(new Dimension(width,height));
     }
     public static void main(String[] args) {
+
         Cell cells[][] = new Cell[10][10];
         for(int i = 0; i<10; i++)
             for(int j = 0; j<10; j++) {
                 cells[i][j] = new Cell();
                 int randomNum = ThreadLocalRandom.current().nextInt(0, 1 + 1);
-                if((randomNum%2)==0)
-                    cells[i][j].setContent(new Fish(i,cells[i][j],0,0,0,true));
+                if((randomNum%2)==0) {
+                    int rand1 = ThreadLocalRandom.current().nextInt(0, 1 + 1);
+                    int rand2 = ThreadLocalRandom.current().nextInt(0, 1 + 1);
+                    int rand3 = ThreadLocalRandom.current().nextInt(0, 1 + 1);
+                    int rand4 = ThreadLocalRandom.current().nextInt(0, 1 + 1);
+                    int rand5 = ThreadLocalRandom.current().nextInt(0, 1 + 1);
+                    cells[i][j].setContent(new Fish(i, cells[i][j], rand1, rand2, rand3, rand4==0));
+                    ((Fish)cells[i][j].getContent()).setSick(rand5 == 0);
+                }
                 cells[i][j].setRow(i);
                 cells[i][j].setColumn(j);
             }
         cells[0][7].setTeleport(new Teleport(1, cells[0][7], cells[8][9]));
         cells[8][9].setTeleport(new Teleport(1, cells[8][9], cells[0][7]));
+        cells[5][6].setNet(new Net(1, cells[5][6]));
+        cells[7][6].setNet(new Net(1, cells[5][6]));
         Map map = new Map();
         map.setCells(cells);
         map.setW(cells.length);
         map.setH(cells[0].length);
+        int grades[] = new int[2];
+        grades[0] = 1;
+        grades[1] = 10;
+        map.setScore(grades);
         MapFrame mapFrame = new MapFrame(map);
         cells[5][5].setContent(new Food(1, cells[5][5]));
         mapFrame.setMap(map);
@@ -218,8 +228,18 @@ public class MapPanel2 extends JPanel{
                 cells[i][j].setContent(new Trash(1, cells[i][j]));
                 mapFrame.setMap(map);
             }
-        for(int i = 0; i<600; i++)
+        for(int i = 0; i<600; i++){
+            int rand5 = ThreadLocalRandom.current().nextInt(0, 10);
+            int rand6 = ThreadLocalRandom.current().nextInt(0, 10);
+            int rand7 = ThreadLocalRandom.current().nextInt(0, 10);
+            int rand8 = ThreadLocalRandom.current().nextInt(0, 10);
+            rand7 = (rand5+1)%10;
+            rand8 = rand6;
+            GameObject temp = cells[rand5][rand6].getContent();
+            cells[rand5][rand6].setContent(cells[rand7][rand8].getContent());
+            cells[rand7][rand8].setContent(temp);
             mapFrame.setMap(map);
+        }
         mapFrame.gameOver();
     }
     public void increaseNeedle(){
@@ -247,5 +267,13 @@ public class MapPanel2 extends JPanel{
     }
     public void setLive(boolean live) {
         isLive = live;
+    }
+
+    public AtomicInteger getNeedle() {
+        return needle;
+    }
+
+    public void setNeedle(AtomicInteger needle) {
+        this.needle = needle;
     }
 }

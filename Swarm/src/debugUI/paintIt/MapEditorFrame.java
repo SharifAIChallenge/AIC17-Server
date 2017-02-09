@@ -22,6 +22,7 @@ public class MapEditorFrame extends JFrame {
     public MapEditorFrame(){
         String message = JOptionPane.showInputDialog(null, "width,height");
         message = message.replaceAll("\n ", "");
+        message = message.replaceAll(" ", "");
         int commaPlace = message.indexOf(',');
         String str1 = message.substring(0, commaPlace);
         String str2 = message.substring(commaPlace+1);

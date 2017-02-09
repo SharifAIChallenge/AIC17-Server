@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static java.util.Objects.hash;
+
 /*
 written by miladink
  */
@@ -163,7 +165,8 @@ public class MapPanel3 extends JPanel{
 
         for(Cell cell_temp: cells_net) {
             gTemp2d.translate(cell_temp.getColumn() * cellSize, cell_temp.getRow() * cellSize);
-            CellPainter.drawNet(cells[cell_temp.getRow()][cell_temp.getColumn()], cellSize, gTemp2d, theme);
+            //CellPainter.drawNet(cells[cell_temp.getRow()][cell_temp.getColumn()], cellSize, gTemp2d, theme);
+            CellPainter.drawNet(hash(cell_temp.getRow()+cell_temp.getColumn())%4, cellSize,gameMap.getW(),gameMap.getH(), gTemp2d, theme);
             gTemp2d.translate(-cell_temp.getColumn() * cellSize, -cell_temp.getRow() * cellSize);
         }
         //---each cell is drawn
@@ -293,6 +296,7 @@ public class MapPanel3 extends JPanel{
             return Color.BLACK;
     }
 
+
     public void ahead(){
         Timer timer1 = new Timer(30, new ActionListener() {
             private int k  = 0;
@@ -313,4 +317,10 @@ public class MapPanel3 extends JPanel{
         });
         timer1.start();
     }
+
+    public ArrayList<Map> getShots(){
+        return  shots;
+    }
+
+
 }

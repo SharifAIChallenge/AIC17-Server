@@ -192,9 +192,9 @@ public class MapPanel2 extends JPanel{
     }
     public static void main(String[] args) {
 
-        Cell cells[][] = new Cell[20][20];
-        for(int i = 0; i<20; i++)
-            for(int j = 0; j<20; j++) {
+        Cell cells[][] = new Cell[10][10];
+        for(int i = 0; i<10; i++)
+            for(int j = 0; j<10; j++) {
                 cells[i][j] = new Cell();
                 int randomNum = ThreadLocalRandom.current().nextInt(0, 1 + 1);
                 if((randomNum%2)==0) {
@@ -225,17 +225,17 @@ public class MapPanel2 extends JPanel{
         cells[5][5].setContent(new Food(1, cells[5][5]));
         mapFrame.setMap(map);
 
-        for(int i = 0; i<20; i+=2)
-            for(int j = 0; j<20; j+=3) {
+        for(int i = 0; i<10; i+=2)
+            for(int j = 0; j<10; j+=3) {
                 cells[i][j].setContent(new Trash(1, cells[i][j]));
                 mapFrame.setMap(map);
             }
         for(int i = 0; i<6000; i++){
-            int rand5 = ThreadLocalRandom.current().nextInt(0, 20);
-            int rand6 = ThreadLocalRandom.current().nextInt(0, 20);
+            int rand5 = ThreadLocalRandom.current().nextInt(0, 10);
+            int rand6 = ThreadLocalRandom.current().nextInt(0, 10);
             int rand7 = ThreadLocalRandom.current().nextInt(0, 10);
             int rand8 = ThreadLocalRandom.current().nextInt(0, 10);
-            rand7 = (rand5+1)%20;
+            rand7 = (rand5+1)%10;
             rand8 = rand6;
             GameObject temp = cells[rand5][rand6].getContent();
             cells[rand5][rand6].setContent(cells[rand7][rand8].getContent());

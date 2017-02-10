@@ -28,7 +28,7 @@ public class MapPanel3 extends JPanel{
     private int cellSize;
     private boolean isEnded = false;
     private int theme = 0;
-    private int themeNumbers = 2;
+    private int themeNumbers = 4;
     private float alpha = 0.0f;
     JButton saveButton;
     private boolean isLive = false;
@@ -285,9 +285,9 @@ public class MapPanel3 extends JPanel{
     public Color getThemeBackGround(){
         Color colors[] = new Color[Math.max(themeNumbers,6)];
         colors[0] = Color.decode("#606c68");
-        colors[1] = Color.decode("#e9cef3");
-        colors[2] = Color.decode("#757575");
-        colors[3] = Color.decode("#757575");
+        colors[1] = Color.decode("#606c68");
+        colors[2] = Color.decode("#e9cef3");
+        colors[3] = Color.decode("#e9cef3");
         colors[4] = Color.decode("#757575");
         colors[5] = Color.decode("#757575");
         if(colors.length>theme)

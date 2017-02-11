@@ -14,7 +14,7 @@ public final class Log {
     public static final int WARN = 3;
     public static final int ERROR = 4;
 
-    public static final boolean DEV_MODE = System.getenv("AICDev") != null;
+    public static final boolean DEV_MODE = System.getenv("AICDev") == null;
     public static final int LOG_LEVEL = DEV_MODE ? VERBOSE : WARN;
 
     private static final String[] LEVELS = {

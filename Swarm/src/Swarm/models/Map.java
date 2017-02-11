@@ -48,7 +48,7 @@ public class Map implements Serializable{
             this.w = mapJson.w;
             this.h = mapJson.h;
 
-            cells= new Cell[h][w];
+            cells = new Cell[h][w];
             for (int i = 0; i < h; i++) {
                 for (int j = 0; j < w; j++) {
                     cells[i][j] = new Cell();

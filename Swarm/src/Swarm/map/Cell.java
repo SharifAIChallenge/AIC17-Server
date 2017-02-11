@@ -44,6 +44,7 @@ public class Cell implements Serializable {
     }
 
     public void setContent(GameObject content) {
+        System.out.println("set content " + this + "=" + content);
         this.content = content;
     }
 
@@ -80,6 +81,8 @@ public class Cell implements Serializable {
         this.net = net;
     }
 
-
-
+    @Override
+    public String toString() {
+        return String.format("(%d,%d)", row, column);
+    }
 }

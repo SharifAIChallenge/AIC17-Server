@@ -8,6 +8,8 @@ import debugUI.control.ImageDataBase;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -178,47 +180,57 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
 
 
     }
-    static void drawNet(Cell cell, int cellSize, Graphics2D g2d, int theme){
-        //draw the net
-        int randomNum = hash(cell.getRow()+cell.getColumn())%4;
-        //int randomNum = 3;
-        if(cell.getNet()!= null) {
-            AffineTransform st = new AffineTransform();
-            AffineTransform en = new AffineTransform();
-            switch (randomNum) {
-                case 1:
-                    st.rotate(Math.PI / 2, cellSize/2, cellSize/2);
-                    en.rotate(-1.0 * Math.PI / 2, cellSize/2, cellSize/2);
-                    break;
-                case 2:
-                    st.rotate(Math.PI, cellSize/2, cellSize/2);
-                    en.rotate(-1.0*Math.PI, cellSize/2, cellSize/2);
-                    break;
-                case 3:
-                    st.rotate(3*Math.PI/2, cellSize/2, cellSize/2);
-                    en.rotate(-3.0*Math.PI/2, cellSize/2, cellSize/2);
-                    break;
-            }
-            g2d.setColor(new Color(0, 0, 0, 135));
-            g2d.transform(st);
-            g2d.translate(-cellSize, -cellSize);
+    static void drawNet(int randomNum, int cellSize, int w, int h, Graphics2D g2d, int theme){
+        AffineTransform st = new AffineTransform();
+        switch (randomNum) {
+            case 1:
+                st.rotate(Math.PI / 2, 3*cellSize/2, 3*cellSize/2);
+                break;
+            case 2:
+                st.rotate(Math.PI, 3*cellSize/2, 3*cellSize/2);
+                break;
+            case 3:
+                st.rotate(3*Math.PI/2, 3*cellSize/2, 3*cellSize/2);
+                break;
+        }
+        int translates[][] = new int[5][2];
+        translates[0][0] = -cellSize;
+        translates[0][1] = -cellSize;
+
+        translates[1][0] = -cellSize-w*cellSize;
+        translates[1][1] = -cellSize;
+
+        translates[2][0] = -cellSize;
+        translates[2][1] = -cellSize-h*cellSize;
+
+        translates[3][0] = -cellSize;
+        translates[3][1] = -cellSize+h*cellSize;
+
+        translates[4][0] = -cellSize+w*cellSize;
+        translates[4][1] = -cellSize;
+
+        g2d.setColor(new Color(0, 0, 0, 135));
+        AffineTransformOp op = new AffineTransformOp(st, AffineTransformOp.TYPE_BILINEAR);
+        for(int i = 0; i<5; i++) {
             Composite composite = g2d.getComposite();
             int rule = AlphaComposite.SRC_OVER;
             //to make the slipper darker if it is reaching the floor
-            Net net = (Net)cell.getNet();
             float alpha = 0.8f;
             //double alpha -(net.getDeadTime() - turn)/5;//TODO:important how many turns to die?
-            Composite comp = AlphaComposite.getInstance(rule , alpha);
+            Composite comp = AlphaComposite.getInstance(rule, alpha);
             g2d.setComposite(comp);
-            g2d.drawImage(slipper, 0, 0, null);
+            BufferedImage bimage = new BufferedImage(slipper.getWidth(null), slipper.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+            // Draw the image on to the buffered image
+            Graphics2D bGr = bimage.createGraphics();
+            bGr.drawImage(slipper, 0, 0, null);
+            bGr.dispose();
+            g2d.drawImage(op.filter(bimage,null), translates[i][0], translates[i][1], null);
             g2d.setComposite(composite);
-            g2d.translate(cellSize, cellSize);
-            g2d.transform(en);
-
-
 
         }
+
     }
+
 
     public static void changeTheme(){
         floor = null;

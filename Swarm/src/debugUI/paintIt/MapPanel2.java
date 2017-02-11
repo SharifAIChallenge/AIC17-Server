@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.lang.instrument.Instrumentation;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
@@ -223,12 +224,13 @@ public class MapPanel2 extends JPanel{
         MapFrame mapFrame = new MapFrame(map);
         cells[5][5].setContent(new Food(1, cells[5][5]));
         mapFrame.setMap(map);
+
         for(int i = 0; i<10; i+=2)
             for(int j = 0; j<10; j+=3) {
                 cells[i][j].setContent(new Trash(1, cells[i][j]));
                 mapFrame.setMap(map);
             }
-        for(int i = 0; i<600; i++){
+        for(int i = 0; i<6000; i++){
             int rand5 = ThreadLocalRandom.current().nextInt(0, 10);
             int rand6 = ThreadLocalRandom.current().nextInt(0, 10);
             int rand7 = ThreadLocalRandom.current().nextInt(0, 10);
@@ -268,12 +270,13 @@ public class MapPanel2 extends JPanel{
     public void setLive(boolean live) {
         isLive = live;
     }
-
     public AtomicInteger getNeedle() {
         return needle;
     }
-
     public void setNeedle(AtomicInteger needle) {
         this.needle = needle;
     }
+
+
+
 }

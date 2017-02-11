@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static java.util.Objects.hash;
+
 /*
 written by miladink
  */
@@ -26,7 +28,7 @@ public class MapPanel3 extends JPanel{
     private int cellSize;
     private boolean isEnded = false;
     private int theme = 0;
-    private int themeNumbers = 2;
+    private int themeNumbers = 4;
     private float alpha = 0.0f;
     JButton saveButton;
     private boolean isLive = false;
@@ -163,7 +165,8 @@ public class MapPanel3 extends JPanel{
 
         for(Cell cell_temp: cells_net) {
             gTemp2d.translate(cell_temp.getColumn() * cellSize, cell_temp.getRow() * cellSize);
-            CellPainter.drawNet(cells[cell_temp.getRow()][cell_temp.getColumn()], cellSize, gTemp2d, theme);
+            //CellPainter.drawNet(cells[cell_temp.getRow()][cell_temp.getColumn()], cellSize, gTemp2d, theme);
+            CellPainter.drawNet(hash(cell_temp.getRow()+cell_temp.getColumn())%4, cellSize,gameMap.getW(),gameMap.getH(), gTemp2d, theme);
             gTemp2d.translate(-cell_temp.getColumn() * cellSize, -cell_temp.getRow() * cellSize);
         }
         //---each cell is drawn
@@ -282,9 +285,9 @@ public class MapPanel3 extends JPanel{
     public Color getThemeBackGround(){
         Color colors[] = new Color[Math.max(themeNumbers,6)];
         colors[0] = Color.decode("#606c68");
-        colors[1] = Color.decode("#e9cef3");
-        colors[2] = Color.decode("#757575");
-        colors[3] = Color.decode("#757575");
+        colors[1] = Color.decode("#606c68");
+        colors[2] = Color.decode("#e9cef3");
+        colors[3] = Color.decode("#e9cef3");
         colors[4] = Color.decode("#757575");
         colors[5] = Color.decode("#757575");
         if(colors.length>theme)
@@ -292,6 +295,7 @@ public class MapPanel3 extends JPanel{
         else
             return Color.BLACK;
     }
+
 
     public void ahead(){
         Timer timer1 = new Timer(30, new ActionListener() {
@@ -313,4 +317,10 @@ public class MapPanel3 extends JPanel{
         });
         timer1.start();
     }
+
+    public ArrayList<Map> getShots(){
+        return  shots;
+    }
+
+
 }

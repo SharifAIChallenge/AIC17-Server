@@ -17,6 +17,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static java.util.Objects.hash;
+
 /*
 written by miladink
  */
@@ -25,8 +27,8 @@ public class MapEditorPanel extends JPanel{
     MapEditorFrame frame = null;
     private Map gameMap;
     private int cellSize;
-    private int theme = 2;
-    private int themeNumbers = 5;
+    private int theme = 0;
+    private int themeNumbers = 4;
     private boolean teleport_Phase2 = false;
     private boolean sick = false;
     private boolean queen = false;
@@ -189,7 +191,8 @@ public class MapEditorPanel extends JPanel{
 
         for(Cell cell_temp: cells_net) {
             gTemp2d.translate(cell_temp.getColumn() * cellSize, cell_temp.getRow() * cellSize);
-            CellPainter.drawNet(cells[cell_temp.getRow()][cell_temp.getColumn()], cellSize, gTemp2d, theme);
+           // CellPainter.drawNet(cells[cell_temp.getRow()][cell_temp.getColumn()], cellSize, gTemp2d, theme);
+            CellPainter.drawNet(hash(cell_temp.getColumn()+cell_temp.getRow())%4, cellSize,gameMap.getW(),gameMap.getH(), gTemp2d, theme);
             gTemp2d.translate(-cell_temp.getColumn() * cellSize, -cell_temp.getRow() * cellSize);
         }
         //---each cell is drawn
@@ -243,11 +246,11 @@ public class MapEditorPanel extends JPanel{
     }
 
     public Color getThemeBackGround(){
-        Color colors[] = new Color[themeNumbers];
+        Color colors[] = new Color[Math.max(themeNumbers,5)];
         colors[0] = Color.decode("#606c68");
-        colors[1] = Color.decode("#e9cef3");
-        colors[2] = Color.decode("#757575");
-        colors[3] = Color.decode("#757575");
+        colors[1] = Color.decode("#606c68");
+        colors[2] = Color.decode("#e9cef3");
+        colors[3] = Color.decode("#e9cef3");
         colors[4] = Color.decode("#757575");
         if(colors.length>theme)
             return colors[theme];

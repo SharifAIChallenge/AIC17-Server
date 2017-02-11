@@ -125,7 +125,7 @@ public class SwarmGameLogic implements GameLogic {
 
     public static void main(String[] args) throws InterruptedException {
         GameServer gameServer = new GameServer(new SwarmGameLogic(), args);
-        System.err.println("start");
+//        System.err.println("start");
         gameServer.start();
         gameServer.waitForFinish();
     }
@@ -462,14 +462,12 @@ public class SwarmGameLogic implements GameLogic {
                     int attacks_num[] = {attacks[i][j][0].size(), attacks[i][j][1].size()};
                     if (cellFish != null)
                         attacks_num[cellFish.getTeamNumber()]++;
-                    System.out.println("attacks num " + i + ", " + j + ": " + attacks_num[1 - ind] + ", " + attacks_num[ind]);
-                    System.out.println("powe sum " + i + ", " + j + ": " + powerSum[1 - ind] + ", " + powerSum[ind]);
                     if ((powerSum[1 - ind] == 0 && powerSum[ind] == 0 && attacks_num[1 - ind] > attacks_num[ind])
                             || powerSum[1 - ind] > 2 * powerSum[ind]) {
 //                        if (cellFish == null || cellFish.getTeamNumber() == ind) {
                         for (Fish f : attacks[i][j][1 - ind]) {
                             // mark as candidate move
-                            System.out.println("move " + f.getId() + " " + (1 - ind) + " " + f.getPosition().getRow() + " " + f.getPosition().getColumn() + " -> " + i + ", " + j);
+//                            System.out.println("move " + f.getId() + " " + (1 - ind) + " " + f.getPosition().getRow() + " " + f.getPosition().getColumn() + " -> " + i + ", " + j);
 //                                //System.out.print("attacks ");
 //                                //System.out.println(attacks[i][j][1 - ind]);
                             moves[1 - ind][f.getPosition().getRow()][f.getPosition().getColumn()] = cells[i][j];
@@ -488,7 +486,7 @@ public class SwarmGameLogic implements GameLogic {
                                 fishesChanged.add(cellFish.getId());
                                 fishChanges.add(new Pair<>(cellFish, "delete"));
 
-                                System.out.println("delete center " + cellFish + ", " + cellFish.getPosition());
+//                                System.out.println("delete center " + cellFish + ", " + cellFish.getPosition());
                             }
                         }
                         for (int k = 0; k < attacks[i][j][ind].size(); k++) {
@@ -793,7 +791,7 @@ public class SwarmGameLogic implements GameLogic {
                      * == or .equals
                      */
                     if (newBorn[ind][i][j] && cells[i][j].getContent() == null) {
-                        System.out.println("turn = " + map.getTurn() + " baby is born in " + "row:" + i + "column:" + j);
+//                        System.out.println("turn = " + map.getTurn() + " baby is born in " + "row:" + i + "column:" + j);
                         makeBabyFish(cells[i][j], motherFish[ind][i][j]);
                     } else if (newBorn[ind][i][j] && cells[i][j].getContent() != null) {
                         loop:
@@ -802,7 +800,7 @@ public class SwarmGameLogic implements GameLogic {
                                 if (k == 0 && l == 0)
                                     continue;
                                 if (cells[k + i][l + j].getContent() == null) {
-                                    System.out.println("turn = " + map.getTurn() + " baby is born in " + "row:" + (i + k) + "column:" + (j + l));
+//                                    System.out.println("turn = " + map.getTurn() + " baby is born in " + "row:" + (i + k) + "column:" + (j + l));
                                     makeBabyFish(cells[k + i][l + j], motherFish[ind][i][j]);
                                     break loop;
                                 }

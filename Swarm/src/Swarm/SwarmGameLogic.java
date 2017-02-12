@@ -112,6 +112,7 @@ public class SwarmGameLogic implements GameLogic {
     private int numberOfQueens[];
     //    HashMap<Integer, String> fishChanges;
     ArrayList<Pair<Fish, String>> fishChanges;
+    HashSet <Integer>deletedFishes;
     Set<Integer> fishesChanged;
     HashSet<Integer> fishAlters = new HashSet<>();
     HashSet<Integer> teleportChecked = new HashSet<>();
@@ -207,6 +208,7 @@ public class SwarmGameLogic implements GameLogic {
         //handle map.getScore()[0];
         nextMoveMap = new HashMap<>();
         fishChanges = new ArrayList<>();
+        deletedFishes = new HashSet<>();
         fishesChanged = new HashSet<>();
         fishAlters = new HashSet<>();
         teleportChecked = new HashSet<>();
@@ -337,6 +339,7 @@ public class SwarmGameLogic implements GameLogic {
         motherFish = new Fish[gc.getTeamNum()][H][W];
 
         fishChanges.clear();
+        deletedFishes.clear();
         fishesChanged.clear();
         fishAlters.clear();
         nextMoveMap.clear();
@@ -485,6 +488,7 @@ public class SwarmGameLogic implements GameLogic {
                                 }
                                 fishesChanged.add(cellFish.getId());
                                 fishChanges.add(new Pair<>(cellFish, "delete"));
+                                deletedFishes.add(cellFish.getId());
 
 //                                System.out.println("delete center " + cellFish + ", " + cellFish.getPosition());
                             }
@@ -500,6 +504,7 @@ public class SwarmGameLogic implements GameLogic {
                             }
                             fishesChanged.add(fish.getId());
                             fishChanges.add(new Pair<>(fish, "delete"));
+                            deletedFishes.add(fish.getId());
 
 //                            System.out.println("delete neighbour " + fish.getId() + ", " + fish.getPosition());
                         }
@@ -609,16 +614,16 @@ public class SwarmGameLogic implements GameLogic {
                 }
             }
 //            //System.out.println("Total chain: " + total_chain);
-            for (int r = 0; r < H; r++) {
-                for (int c = 0; c < W; c++) {
-                    if (moves_valid[t][r][c] != 0) {
-                        //System.out.print("v");
-                    } else {
-                        //System.out.print(".");
-                    }
-                }
-                //System.out.println();
-            }
+//            for (int r = 0; r < H; r++) {
+//                for (int c = 0; c < W; c++) {
+//                    if (moves_valid[t][r][c] != 0) {
+//                        //System.out.print("v");
+//                    } else {
+//                        //System.out.print(".");
+//                    }
+//                }
+//                //System.out.println();
+//            }
             ArrayList[] valid_moves = new ArrayList[W * H];
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
@@ -736,6 +741,7 @@ public class SwarmGameLogic implements GameLogic {
                     if (isNetDeadTime(cells[i][j])) {
                         Fish fish = (Fish) cells[i][j].getContent();
                         fishChanges.add(new Pair<>(fish, "delete"));
+                        deletedFishes.add(fish.getId());
                         fishesChanged.add(fish.getId());
                         deleteFish(fish, fishes[fish.getTeamNumber()].indexOf(fish));
                         //fishes[fish.getTeamNumber()].remove(fish);
@@ -757,6 +763,7 @@ public class SwarmGameLogic implements GameLogic {
                 if (fishes[ind].get(i).getDeadTime() == map.getTurn()) {
                     Fish fish = fishes[ind].get(i);
                     fishChanges.add(new Pair<>(fish, "delete"));
+                    deletedFishes.add(fish.getId());
                     deleteFish(fish, i);
                     //diff.del(fish.getId());
                     //cells[fish.getPosition().getRow()][fish.getPosition().getColumn()].setContent(null);
@@ -768,20 +775,13 @@ public class SwarmGameLogic implements GameLogic {
 
     private void stageDiff() {
         // Iterate through HashMap entries(Key-Value pairs)
-        HashSet<Integer> delFishId = new HashSet<>();
-
         for (Pair<Fish, String> p : fishChanges) {
             String str = p.second;
             Fish fish = p.first;
             if (str.equals("delete")) {
-                delFishId.add(fish.getId());
                 diff.del(fish.getId());
             }
-        }
-        for (Pair<Fish, String> p : fishChanges) {
-            String str = p.second;
-            Fish fish = p.first;
-            if (str.equals("move") && !delFishId.contains(fish.getId())) {
+            else if (str.equals("move") && !deletedFishes.contains(fish.getId())) {
                 diff.mov(fish.getId(), nextMoveMap.get(fish.getId()));
             }
         }
@@ -966,6 +966,9 @@ public class SwarmGameLogic implements GameLogic {
     }
 
     private void deleteFish(Fish fish, int i) {
+        if(i < 0) {
+            return;
+        }
         fishes[fish.getTeamNumber()].remove(i);
         nextCell[fish.getTeamNumber()].remove(i);
 //        nextMove[fish.getTeamNumber()].remove(i);
@@ -982,6 +985,9 @@ public class SwarmGameLogic implements GameLogic {
     }
 
     private void moveFish(Fish fish, Cell nxtCell/*, int nxtMove*/) {
+        if(deletedFishes.contains(fish.getId())) {
+            return;
+        }
         boolean moved = false;
         if (!fish.getPosition().equals(nxtCell)) {
             moved = true;

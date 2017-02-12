@@ -44,7 +44,7 @@ public class Cell implements Serializable {
     }
 
     public void setContent(GameObject content) {
-        System.out.println("set content " + this + "=" + content);
+//        System.out.println("set content " + this + "=" + content);
         this.content = content;
     }
 

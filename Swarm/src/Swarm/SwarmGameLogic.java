@@ -501,7 +501,7 @@ public class SwarmGameLogic implements GameLogic {
                             fishesChanged.add(fish.getId());
                             fishChanges.add(new Pair<>(fish, "delete"));
 
-                            System.out.println("delete neighbour " + fish.getId() + ", " + fish.getPosition());
+//                            System.out.println("delete neighbour " + fish.getId() + ", " + fish.getPosition());
                         }
 //                        Fish takFish = attacks[i][j][1-ind].get(0);
 //                        int indexOf = fishes[takFish.getTeamNumber()].indexOf(takFish);
@@ -516,7 +516,7 @@ public class SwarmGameLogic implements GameLogic {
                         // todo: next choice?!?!?!
                     } else {
                         for (Fish f : attacks[i][j][1 - ind]) {
-                            System.out.println("move cellfish " + f + ", " + f.getPosition() + " " + i + "," + j);
+//                            System.out.println("move cellfish " + f + ", " + f.getPosition() + " " + i + "," + j);
                             int r = f.getPosition().getRow(), c = f.getPosition().getColumn();
                             moves[1 - ind][r][c] = cells[r][c];
                         }
@@ -584,14 +584,14 @@ public class SwarmGameLogic implements GameLogic {
                 }
 //                //System.out.println();
             }
-            System.out.println("moves " + t);
-            for (int r = 0; r < H; r++) {
-                for (int c = 0; c < W; c++) {
-                    System.out.print(moves[t][r][c]);
-                    System.out.print(",");
-                }
-                System.out.println();
-            }
+//            System.out.println("moves " + t);
+//            for (int r = 0; r < H; r++) {
+//                for (int c = 0; c < W; c++) {
+//                    System.out.print(moves[t][r][c]);
+//                    System.out.print(",");
+//                }
+//                System.out.println();
+//            }
             int total_chain = 0;
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
@@ -809,7 +809,7 @@ public class SwarmGameLogic implements GameLogic {
                                     continue;
                                 if (cells[k + i][l + j].getContent() == null) {
 //                                    System.out.println("turn = " + map.getTurn() + " baby is born in " + "row:" + (i + k) + "column:" + (j + l));
-                                    makeBabyFish(cells[k + i][l + j], motherFish[ind][i][j]);
+                                    makeBabyFish(cells[(k + i)%H][(l + j)%W], motherFish[ind][i][j]);
                                     break loop;
                                 }
                             }

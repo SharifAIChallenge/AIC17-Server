@@ -193,7 +193,7 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
                 st.rotate(3*Math.PI/2, 3*cellSize/2, 3*cellSize/2);
                 break;
         }
-        int translates[][] = new int[5][2];
+        int translates[][] = new int[9][2];
         translates[0][0] = -cellSize;
         translates[0][1] = -cellSize;
 
@@ -209,9 +209,21 @@ class CellPainter {//this will paint the cell  with top left at (0,0)
         translates[4][0] = -cellSize+w*cellSize;
         translates[4][1] = -cellSize;
 
+        translates[5][0] = -cellSize+w*cellSize;
+        translates[5][1] = -cellSize+h*cellSize;
+
+        translates[6][0] = -cellSize-w*cellSize;
+        translates[6][1] = -cellSize+h*cellSize;
+
+        translates[7][0] = -cellSize-w*cellSize;
+        translates[7][1] = -cellSize-h*cellSize;
+
+        translates[8][0] = -cellSize+w*cellSize;
+        translates[8][1] = -cellSize-h*cellSize;
+
         g2d.setColor(new Color(0, 0, 0, 135));
         AffineTransformOp op = new AffineTransformOp(st, AffineTransformOp.TYPE_BILINEAR);
-        for(int i = 0; i<5; i++) {
+        for(int i = 0; i<9; i++) {
             Composite composite = g2d.getComposite();
             int rule = AlphaComposite.SRC_OVER;
             //to make the slipper darker if it is reaching the floor

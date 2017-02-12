@@ -768,12 +768,20 @@ public class SwarmGameLogic implements GameLogic {
 
     private void stageDiff() {
         // Iterate through HashMap entries(Key-Value pairs)
+        HashSet<Integer> delFishId = new HashSet<>();
+
         for (Pair<Fish, String> p : fishChanges) {
             String str = p.second;
             Fish fish = p.first;
             if (str.equals("delete")) {
+                delFishId.add(fish.getId());
                 diff.del(fish.getId());
-            } else if (str.equals("move")) {
+            }
+        }
+        for (Pair<Fish, String> p : fishChanges) {
+            String str = p.second;
+            Fish fish = p.first;
+            if (str.equals("move") && !delFishId.contains(fish.getId())) {
                 diff.mov(fish.getId(), nextMoveMap.get(fish.getId()));
             }
         }

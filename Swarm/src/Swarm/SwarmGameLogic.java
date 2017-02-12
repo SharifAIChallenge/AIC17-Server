@@ -15,6 +15,10 @@ import util.Log;
 
 import java.util.*;
 
+
+/**
+ * Created by pezzati on 1/28/16.
+ */
 public class SwarmGameLogic implements GameLogic {
     private static final String TAG = "Swarm";
 
@@ -154,8 +158,6 @@ public class SwarmGameLogic implements GameLogic {
         this.idCounter = this.map.getIdCounter();
         this.score = this.map.getScore();
 
-        System.out.println(gc.getSickLifeTime());
-
         initialize();
 
         if (PARAM_SHOW_DEBUG_UI.getValue() == Boolean.TRUE) {
@@ -276,13 +278,6 @@ public class SwarmGameLogic implements GameLogic {
         }
         map.setTurn(map.getTurn()+1);
         */
-//        //System.out.println("Events: ");
-        for (int t = 0; t < gc.getTeamNum(); t++) {
-            for (int k = 0; k < clientsEvent[t].length; k++) {
-//                //System.out.format("(%s %s), ", clientsEvent[t][k].getType(), Arrays.toString(clientsEvent[t][k].getArgs()));
-            }
-//            //System.out.println();
-        }
         if (firstTurn) {
             firstTurn = false;
             //map.setTurn(map.getTurn()+1);
@@ -291,20 +286,20 @@ public class SwarmGameLogic implements GameLogic {
         map.setTurn(map.getTurn() + 1);
 
 
-//        //System.out.println("TUUUUUUUUUUUUURN" + map.getTurn());
+//        System.out.println("TUUUUUUUUUUUUURN" + map.getTurn());
 //        for(int i=0;i<H;i++){
 //            for(int j=0;j<W;j++){
 //                Cell cell = cells[i][j];
-//                //System.out.println(i + " " + j);
-//                //System.out.println(cell.getContent());
-//                //System.out.println(cell.getNet());
+//                System.out.println(i + " " + j);
+//                System.out.println(cell.getContent());
+//                System.out.println(cell.getNet());
 //            }
 //        }
 
         /*for(int ind=0;ind<2;ind++){
             for(int i=0;i<fishes[ind].size();i++){
                 Fish fish = fishes[ind].get(i);
-                //System.out.println("ind:" + ind + " i:" + i + " row:" + fish.getPosition().getRow() + " col:" + fish.getPosition().getColumn());
+                System.out.println("ind:" + ind + " i:" + i + " row:" + fish.getPosition().getRow() + " col:" + fish.getPosition().getColumn());
             }
         }
 */
@@ -385,9 +380,6 @@ public class SwarmGameLogic implements GameLogic {
         }
 
         // NEXTCELL ACCORDING TO FISHES
-//        //System.out.println("fish sizes");
-//        //System.out.println(fishes[0].size());
-//        //System.out.println(fishes[1].size());
         for (int ind = 0; ind < gc.getTeamNum(); ind++) {
             for (int i = 0; i < fishes[ind].size(); i++) {
                 nextCell[ind].add(getNextCellViaUpdate(fishes[ind].get(i)));
@@ -422,13 +414,14 @@ public class SwarmGameLogic implements GameLogic {
 
         stageSickDeath();
 
-        stageDiff();
 
-        stageNewBorn();
 
         stageFoodTrashNet();
 
         stageAddRandomTempObject();
+
+        stageNewBorn();
+        stageDiff();
 
         stageSwitchTeleports();
 
@@ -603,13 +596,11 @@ public class SwarmGameLogic implements GameLogic {
             int total_chain = 0;
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
-//                    //System.out.print(moves[t][r][c] == null ? "." : "m");
                     if (moves[t][r][c] == null && mark[t][r][c] == 0) {
                         total_chain += dfs_reverse(t, r, c, 0);
                         mark[t][r][c] = 1;
                     }
                 }
-//                //System.out.println();
             }
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
@@ -801,7 +792,21 @@ public class SwarmGameLogic implements GameLogic {
                      * == or .equals
                      */
                     if (newBorn[ind][i][j] && cells[i][j].getContent() == null) {
+                        System.out.println("turn = "+map.getTurn() + " baby is born in " + "row:"+i + "column:"+j);
                         makeBabyFish(cells[i][j], motherFish[ind][i][j]);
+                    }
+                    else if(newBorn[ind][i][j] && cells[i][j].getContent() != null ) {
+                       loop: for (int k = -1; k <= 1; k++) {
+                            for (int l = -1; l <= 1; l++) {
+                                if(k == 0 && l == 0)
+                                    continue;
+                                if(cells[k + i][l + j].getContent() == null){
+                                    System.out.println("turn = "+map.getTurn() + " baby is born in " + "row:"+(i+k) + "column:"+(j+l));
+                                    makeBabyFish(cells[k+i][l+j],motherFish[ind][i][j]);
+                                    break loop;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -813,14 +818,14 @@ public class SwarmGameLogic implements GameLogic {
 
         if (tempObjects.size() > 0) {
             for (int i = tempObjects.size() - 1; i >= 0; i--) {
-                ////System.out.println("ooooooooooooo");
+                //System.out.println("ooooooooooooo");
                 GameObject tempObject = tempObjects.get(i);
                 /*if(tempObject instanceof Net){
-                    //System.out.println("NEEEEEEEEEEEEEEEEEEEEEEEEEEEEET");
-                    //System.out.println(tempObject.getDeadTime() + " " + map.getTurn());
+                    System.out.println("NEEEEEEEEEEEEEEEEEEEEEEEEEEEEET");
+                    System.out.println(tempObject.getDeadTime() + " " + map.getTurn());
                 }*/
                 if (tempObject.getDeadTime() == map.getTurn()) {
-                    // //System.out.println("Dead Tiiiiiiiiiiiiiiiiiiime!");
+                    // System.out.println("Dead Tiiiiiiiiiiiiiiiiiiime!");
                     diff.del(tempObject.getId());
                     Cell cell = cells[tempObject.getPosition().getRow()][tempObject.getPosition().getColumn()];
                     if (tempObject instanceof Net) {
@@ -955,7 +960,6 @@ public class SwarmGameLogic implements GameLogic {
     }
 
     private void deleteFish(Fish fish, int i){
-        //System.out.println("deleting " + fish.getId());
         fishes[fish.getTeamNumber()].remove(i);
         nextCell[fish.getTeamNumber()].remove(i);
 //        nextMove[fish.getTeamNumber()].remove(i);
@@ -972,7 +976,6 @@ public class SwarmGameLogic implements GameLogic {
     }
 
     private void moveFish(Fish fish, Cell nxtCell/*, int nxtMove*/){
-        System.out.println("moving " + fish.getId() + " to " + nxtCell);
         boolean moved = false;
         if(!fish.getPosition().equals(nxtCell)) {
             moved = true;
@@ -983,7 +986,7 @@ public class SwarmGameLogic implements GameLogic {
             fish.getPosition().setContent(null); /// NULL
         }
         //////////////// if fish is pregnant add new baby on old position
-        if(moved && fish.isPregnant()) {
+        if(fish.isPregnant()) {
             newBorn[fish.getTeamNumber()][fish.getPosition().getRow()][fish.getPosition().getColumn()] = true;
             motherFish[fish.getTeamNumber()][fish.getPosition().getRow()][fish.getPosition().getColumn()] = fish;
             fish.setPregnant(false);
@@ -998,12 +1001,8 @@ public class SwarmGameLogic implements GameLogic {
              * turn
              */
             if(!fish.isSick()) {
-                System.out.println("fish sickkkkkkkkkk");
                 fish.setSick(true);
                 fish.setDeadTime(map.getTurn() + gc.getSickLifeTime());
-                System.out.println(map.getTurn());
-                System.out.println(gc.getSickLifeTime());
-                System.out.println(fish.getDeadTime());
                 fishAlters.add(fish.getId());
             }
 
@@ -1105,15 +1104,38 @@ public class SwarmGameLogic implements GameLogic {
          */
         // set direction & return next
         mv = update[fish.getTeamNumber()][fish.getColorNumber()][right][head][left];
+        // TODO: 2/9/2017 DISOBEY
+        /**
+         * DisobeyNum is for example 50 in the real Game
+         */
+        int disObeyNum = this.map.getConstants().getDisobeyNum();
+        int teamNum = fish.getTeamNumber();
+        int j =0;
+        if(fishes[teamNum].size() > disObeyNum )
+        {
+            int dTurn = (int) Math.abs(1/(1-Math.sqrt(Math.min(disObeyNum/fishes[teamNum].size(),1))));
+            for (int i = 0; i < fishes[teamNum].size(); i++) {
+                if(fishes[teamNum].get(i).getId() == fish.getId()){
+                    j = i;
+                    break;
+                }
+            }
+
+            if(this.map.getTurn() - j % dTurn == 0) {
+                Random rand = new Random();
+                mv = rand.nextInt(2);
+            }
+        }
+
 
 //        nextMove[fish.getTeamNumber()].add(mv);
 
         return getNextCellViaMove(fish, mv);
 
     }
-
     // FISHCHANGES MOVE
-    private Cell getNextCellViaMove(Fish fish, int mv) {
+    private Cell getNextCellViaMove(Fish fish, int mv)
+    {
         nextMoveMap.put(fish.getId(), mv);
         int row, col, dir;
         row = fish.getPosition().getRow();
@@ -1245,6 +1267,11 @@ public class SwarmGameLogic implements GameLogic {
         }
         map.setScore(finalScore);
         int population = fishes[0].size() + fishes[1].size();
+        if(population / (this.map.getH()*this.map.getW()) >= this.map.getConstants().getEndRatio()){
+            System.out.println("FIIIINISH");
+            return true;
+        }
+
         if(numberOfQueens[0]==0 || numberOfQueens[1]==0 /*|| population > gc.getEndRatio()*(W*H)*/) {
             //System.out.println("FIIIINISH");
             return true;
@@ -1254,6 +1281,7 @@ public class SwarmGameLogic implements GameLogic {
 
     @Override
     public void terminate() {
+        this.debugUI.gameOver();
         /*
         if (debugUI != null) {
             debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), null, getStatusMessage(), null, null);

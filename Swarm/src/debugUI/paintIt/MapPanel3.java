@@ -261,6 +261,8 @@ public class MapPanel3 extends JPanel{
     }
 
     public Map getGameMap() {
+        if(needle.get()>=0)
+            return shots.get(needle.get());
         return gameMap;
     }
 
@@ -321,6 +323,7 @@ public class MapPanel3 extends JPanel{
     public ArrayList<Map> getShots(){
         return  shots;
     }
+
 
 
 }

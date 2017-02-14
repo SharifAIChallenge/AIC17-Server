@@ -171,6 +171,7 @@ public class SwarmGameLogic implements GameLogic {
 
         attacks = new ArrayList[H][W][2];
         this.numberOfQueens = new int[gc.getTeamNum()];
+        this.update = new int[gc.getTeamNum()][2][3][2][3];
 
         mark = new int[2][H][W];
         moves = new Cell[2][H][W];
@@ -192,14 +193,6 @@ public class SwarmGameLogic implements GameLogic {
 
         //////////////////
         update = new int[gc.getTeamNum()][2][3][2][3];
-
-        for (int i = 0; i < gc.getTeamNum(); i++) {
-            for (int j = 0; j < 2; j++)
-                for (int k = 0; k < 3; k++)
-                    for (int t = 0; t < 2; t++)
-                        for (int r = 0; r < 3; r++)
-                            update[i][j][k][t][r] = 1;
-        }
         //Arrays.fill(update, 1);
         /*
         for (int ind = 0; ind < 2; ind++) {
@@ -706,7 +699,7 @@ public class SwarmGameLogic implements GameLogic {
 //            pair.setFirst(true);
 //            pair.setSecond(d + 1 - mark[t][r2][c2]);
             mark[t][r][c] = 1;
-            return d + 1 - dfs_loop_data[t][r2][c2];
+            return d + /*1*/ - dfs_loop_data[t][r2][c2];
         }
 
         int dl = dfs_loop(t, r2, c2, d + 1);
@@ -1096,6 +1089,7 @@ public class SwarmGameLogic implements GameLogic {
                 } else if(cell.getContent()!=null && fish.getId() != cell.getContent().getId()) {
                     if(cell.getContent() instanceof Fish) {
                         System.out.println("Wrong id1: "+fish.getId() + " id2 "+ cell.getContent().getId());
+                        System.out.println("Cell cl: " + cell.getColumn() + "row:" + cell.getRow());
                     }
                     else{
                         System.out.println("Wrong entity");
@@ -1280,19 +1274,19 @@ public class SwarmGameLogic implements GameLogic {
         int[] finalScore = new int[2];
         finalScore[0] = map.getScore()[0];
         finalScore[1] = map.getScore()[1];
-//        if (numberOfQueens[0] == 0 && numberOfQueens[1] > 0) {
-//            finalScore[0] = 0;
-//        } else if (numberOfQueens[1] == 0 && numberOfQueens[0] > 0) {
-//            finalScore[1] = 0;
-//        }
+        if (numberOfQueens[0] == 0 && numberOfQueens[1] > 0) {
+            finalScore[0] = 0;
+        } else if (numberOfQueens[1] == 0 && numberOfQueens[0] > 0) {
+            finalScore[1] = 0;
+        }
         map.setScore(finalScore);
         int population = fishes[0].size() + fishes[1].size();
         if (((float) population) / (this.map.getH() * this.map.getW()) >= this.map.getConstants().getEndRatio()) {
             return true;
         }
-//        if (numberOfQueens[0] == 0 || numberOfQueens[1] == 0) {
-//            return true;
-//        }
+        if (numberOfQueens[0] == 0 || numberOfQueens[1] == 0) {
+            return true;
+        }
         return false;
     }
 

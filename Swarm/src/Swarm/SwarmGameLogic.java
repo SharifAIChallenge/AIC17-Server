@@ -247,7 +247,7 @@ public class SwarmGameLogic implements GameLogic {
             return;
         }
         map.setTurn(map.getTurn() + 1);
-        System.out.println("Turn -----------------------" + map.getTurn());
+//        System.out.println("Turn -----------------------" + map.getTurn());
         Wrongid();
 
 
@@ -354,9 +354,9 @@ public class SwarmGameLogic implements GameLogic {
             }
         }
 
-        if(map.getTurn() == 3) {
-            System.out.println("Turn 4");
-        }
+//        if(map.getTurn() == 3) {
+//            System.out.println("Turn 4");
+//        }
         stageMakeAttacks();
 
         stageDeleteAndMove();
@@ -550,9 +550,9 @@ public class SwarmGameLogic implements GameLogic {
 //                }
 //                System.out.println();
 //            }
-            if(map.getTurn() == 8){
-                System.out.println("Turn 8");
-            }
+//            if(map.getTurn() == 8){
+//                System.out.println("Turn 8");
+//            }
             int total_chain = 0;
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
@@ -562,7 +562,7 @@ public class SwarmGameLogic implements GameLogic {
                     }
                 }
             }
-            System.out.println("total_chain:"+total_chain);
+//            System.out.println("total_chain:"+total_chain);
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
                     if (moves[t][r][c] != null && mark[t][r][c] == 0) {
@@ -765,8 +765,8 @@ public class SwarmGameLogic implements GameLogic {
                 diff.del(fish.getId());
             }
             else if (str.equals("move") && !deletedFishes.contains(fish.getId())) {
-                System.out.println("id :" + fish.getId() + "----------move:" +  nextMoveMap.get(fish.getId()));
-                System.out.println("real ----------------move:"+  moves[fish.getTeamNumber()][fish.getPosition().getRow()][fish.getPosition().getColumn()]);
+//                System.out.println("id :" + fish.getId() + "----------move:" +  nextMoveMap.get(fish.getId()));
+//                System.out.println("real ----------------move:"+  moves[fish.getTeamNumber()][fish.getPosition().getRow()][fish.getPosition().getColumn()]);
 
                 diff.mov(fish.getId(), nextMoveMap.get(fish.getId()));
             }
@@ -1034,7 +1034,7 @@ public class SwarmGameLogic implements GameLogic {
             nxtCell.setContent(fish);
         }
         if(nxtCell.equals(cell) && nextMoveMap.get(fish.getId()) != 1){
-            System.out.println("---------------WWWW----------------------");
+//            System.out.println("---------------WWWW----------------------");
             fishChanges.add(new Pair<>(fish, "move"));
             nxtCell.setContent(fish);
 
@@ -1083,14 +1083,14 @@ public class SwarmGameLogic implements GameLogic {
                 Fish fish = fishes[t].get(i);
                 Cell cell = fish.getPosition();
                 if(cell.getContent() == null) {
-                    System.out.println("Wrong id null id:" + fish.getId());
+//                    System.out.println("Wrong id null id:" + fish.getId());
                 } else if(cell.getContent()!=null && fish.getId() != cell.getContent().getId()) {
                     if(cell.getContent() instanceof Fish) {
-                        System.out.println("Wrong id1: "+fish.getId() + " id2 "+ cell.getContent().getId());
-                        System.out.println("Cell cl: " + cell.getColumn() + "row:" + cell.getRow());
+//                        System.out.println("Wrong id1: "+fish.getId() + " id2 "+ cell.getContent().getId());
+//                        System.out.println("Cell cl: " + cell.getColumn() + "row:" + cell.getRow());
                     }
                     else{
-                        System.out.println("Wrong entity");
+//                        System.out.println("Wrong entity");
                     }
 
                 }
@@ -1169,7 +1169,7 @@ public class SwarmGameLogic implements GameLogic {
         if(mv == 0 || mv == 2){
             moveFish(fish, fish.getPosition());
         }
-        System.out.println("id: "+fish.getId()+"put nexmovemap---------------------------------:" + mv);
+//        System.out.println("id: "+fish.getId()+"put nexmovemap---------------------------------:" + mv);
         int row, col, dir;
         row = fish.getPosition().getRow();
         col = fish.getPosition().getColumn();

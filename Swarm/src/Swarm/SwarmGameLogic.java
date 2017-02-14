@@ -21,57 +21,11 @@ import java.util.*;
 /**
  * Created by pezzati on 1/28/16.
  */
+
 public class SwarmGameLogic implements GameLogic {
     private static final String TAG = "Swarm";
 
     private MapFrame debugUI;
-    private Event[][] lastClientEvents;
-
-    /**
-     * //swarm Constatnts :::
-     * private int mapSize;
-     * private int teamNum = 2;
-     * private int teleportNum;
-     * private int initFishNum;
-     * private int initQueenNum;
-     * <p>
-     * private double foodProb;
-     * private double trashProb;
-     * private double netProb;
-     * <p>
-     * private int netActiveTime;
-     * private int netValidTime;
-     * <p>
-     * //
-     * <p>
-     * private int changeColorLimit;
-     * private int kStep;
-     * // or :
-     * private int colorCost;
-     * //
-     * private int sickCost;
-     * private int UpdateCost;
-     * private int detMoveCost;
-     * <p>
-     * private int killQueenScore;
-     * private int killFishScore;
-     * private int queenCollisionScore;
-     * private int fishFoodScore;
-     * private int queenFoodScore;
-     * private int sickLifeTime;
-     * <p>
-     * private int powerRatio;
-     * private double endRatio;
-     * <p>
-     * private int disobeyPointerTeam0;
-     * private int disobeyPointerTeam1;
-     * private int disobeyNum;
-     * private double disobeyRatio;
-     * <p>
-     * private int foodValidTime;
-     * private int trashValidTime;
-     */
-//////////
     Diff diff = new Diff();
     private int idCounter;
     private int H, W;
@@ -112,6 +66,7 @@ public class SwarmGameLogic implements GameLogic {
     private int numberOfQueens[];
     //    HashMap<Integer, String> fishChanges;
     ArrayList<Pair<Fish, String>> fishChanges;
+    ArrayList<Pair<Fish,String>> moveChanges = new ArrayList<>();
     HashSet <Integer>deletedFishes;
     Set<Integer> fishesChanged;
     HashSet<Integer> fishAlters = new HashSet<>();
@@ -237,6 +192,7 @@ public class SwarmGameLogic implements GameLogic {
         //////////////////
         update = new int[gc.getTeamNum()][2][3][2][3];
         //Arrays.fill(update, 1);
+        /*
         for (int ind = 0; ind < 2; ind++) {
             for (int c = 0; c < 2; c++) {
                 for (int i = 0; i < 3; i++) {
@@ -248,6 +204,7 @@ public class SwarmGameLogic implements GameLogic {
                 }
             }
         }
+        */
 
         detMoves = new ArrayList[2];
         detMoves[0] = new ArrayList<>();
@@ -288,6 +245,8 @@ public class SwarmGameLogic implements GameLogic {
             return;
         }
         map.setTurn(map.getTurn() + 1);
+        System.out.println("Turn -----------------------" + map.getTurn());
+        Wrongid();
 
 
 //        System.out.println("TUUUUUUUUUUUUURN" + map.getTurn());
@@ -339,11 +298,13 @@ public class SwarmGameLogic implements GameLogic {
         motherFish = new Fish[gc.getTeamNum()][H][W];
 
         fishChanges.clear();
+        moveChanges.clear();
         deletedFishes.clear();
         fishesChanged.clear();
         fishAlters.clear();
         nextMoveMap.clear();
         teleportChecked.clear();
+
         // get argomans and make what we want
         for (int ind = 0; ind < gc.getTeamNum(); ind++) {
             for (int i = 0; i < clientsEvent[ind].length; i++) {
@@ -369,10 +330,10 @@ public class SwarmGameLogic implements GameLogic {
                         t[j] = Integer.parseInt(clientsEvent[ind][i].getArgs()[j]);
                     }
                     for (int j = 0; j < fishes[ind].size(); j++) {
-                        /**
-                         *  we check containing in fishAlters
-                         *  so do not need to get HASHSET
-                         */
+                                        /**
+                                         *  we check containing in fishAlters
+                                         *  so do not need to get HASHSET
+                                         */
                         if (fishes[ind].get(j).getId() == t[0] && !fishAlters.contains(fishes[ind].get(j).getId())) {
                             fishes[ind].get(j).setColorNumber(t[1]);
                             //score[ind] -= gc.getColorCost();
@@ -390,24 +351,6 @@ public class SwarmGameLogic implements GameLogic {
                 nextCell[ind].add(getNextCellViaUpdate(fishes[ind].get(i)));
             }
         }
-//
-//        // DESTINATIONS
-//        for(int ind=0;ind<gc.getTeamNum();ind++){
-//            for(int i=0; i<detMoves[ind].size(); i++){
-//                /**
-//                 * handle correct type
-//                 */
-//                int id = Integer.parseInt(detMoves[ind].get(i).getArgs()[0]),
-//                        mv = Integer.parseInt(detMoves[ind].get(i).getArgs()[1]);
-//                for(int j=0;j<fishes[ind].size();j++){
-//                    if(fishes[ind].get(j).getId() == id){
-//                        nextCell[ind].set(j, getNextCellViaMove(fishes[ind].get(j), mv));
-//                        //score[ind] -= gc.getDetMoveCost();
-//                        changeScores(ind, gc.getDetMoveCost());
-//                    }
-//                }
-//            }
-//        }
 
         stageMakeAttacks();
 
@@ -521,6 +464,7 @@ public class SwarmGameLogic implements GameLogic {
                         // todo: next choice?!?!?!
                     } else {
                         for (Fish f : attacks[i][j][1 - ind]) {
+
 //                            System.out.println("move cellfish " + f + ", " + f.getPosition() + " " + i + "," + j);
                             int r = f.getPosition().getRow(), c = f.getPosition().getColumn();
                             moves[1 - ind][r][c] = cells[r][c];
@@ -545,6 +489,9 @@ public class SwarmGameLogic implements GameLogic {
                 if (cell == fishes[ind].get(i).getPosition()) {
                     moves[ind][cell.getRow()][cell.getColumn()] = cell;
                 }
+                if (cell == moves[ind][cell.getRow()][cell.getColumn()]) {
+                    mark[ind][cell.getRow()][cell.getColumn()] = 1;
+                }
             }
         }
     }
@@ -554,7 +501,7 @@ public class SwarmGameLogic implements GameLogic {
         Log.i(TAG, "changes: " + fishChanges.toString());
 
 
-        for (int i = 0; i < fishChanges.size(); i++) {
+         for (int i = 0; i < fishChanges.size(); i++) {
             Fish fish = fishChanges.get(i).first;
             String change = fishChanges.get(i).second;
             int team = fish.getTeamNumber();
@@ -606,10 +553,11 @@ public class SwarmGameLogic implements GameLogic {
                     }
                 }
             }
+            System.out.println("total_chain:"+total_chain);
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
                     if (moves[t][r][c] != null && mark[t][r][c] == 0) {
-                        total_chain += dfs_loop(t, r, c, 0);
+                        total_chain += dfs_loop(t, r, c, 0).second;
                     }
                 }
             }
@@ -632,7 +580,7 @@ public class SwarmGameLogic implements GameLogic {
                         //System.out.println(r + ", " + c + ", " + cells[r][c].getContent());
                         if (valid_moves[i] == null)
                             valid_moves[i] = new ArrayList();
-                        if (cells[r][c].getContent() != null) {
+                        if (cells[r][c].getContent() != null && cells[r][c].getContent() instanceof  Fish) {
                             valid_moves[i].add(new int[]{t, r, c});
                             fishesChanged.add(cells[r][c].getContent().getId());
                         }
@@ -640,11 +588,13 @@ public class SwarmGameLogic implements GameLogic {
                     }
                 }
             }
+
             for (int i = 0; i < valid_moves.length; i++) {
                 if (valid_moves[i] != null) {
                     for (Object move : valid_moves[i]) {
                         int[] move_arr = (int[]) move;
-                        fishChanges.add(new Pair<>((Fish) cells[move_arr[1]][move_arr[2]].getContent(), "move"));
+//                        System.out.println("--------------------------"+move_arr[0]);
+                        moveChanges.add(new Pair<>((Fish) cells[move_arr[1]][move_arr[2]].getContent(), "move"));
                     }
                 }
             }
@@ -653,15 +603,15 @@ public class SwarmGameLogic implements GameLogic {
 //                if (fishChanges.containsKey(fish.getId())) {
 //                    String str = fishChanges.get(fish.getId());
 //                    if (str.equals("move")) {
-//                        moveFish(fish, nextCell[t].get(i));
+//                        moveFish(fish, L[t].get(i));
 //                    }
 //                }
 //            }
         }
 
-        for (int i = 0; i < fishChanges.size(); i++) {
-            Fish fish = fishChanges.get(i).first;
-            String change = fishChanges.get(i).second;
+        for (int i = 0; i < moveChanges.size(); i++) {
+            Fish fish = moveChanges.get(i).first;
+            String change = moveChanges.get(i).second;
             int team = fish.getTeamNumber();
             if (change.equals("move")) {
                 int r = fish.getPosition().getRow(), c = fish.getPosition().getColumn();
@@ -702,24 +652,36 @@ public class SwarmGameLogic implements GameLogic {
         return max + 1;
     }
 
-    private int dfs_loop(int t, int r, int c, int d) {
-        if (mark[t][r][c] != 0)
-            return 0;
+    private Pair<Boolean,Integer> dfs_loop(int t, int r, int c, int d) {
+        Pair<Boolean, Integer> pair = new Pair<>(false,0);
+
+        if (mark[t][r][c] != 0) {
+            pair.setFirst(false);
+            return pair;
+        }
         mark[t][r][c] = d;
-        if (moves[t][r][c] == null)
-            return 0;
+        if (moves[t][r][c] == null) {
+            pair.setFirst(false);
+            return pair;
+        }
         int r2 = moves[t][r][c].getRow();
         int c2 = moves[t][r][c].getColumn();
-        int dl = dfs_loop(t, r2, c2, d + 1);
-        if (dl > 0) {
+        Pair<Boolean,Integer> p = dfs_loop(t, r2, c2, d + 1);
+        int dl = p.second;
+        if (dl > 0 && p.first) {
             moves_valid[t][r][c] = d + 1;
-            return dl - 1;
+            pair.setFirst(true);
+            pair.setSecond(dl-1);
+            return pair;
         }
         if (mark[t][r2][c2] != d + 1) {
             moves_valid[t][r][c] = d + 1;
-            return d + 1 - mark[t][r2][c2];
+            pair.setFirst(true);
+            pair.setSecond(d + 1 - mark[t][r2][c2]);
+            return pair;
         }
-        return 0;
+        pair.setFirst(false);
+        return pair;
     }
 
     private void stageSickZombie() {
@@ -852,8 +814,8 @@ public class SwarmGameLogic implements GameLogic {
         int trashValidTime = this.map.getConstants().getTrashValidTime();
         int netValidTime = this.map.getConstants().getNetValidTime();
         int turn = this.map.getTurn();
-        for (int i = 0; i < this.W; i++) {
-            for (int j = 0; j < this.H; j++) {
+        for (int i = 0; i < this.H; i++) {
+            for (int j = 0; j < this.W; j++) {
 
                 if (cells[i][j].getContent() == null && cells[i][j].getTeleport() == null) {
 
@@ -865,7 +827,7 @@ public class SwarmGameLogic implements GameLogic {
                         this.tempObjects.add(food);
                         cells[i][j].setContent(food);
                         diff.add(food.getId(), 1, i, j); // todo: check with clients
-                    } else {
+                    } else if(cells[i][j].getContent() == null){
                         double r1 = Math.random();
                         if (r1 < this.map.getConstants().getTrashProb()) {
                             Trash trash = new Trash(idCounter++, cells[i][j]);
@@ -985,6 +947,7 @@ public class SwarmGameLogic implements GameLogic {
     }
 
     private void moveFish(Fish fish, Cell nxtCell/*, int nxtMove*/) {
+        Cell cell = fish.getPosition();
         if(deletedFishes.contains(fish.getId())) {
             return;
         }
@@ -1042,7 +1005,10 @@ public class SwarmGameLogic implements GameLogic {
             tempObjects.remove(food);
             // DIF FOOD DELETE
         }
-        nxtCell.setContent(fish);
+        if(!nxtCell.equals(cell)) {
+            fishChanges.add(new Pair<>(fish, "move"));
+            nxtCell.setContent(fish);
+        }
         // DIFF.move
         /**
          * mv r dir
@@ -1081,6 +1047,25 @@ public class SwarmGameLogic implements GameLogic {
                 baby.getDirection(), baby.getColorNumber(), (baby.isQueen()) ? 1 : 0, baby.getTeamNumber());
         //int id, int type, int x, int y, int dir, int color, int queen, int team
     }
+    private void Wrongid() {
+        for (int t = 0; t < 2; t++) {
+            for (int i = 0; i < fishes[t].size(); i++) {
+                Fish fish = fishes[t].get(i);
+                Cell cell = fish.getPosition();
+                if(cell.getContent() == null) {
+                    System.out.println("Wrong id null id:" + fish.getId());
+                } else if(cell.getContent()!=null && fish.getId() != cell.getContent().getId()) {
+                    if(cell.getContent() instanceof Fish) {
+                        System.out.println("Wrong id1: "+fish.getId() + " id2 "+ cell.getContent().getId());
+                    }
+                    else{
+                        System.out.println("Wrong entity");
+                    }
+
+                }
+            }
+        }
+    }
 
     private Cell getNextCellViaUpdate(Fish fish) {
         int left, right, head, mv;
@@ -1114,10 +1099,12 @@ public class SwarmGameLogic implements GameLogic {
          */
         // set direction & return next
         mv = update[fish.getTeamNumber()][fish.getColorNumber()][right][head][left];
+        /*
         // TODO: 2/9/2017 DISOBEY
         /**
          * DisobeyNum is for example 50 in the real Game
          */
+
         int disObeyNum = this.map.getConstants().getDisobeyNum();
         int teamNum = fish.getTeamNumber();
         int j = 0;
@@ -1135,6 +1122,7 @@ public class SwarmGameLogic implements GameLogic {
                 mv = rand.nextInt(2);
             }
         }
+
 
 
 //        nextMove[fish.getTeamNumber()].add(mv);
@@ -1206,22 +1194,11 @@ public class SwarmGameLogic implements GameLogic {
             return 2;
     }
 
-
-    /*
-    it is remained :generateOutputs
-     */
     @Override
     public void generateOutputs() {
         if (PARAM_SHOW_DEBUG_UI.getValue() == Boolean.TRUE) {
             debugUI.setMap(this.map);
         }
-        /*
-        if (debugUI != null) {
-            debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), lastClientEvents, getStatusMessage(), movesDest2, movesSize2);
-        }
-        this.context.flush();
-        this.context.turnUP();
-        */
     }
 
     @Override
@@ -1233,9 +1210,6 @@ public class SwarmGameLogic implements GameLogic {
         return messages;
     }
 
-    /*
-    It is remained:getStatusMessage
-     */
     @Override
     public Message getStatusMessage() {
 
@@ -1261,9 +1235,7 @@ public class SwarmGameLogic implements GameLogic {
         return new Event[0];
     }
 
-    /*
-    isGameFinished is remained
-     */
+
     @Override
     public boolean isGameFinished() {
         int[] finalScore = new int[2];
@@ -1288,11 +1260,6 @@ public class SwarmGameLogic implements GameLogic {
     @Override
     public void terminate() {
         this.debugUI.gameOver();
-        /*
-        if (debugUI != null) {
-            debugUI.update(context.getMap().getAdjacencyList(), context.getDiffer().getPrevOwnership(), context.getDiffer().getPrevArmyCount(), null, getStatusMessage(), null, null);
-        }
-        */
     }
 }
 
@@ -1303,6 +1270,22 @@ class Pair<K, V> {
 
     Pair(K first, V second) {
         this.first = first;
+        this.second = second;
+    }
+
+    public K getFirst() {
+        return first;
+    }
+
+    public void setFirst(K first) {
+        this.first = first;
+    }
+
+    public V getSecond() {
+        return second;
+    }
+
+    public void setSecond(V second) {
         this.second = second;
     }
 }

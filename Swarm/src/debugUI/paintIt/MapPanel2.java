@@ -237,6 +237,10 @@ public class MapPanel2 extends JPanel{
             int rand8 = ThreadLocalRandom.current().nextInt(0, 10);
             rand7 = (rand5+1)%10;
             rand8 = rand6;
+            int[] scores = new int[2];
+            scores[0] = i;
+            scores[1] = 500 - i;
+            map.setScore(scores);
             GameObject temp = cells[rand5][rand6].getContent();
             cells[rand5][rand6].setContent(cells[rand7][rand8].getContent());
             cells[rand7][rand8].setContent(temp);

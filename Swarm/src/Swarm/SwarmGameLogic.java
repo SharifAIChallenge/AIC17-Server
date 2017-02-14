@@ -171,7 +171,6 @@ public class SwarmGameLogic implements GameLogic {
 
         attacks = new ArrayList[H][W][2];
         this.numberOfQueens = new int[gc.getTeamNum()];
-        this.update = new int[gc.getTeamNum()][2][3][2][3];
 
         mark = new int[2][H][W];
         moves = new Cell[2][H][W];
@@ -193,6 +192,14 @@ public class SwarmGameLogic implements GameLogic {
 
         //////////////////
         update = new int[gc.getTeamNum()][2][3][2][3];
+
+        for (int i = 0; i < gc.getTeamNum(); i++) {
+            for (int j = 0; j < 2; j++)
+                for (int k = 0; k < 3; k++)
+                    for (int t = 0; t < 2; t++)
+                        for (int r = 0; r < 3; r++)
+                            update[i][j][k][t][r] = 1;
+        }
         //Arrays.fill(update, 1);
         /*
         for (int ind = 0; ind < 2; ind++) {
@@ -551,7 +558,7 @@ public class SwarmGameLogic implements GameLogic {
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
                     if (moves[t][r][c] == null && mark[t][r][c] == 0) {
-                        total_chain += dfs_reverse(t, r, c, 0);
+                        total_chain += dfs_reverse(t, r, c, 1, 0);
                         mark[t][r][c] = 1;
                     }
                 }
@@ -624,32 +631,54 @@ public class SwarmGameLogic implements GameLogic {
 
     }
 
-    private int dfs_reverse(int t, int r, int c, int valid_index) {
-        //System.out.println("dfs rev on " + r + ", " + c);
-        if (valid_index > 0)
+    private int dfs_reverse(int t, int r, int c, int valid_index, int valid_mark) {
+        System.out.println("dfs rev on " + r + ", " + c + ", " + valid_index);
+        if (valid_index > 0 && moves[t][r][c] != null)
             moves_valid[t][r][c] = valid_index;
-        if (mark[t][r][c] != 0)
+        if (mark[t][r][c] != valid_mark)
             return dfs_reverse_data[t][r][c];
-        mark[t][r][c] = 1;
+        mark[t][r][c] = valid_mark + 1;
         boolean has_max = false;
         int max = 0, maxr = 0, maxc = 0;
+        int num_in = 0;
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
+                if (i == 0 && j == 0)
+                    continue;
                 int row = makeValidIndex(r + i, H);
                 int col = makeValidIndex(c + j, W);
                 if (moves[t][row][col] == cells[r][c]) {
-                    int val = dfs_reverse(t, row, col, 0);
-                    if (val > max) {
-                        has_max = true;
-                        max = val;
-                        maxr = row;
-                        maxc = col;
+                    num_in++;
+                    maxr = row;
+                    maxc = col;
+                }
+            }
+        }
+        if (num_in == 1) {
+            max = dfs_reverse(t, maxr, maxc, 0, valid_mark);
+            has_max = true;
+        }
+        if (num_in > 1) {
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    if (i == 0 && j == 0)
+                        continue;
+                    int row = makeValidIndex(r + i, H);
+                    int col = makeValidIndex(c + j, W);
+                    if (moves[t][row][col] == cells[r][c]) {
+                        int val = dfs_reverse(t, row, col, 0, valid_mark);
+                        if (val > max) {
+                            has_max = true;
+                            max = val;
+                            maxr = row;
+                            maxc = col;
+                        }
                     }
                 }
             }
         }
-        if (has_max) {
-            dfs_reverse(t, maxr, maxc, valid_index + 1);
+        if (has_max && valid_index != 0) {
+            dfs_reverse(t, maxr, maxc, valid_index + 1, valid_mark + 1);
         }
         dfs_reverse_data[t][r][c] = max + 1;
         return max + 1;
@@ -1251,19 +1280,19 @@ public class SwarmGameLogic implements GameLogic {
         int[] finalScore = new int[2];
         finalScore[0] = map.getScore()[0];
         finalScore[1] = map.getScore()[1];
-        if (numberOfQueens[0] == 0 && numberOfQueens[1] > 0) {
-            finalScore[0] = 0;
-        } else if (numberOfQueens[1] == 0 && numberOfQueens[0] > 0) {
-            finalScore[1] = 0;
-        }
+//        if (numberOfQueens[0] == 0 && numberOfQueens[1] > 0) {
+//            finalScore[0] = 0;
+//        } else if (numberOfQueens[1] == 0 && numberOfQueens[0] > 0) {
+//            finalScore[1] = 0;
+//        }
         map.setScore(finalScore);
         int population = fishes[0].size() + fishes[1].size();
         if (((float) population) / (this.map.getH() * this.map.getW()) >= this.map.getConstants().getEndRatio()) {
             return true;
         }
-        if (numberOfQueens[0] == 0 || numberOfQueens[1] == 0) {
-            return true;
-        }
+//        if (numberOfQueens[0] == 0 || numberOfQueens[1] == 0) {
+//            return true;
+//        }
         return false;
     }
 

@@ -58,6 +58,7 @@ public class SwarmGameLogic implements GameLogic {
     private int[][][] mark;
     private Cell[][][] moves;
     private int[][][] moves_valid;
+    private int[][][] dfs_loop_data;
     private int[][][] dfs_reverse_data;
 
     private boolean firstTurn = false;
@@ -177,6 +178,7 @@ public class SwarmGameLogic implements GameLogic {
 //        moves_r = new ArrayList[2][H][W];
         moves_valid = new int[2][H][W];
         dfs_reverse_data = new int[2][H][W];
+        dfs_loop_data = new int[2][H][W];
 
         for (int i = 0; i < H; i++) {
             for (int j = 0; j < W; j++) {
@@ -485,10 +487,10 @@ public class SwarmGameLogic implements GameLogic {
         }
         for (int ind = 0; ind < gc.getTeamNum(); ind++) {
             for (int i = 0; i < fishes[ind].size(); i++) {
-                Cell cell = nextCell[ind].get(i);
-                if (cell == fishes[ind].get(i).getPosition()) {
-                    moves[ind][cell.getRow()][cell.getColumn()] = cell;
-                }
+                Cell cell = fishes[ind].get(i).getPosition();
+//                if (cell == fishes[ind].get(i).getPosition()) {
+//                    moves[ind][cell.getRow()][cell.getColumn()] = cell;
+//                }
                 if (cell == moves[ind][cell.getRow()][cell.getColumn()]) {
                     mark[ind][cell.getRow()][cell.getColumn()] = 1;
                 }
@@ -557,7 +559,7 @@ public class SwarmGameLogic implements GameLogic {
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
                     if (moves[t][r][c] != null && mark[t][r][c] == 0) {
-                        total_chain += dfs_loop(t, r, c, 0).second;
+                        total_chain += dfs_loop(t, r, c, 0);
                     }
                 }
             }
@@ -652,36 +654,38 @@ public class SwarmGameLogic implements GameLogic {
         return max + 1;
     }
 
-    private Pair<Boolean,Integer> dfs_loop(int t, int r, int c, int d) {
-        Pair<Boolean, Integer> pair = new Pair<>(false,0);
+    private int dfs_loop(int t, int r, int c, int d) {
+//        Pair<Integer, Integer> pair = new Pair<>(0,0);
 
-        if (mark[t][r][c] != 0) {
-            pair.setFirst(false);
-            return pair;
+        if (mark[t][r][c] == 1) {
+//            pair.setFirst(0);
+            return 0;
         }
-        mark[t][r][c] = d;
+        mark[t][r][c] = 2;
+        dfs_loop_data[t][r][c] = d;
         if (moves[t][r][c] == null) {
-            pair.setFirst(false);
-            return pair;
+//            pair.setFirst(false);
+//            return pair;
+            return 0;
         }
         int r2 = moves[t][r][c].getRow();
         int c2 = moves[t][r][c].getColumn();
-        Pair<Boolean,Integer> p = dfs_loop(t, r2, c2, d + 1);
-        int dl = p.second;
-        if (dl > 0 && p.first) {
+        int dl = dfs_loop(t, r2, c2, d + 1);
+//        int dl = p.second;
+        if (dl > 0) {
             moves_valid[t][r][c] = d + 1;
-            pair.setFirst(true);
-            pair.setSecond(dl-1);
-            return pair;
+//            pair.setFirst(true);
+//            pair.setSecond(dl-1);
+            return dl-1;
         }
-        if (mark[t][r2][c2] != d + 1) {
+        if (mark[t][r2][c2] == 2 && dfs_loop_data[t][r2][c2] != d + 1) {
             moves_valid[t][r][c] = d + 1;
-            pair.setFirst(true);
-            pair.setSecond(d + 1 - mark[t][r2][c2]);
-            return pair;
+//            pair.setFirst(true);
+//            pair.setSecond(d + 1 - mark[t][r2][c2]);
+            return d + 1 - dfs_loop_data[t][r2][c2];
         }
-        pair.setFirst(false);
-        return pair;
+//        pair.setFirst(false);
+        return 0;
     }
 
     private void stageSickZombie() {

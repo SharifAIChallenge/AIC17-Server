@@ -488,9 +488,10 @@ public class SwarmGameLogic implements GameLogic {
         for (int ind = 0; ind < gc.getTeamNum(); ind++) {
             for (int i = 0; i < fishes[ind].size(); i++) {
                 Cell cell = fishes[ind].get(i).getPosition();
-//                if (cell == fishes[ind].get(i).getPosition()) {
-//                    moves[ind][cell.getRow()][cell.getColumn()] = cell;
-//                }
+                Cell ncell = nextCell[ind].get(i);
+                if (ncell == fishes[ind].get(i).getPosition()) {
+                    moves[ind][ncell.getRow()][ncell.getColumn()] = ncell;
+                }
                 if (cell == moves[ind][cell.getRow()][cell.getColumn()]) {
                     mark[ind][cell.getRow()][cell.getColumn()] = 1;
                 }
@@ -666,25 +667,30 @@ public class SwarmGameLogic implements GameLogic {
         if (moves[t][r][c] == null) {
 //            pair.setFirst(false);
 //            return pair;
+            mark[t][r][c] = 1;
             return 0;
         }
         int r2 = moves[t][r][c].getRow();
         int c2 = moves[t][r][c].getColumn();
+        if (mark[t][r2][c2] == 2 && dfs_loop_data[t][r2][c2] != d + 1) {
+            moves_valid[t][r][c] = d + 1;
+//            pair.setFirst(true);
+//            pair.setSecond(d + 1 - mark[t][r2][c2]);
+            mark[t][r][c] = 1;
+            return d + 1 - dfs_loop_data[t][r2][c2];
+        }
+
         int dl = dfs_loop(t, r2, c2, d + 1);
 //        int dl = p.second;
         if (dl > 0) {
             moves_valid[t][r][c] = d + 1;
 //            pair.setFirst(true);
 //            pair.setSecond(dl-1);
+            mark[t][r][c] = 1;
             return dl-1;
         }
-        if (mark[t][r2][c2] == 2 && dfs_loop_data[t][r2][c2] != d + 1) {
-            moves_valid[t][r][c] = d + 1;
-//            pair.setFirst(true);
-//            pair.setSecond(d + 1 - mark[t][r2][c2]);
-            return d + 1 - dfs_loop_data[t][r2][c2];
-        }
 //        pair.setFirst(false);
+        mark[t][r][c] = 1;
         return 0;
     }
 
@@ -1109,23 +1115,23 @@ public class SwarmGameLogic implements GameLogic {
          * DisobeyNum is for example 50 in the real Game
          */
 
-        int disObeyNum = this.map.getConstants().getDisobeyNum();
-        int teamNum = fish.getTeamNumber();
-        int j = 0;
-        if (fishes[teamNum].size() > disObeyNum) {
-            int dTurn = (int) Math.abs(1 / (1 - Math.sqrt(Math.min(disObeyNum / fishes[teamNum].size(), 1))));
-            for (int i = 0; i < fishes[teamNum].size(); i++) {
-                if (fishes[teamNum].get(i).getId() == fish.getId()) {
-                    j = i;
-                    break;
-                }
-            }
-
-            if (this.map.getTurn() - j % dTurn == 0) {
-                Random rand = new Random();
-                mv = rand.nextInt(2);
-            }
-        }
+//        int disObeyNum = this.map.getConstants().getDisobeyNum();
+//        int teamNum = fish.getTeamNumber();
+//        int j = 0;
+//        if (fishes[teamNum].size() > disObeyNum) {
+//            int dTurn = (int) Math.abs(1 / (1 - Math.sqrt(Math.min(disObeyNum / fishes[teamNum].size(), 1))));
+//            for (int i = 0; i < fishes[teamNum].size(); i++) {
+//                if (fishes[teamNum].get(i).getId() == fish.getId()) {
+//                    j = i;
+//                    break;
+//                }
+//            }
+//
+//            if (this.map.getTurn() - j % dTurn == 0) {
+//                Random rand = new Random();
+//                mv = rand.nextInt(2);
+//            }
+//        }
 
 
 

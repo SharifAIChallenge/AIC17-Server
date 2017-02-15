@@ -765,6 +765,9 @@ public class SwarmGameLogic implements GameLogic {
                 diff.del(fish.getId());
             }
             else if (str.equals("move") && !deletedFishes.contains(fish.getId())) {
+                System.out.println("id :" + fish.getId() + "----------move:" +  nextMoveMap.get(fish.getId()));
+                System.out.println("real ----------------move:"+  moves[fish.getTeamNumber()][fish.getPosition().getRow()][fish.getPosition().getColumn()]);
+
                 diff.mov(fish.getId(), nextMoveMap.get(fish.getId()));
             }
         }
@@ -1026,9 +1029,15 @@ public class SwarmGameLogic implements GameLogic {
             tempObjects.remove(food);
             // DIF FOOD DELETE
         }
-        if(!nxtCell.equals(cell)) {
+        if(!nxtCell.equals(cell) ) {
             fishChanges.add(new Pair<>(fish, "move"));
             nxtCell.setContent(fish);
+        }
+        if(nxtCell.equals(cell) && nextMoveMap.get(fish.getId()) != 1){
+            System.out.println("---------------WWWW----------------------");
+            fishChanges.add(new Pair<>(fish, "move"));
+            nxtCell.setContent(fish);
+
         }
         // DIFF.move
         /**
@@ -1155,7 +1164,12 @@ public class SwarmGameLogic implements GameLogic {
 
     // FISHCHANGES MOVE
     private Cell getNextCellViaMove(Fish fish, int mv) {
+        // TODO: 2/14/2017 Tofe khales
         nextMoveMap.put(fish.getId(), mv);
+        if(mv == 0 || mv == 2){
+            moveFish(fish, fish.getPosition());
+        }
+        System.out.println("id: "+fish.getId()+"put nexmovemap---------------------------------:" + mv);
         int row, col, dir;
         row = fish.getPosition().getRow();
         col = fish.getPosition().getColumn();

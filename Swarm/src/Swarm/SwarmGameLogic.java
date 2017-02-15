@@ -354,6 +354,9 @@ public class SwarmGameLogic implements GameLogic {
             }
         }
 
+        if(map.getTurn() == 3) {
+            System.out.println("Turn 4");
+        }
         stageMakeAttacks();
 
         stageDeleteAndMove();
@@ -547,11 +550,14 @@ public class SwarmGameLogic implements GameLogic {
 //                }
 //                System.out.println();
 //            }
+            if(map.getTurn() == 8){
+                System.out.println("Turn 8");
+            }
             int total_chain = 0;
             for (int r = 0; r < H; r++) {
                 for (int c = 0; c < W; c++) {
                     if (moves[t][r][c] == null && mark[t][r][c] == 0) {
-                        total_chain += dfs_reverse(t, r, c, 0);
+                        total_chain += dfs_reverse(t, r, c, -1);
                         mark[t][r][c] = 1;
                     }
                 }
@@ -648,8 +654,13 @@ public class SwarmGameLogic implements GameLogic {
                 }
             }
         }
-        if (has_max) {
-            dfs_reverse(t, maxr, maxc, valid_index + 1);
+        if (has_max && valid_index!=0) {
+            if(valid_index == -1)
+
+                dfs_reverse(t, maxr, maxc,  1);
+            else
+
+                dfs_reverse(t, maxr, maxc, valid_index + 1);
         }
         dfs_reverse_data[t][r][c] = max + 1;
         return max + 1;
@@ -677,7 +688,7 @@ public class SwarmGameLogic implements GameLogic {
 //            pair.setFirst(true);
 //            pair.setSecond(d + 1 - mark[t][r2][c2]);
             mark[t][r][c] = 1;
-            return d + 1 - dfs_loop_data[t][r2][c2];
+            return d + /*1*/ - dfs_loop_data[t][r2][c2];
         }
 
         int dl = dfs_loop(t, r2, c2, d + 1);
@@ -1067,6 +1078,7 @@ public class SwarmGameLogic implements GameLogic {
                 } else if(cell.getContent()!=null && fish.getId() != cell.getContent().getId()) {
                     if(cell.getContent() instanceof Fish) {
                         System.out.println("Wrong id1: "+fish.getId() + " id2 "+ cell.getContent().getId());
+                        System.out.println("Cell cl: " + cell.getColumn() + "row:" + cell.getRow());
                     }
                     else{
                         System.out.println("Wrong entity");

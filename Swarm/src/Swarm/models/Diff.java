@@ -89,8 +89,8 @@ public class Diff {
     public Change[] getChanges() {
         Change[] changes = new Change[4];
         changes[0] = new Change('d', del);
-        changes[1] = new Change('a', add);
-        changes[2] = new Change('m', mov);
+        changes[2] = new Change('a', add);
+        changes[1] = new Change('m', mov);
         changes[3] = new Change('c', alter);
         return changes;
     }

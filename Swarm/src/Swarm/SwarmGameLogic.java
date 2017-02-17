@@ -710,7 +710,7 @@ public class SwarmGameLogic implements GameLogic {
 //            pair.setFirst(true);
 //            pair.setSecond(d + 1 - mark[t][r2][c2]);
             mark[t][r][c] = 1;
-            return d + 1 - dfs_loop_data[t][r2][c2];
+            return d +/* 1*/ - dfs_loop_data[t][r2][c2];
         }
 
         int dl = dfs_loop(t, r2, c2, d + 1);

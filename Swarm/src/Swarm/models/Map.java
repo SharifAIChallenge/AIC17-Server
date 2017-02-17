@@ -96,6 +96,7 @@ public class Map implements Serializable{
         gameConstants.setDisobeyNum((int)constants[18]);
         gameConstants.setFoodValidTime((int)constants[19]);
         gameConstants.setTrashValidTime((int)constants[20]);
+        gameConstants.setTotalTurn((int)constants[21]);
         return gameConstants;
 
     }

@@ -1,5 +1,6 @@
 package server.core;
 
+import Swarm.SwarmGameLogic;
 import model.Event;
 import network.data.Message;
 import server.config.ClientConfig;
@@ -225,7 +226,9 @@ public class GameServer {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    System.exit(0);
+                    if(SwarmGameLogic.PARAM_SHOW_DEBUG_UI.equals(false)) {
+                        System.exit(0);
+                    }
                     return;
                 }
 

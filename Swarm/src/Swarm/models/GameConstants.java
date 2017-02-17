@@ -49,6 +49,16 @@ public class GameConstants implements Serializable{
     private int foodValidTime = 4;
     private int trashValidTime = 4;
 
+    private int totalTurn;
+
+    public int getTotalTurn() {
+        return totalTurn;
+    }
+
+    public void setTotalTurn(int totalTurn) {
+        this.totalTurn = totalTurn;
+    }
+
     public GameConstants(){}
 
     public long getTurnTimeout() {

@@ -11,6 +11,7 @@ import network.data.Message;
 import server.config.BooleanParam;
 import server.config.FileParam;
 import server.config.IntegerParam;
+import server.config.StringParam;
 import server.core.GameLogic;
 import server.core.GameServer;
 import util.Log;
@@ -322,8 +323,10 @@ public class SwarmGameLogic implements GameLogic {
                     /**
                      * handling that the type of args is correct or not
                      */
+//                    System.out.println("dete --------------------------f:"+clientsEvent[ind][i].getArgs()[1]);
                     if (clientsEvent[ind][i].getArgs().length != 2) continue;
                     detMoves[ind].add(clientsEvent[ind][i]);
+                    changeScores(ind, gc.getDetMoveCost());
                 } else if (clientsEvent[ind][i].getType().equals("c")) {
                     if (clientsEvent[ind][i].getArgs().length != 2) continue;
                     int[] t = new int[2];
@@ -812,7 +815,7 @@ public class SwarmGameLogic implements GameLogic {
                             for (int l = -1; l <= 1; l++) {
                                 if (k == 0 && l == 0)
                                     continue;
-                                if (cells[k + i][l + j].getContent() == null) {
+                                if (cells[(k + i)%this.H][(l + j)%this.W].getContent() == null) {
 //                                    System.out.println("turn = " + map.getTurn() + " baby is born in " + "row:" + (i + k) + "column:" + (j + l));
                                     makeBabyFish(cells[(k + i)%H][(l + j)%W], motherFish[ind][i][j]);
                                     break loop;
@@ -1149,23 +1152,39 @@ public class SwarmGameLogic implements GameLogic {
          */
         // set direction & return next
         mv = update[fish.getTeamNumber()][fish.getColorNumber()][right][head][left];
+
+        /**
+         * Deterministic Move
+         */
+        int TeamNum = fish.getTeamNumber();
+        int size = detMoves[TeamNum].size();
+        for (int i = 0; i < size; i++) {
+            String[] args = detMoves[TeamNum].get(i).getArgs();
+            if(Integer.parseInt(args[0] )== fish.getId()){
+                mv = Integer.parseInt(args[1]);
+
+            }
+        }
+
+
         /*
         // TODO: 2/9/2017 DISOBEY
         /**
          * DisobeyNum is for example 50 in the real Game
          */
 
-//        int disObeyNum = this.map.getConstants().getDisobeyNum();
-//        int teamNum = fish.getTeamNumber();
-//        int j = 0;
-//        if (fishes[teamNum].size() > disObeyNum) {
-//            int dTurn = (int) Math.abs(1 / (1 - Math.sqrt(Math.min(disObeyNum / fishes[teamNum].size(), 1))));
-//            for (int i = 0; i < fishes[teamNum].size(); i++) {
-//                if (fishes[teamNum].get(i).getId() == fish.getId()) {
-//                    j = i;
-//                    break;
-//                }
-//            }
+        int disObeyNum = this.map.getConstants().getDisobeyNum();
+        int teamNum = fish.getTeamNumber();
+        int j = 0;
+        if (fishes[teamNum].size() > disObeyNum) {
+            int dTurn = (int) Math.abs(1 / (1 - Math.sqrt(Math.min(disObeyNum / fishes[teamNum].size(), 1))));
+            for (int i = 0; i < fishes[teamNum].size(); i++) {
+                if (fishes[teamNum].get(i).getId() == fish.getId()) {
+                    j = i;
+                    break;
+                }
+            }
+        }
 //
 //            if (this.map.getTurn() - j % dTurn == 0) {
 //                Random rand = new Random();
@@ -1304,6 +1323,9 @@ public class SwarmGameLogic implements GameLogic {
         map.setScore(finalScore);
         int population = fishes[0].size() + fishes[1].size();
         if (((float) population) / (this.map.getH() * this.map.getW()) >= this.map.getConstants().getEndRatio()) {
+            return true;
+        }
+        if(this.map.getTurn() >= gc.getTotalTurn()){
             return true;
         }
         if (numberOfQueens[0] == 0 || numberOfQueens[1] == 0) {

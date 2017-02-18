@@ -1095,6 +1095,9 @@ public class SwarmGameLogic implements GameLogic {
         Fish baby = new Fish(idCounter++, cell, fish.getTeamNumber(), fish.getDirection(), fish.getColorNumber(), fish.isQueen());
         cell.setContent(baby);
         fishes[fish.getTeamNumber()].add(baby);
+        if(fish.isQueen()) {
+            numberOfQueens[fish.getTeamNumber()]++;
+        }
         diff.addFish(baby.getId(), 0, baby.getPosition().getRow(), baby.getPosition().getColumn(),
                 baby.getDirection(), baby.getColorNumber(), (baby.isQueen()) ? 1 : 0, baby.getTeamNumber());
         //int id, int type, int x, int y, int dir, int color, int queen, int team

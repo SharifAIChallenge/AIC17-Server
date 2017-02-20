@@ -381,7 +381,8 @@ public class SwarmGameLogic implements GameLogic {
 
         stageAlters();
 
-        Wrongid();
+//        Wrongid();
+
 
 
         //uiMessage = new Message(Message.NAME_TURN, uiMessages.toArray());
@@ -815,9 +816,9 @@ public class SwarmGameLogic implements GameLogic {
                             for (int l = -1; l <= 1; l++) {
                                 if (k == 0 && l == 0)
                                     continue;
-                                if (cells[(k + i)%this.H][(l + j)%this.W].getContent() == null) {
+                                if (cells[(k + i + this.H)%this.H][(l + j + this.W)%this.W].getContent() == null) {
 //                                    System.out.println("turn = " + map.getTurn() + " baby is born in " + "row:" + (i + k) + "column:" + (j + l));
-                                    makeBabyFish(cells[(k + i)%H][(l + j)%W], motherFish[ind][i][j]);
+                                    makeBabyFish(cells[(k + i+this.H)%H][(l + j+this.W)%W], motherFish[ind][i][j]);
                                     break loop;
                                 }
                             }

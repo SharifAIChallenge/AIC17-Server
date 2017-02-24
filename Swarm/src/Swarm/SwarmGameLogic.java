@@ -1340,7 +1340,8 @@ public class SwarmGameLogic implements GameLogic {
 
     @Override
     public void terminate() {
-        this.debugUI.gameOver();
+        if(PARAM_SHOW_DEBUG_UI.getValue())
+            this.debugUI.gameOver();
     }
 }
 

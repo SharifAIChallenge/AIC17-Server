@@ -11,6 +11,7 @@ public class GameConstants implements Serializable{
     private int w;
     private int h;
     private int teamNum = 2;
+
     private int teleportNum;
     private int initFishNum;
     private int initQueenNum;
@@ -21,14 +22,11 @@ public class GameConstants implements Serializable{
 
     private int netActiveTime;
     private int netValidTime;
+    private int sickLifeTime = 2;
+    private int foodValidTime = 4;
+    private int trashValidTime = 4;
 
-    //
-
-   // private int changeColorLimit;
-   // private int kStep;
-    // or :
     private int colorCost = 10;
-    //
     private int sickCost = 10;
     private int UpdateCost = 10;
     private int detMoveCost = 50;
@@ -39,17 +37,16 @@ public class GameConstants implements Serializable{
     private int queenCollisionScore = 0;
     private int fishFoodScore = 100;
     private int queenFoodScore = 200;
-    private int sickLifeTime = 2;
+
 
     private int powerRatio = 2;
     private double endRatio = 0.7;
 
     private int disobeyNum;
 
-    private int foodValidTime = 4;
-    private int trashValidTime = 4;
+    private int totalTurn = 1000;
 
-    private int totalTurn;
+    public GameConstants(){}
 
     public int getTotalTurn() {
         return totalTurn;
@@ -58,8 +55,6 @@ public class GameConstants implements Serializable{
     public void setTotalTurn(int totalTurn) {
         this.totalTurn = totalTurn;
     }
-
-    public GameConstants(){}
 
     public long getTurnTimeout() {
         return turnTimeout;

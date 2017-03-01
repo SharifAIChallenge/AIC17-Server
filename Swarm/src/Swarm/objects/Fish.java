@@ -13,15 +13,10 @@ public class Fish extends GameObject implements Serializable {
     private int colorNumber; // 0 or 1
     private int power = 0;
 
-    private boolean queen;
+    private boolean queen = false;
     private boolean sick = false;
     private boolean pregnant = false;
 
-    /**
-     * this.power = 0;
-     * this.sick = false;
-     * this.pregnant = false
-     */
 
     public Fish(int id, Cell position, int teamNumber, int direction, int colorNumber, boolean queen) {
         super(id, position);
@@ -42,17 +37,6 @@ public class Fish extends GameObject implements Serializable {
 
     }
 
-    //    public Fish(int id, Cell position, int teamNumber, int direction, boolean queen, int colorNumber) {
-//        super(id, position);
-//        this.teamNumber = teamNumber;
-//        this.direction = direction;
-//        this.queen = queen;
-//        this.colorNumber = colorNumber;
-//        //
-//        this.sickAge = 0;
-//        this.power = 0;
-//        this.pregnant = false;
-//    }
 
 
     public void setTeamNumber(int teamNumber) {

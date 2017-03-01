@@ -10,12 +10,10 @@ import java.util.ArrayList;
 
 public class Cell implements Serializable {
 
-
     private int row, column;
     private GameObject content = null;
     private Teleport teleport = null;
     private Net net = null;
-    //private int contentAge = 0;
 
     // constructors
     public Cell(){
@@ -44,7 +42,6 @@ public class Cell implements Serializable {
     }
 
     public void setContent(GameObject content) {
-//        System.out.println("set content " + this + "=" + content);
         this.content = content;
     }
 

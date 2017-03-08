@@ -783,7 +783,7 @@ public class SwarmGameLogic implements GameLogic {
 
                 if (cells[i][j].getContent() == null && cells[i][j].getTeleport() == null) {
                     double r0 = Math.random();
-                    if (r0 < gc.getFoodProb()) {
+                    if (r0 < this.foodProbs[i][j]) {
                         Food food;
                         food = new Food(idCounter++, cells[i][j]);
                         food.setDeadTime(foodValidTime + turn);
@@ -792,7 +792,7 @@ public class SwarmGameLogic implements GameLogic {
                         diff.add(food.getId(), 1, i, j);
                     } else if (cells[i][j].getContent() == null) {
                         double r1 = Math.random();
-                        if (r1 < gc.getTrashProb()) {
+                        if (r1 < this.trashProbs[i][j]) {
                             Trash trash;
                             trash = new Trash(idCounter++, cells[i][j]);
                             trash.setDeadTime(trashValidTime + turn);
@@ -804,7 +804,7 @@ public class SwarmGameLogic implements GameLogic {
                 }
                 if (cells[i][j].getNet() == null) {
                     double r2 = Math.random();
-                    if (r2 < gc.getNetProb()) {
+                    if (r2 < this.netProbs[i][j]) {
                         Net net;
                         net = new Net(idCounter++, cells[i][j]);
                         net.setDeadTime(netValidTime + turn);
@@ -1236,11 +1236,11 @@ public class SwarmGameLogic implements GameLogic {
     private void probabilityMaker() {
         for (int i = 0; i < this.H; i++) {
             for (int j = 0; j < this.W; j++) {
-                double xi = -5 + (i * 10) / H;
-                double yi = -5 + (j * 10) / W;
-                this.foodProbs[i][j] = (1 / (2 * Math.PI)) * Math.exp(-(xi * xi + yi * yi) / (2)) * gc.getFoodProb();
-                this.trashProbs[i][j] = (1 / (2 * Math.PI)) * Math.exp(-(xi * xi + yi * yi) / (2)) * gc.getTrashProb();
-                this.netProbs[i][j] = (1 / (2 * Math.PI)) * Math.exp(-(xi * xi + yi * yi) / (2)) * gc.getNetProb();
+                double xi = -2 + (i * 4) / H;
+                double yi = -2 + (j * 4) / W;
+                this.foodProbs[i][j] = (1 / (2 * Math.PI)) * Math.exp(-(xi * xi + yi * yi) / (2)) * gc.getFoodProb() * 8;
+                this.trashProbs[i][j] = (1 / (2 * Math.PI)) * Math.exp(-(xi * xi + yi * yi) / (2)) * gc.getTrashProb() * 8;
+                this.netProbs[i][j] = (1 / (2 * Math.PI)) * Math.exp(-(xi * xi + yi * yi) / (2)) * gc.getNetProb() * 8;
             }
 
         }

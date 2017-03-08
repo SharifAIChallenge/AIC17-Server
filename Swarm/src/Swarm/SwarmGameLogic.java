@@ -11,10 +11,10 @@ import network.data.Message;
 import server.config.BooleanParam;
 import server.config.FileParam;
 import server.config.IntegerParam;
-import server.config.StringParam;
 import server.core.GameLogic;
 import server.core.GameServer;
 import util.Log;
+
 import java.util.*;
 
 
@@ -22,7 +22,7 @@ public class SwarmGameLogic implements GameLogic {
     private static final String TAG = "Swarm";
 
     public static final IntegerParam PARAM_CLIENT_TIMEOUT = new IntegerParam("ClientTimeout", 500);
-    public static  IntegerParam PARAM_TURN_TIMEOUT = new IntegerParam("TurnTimeout", 1000);
+    public static IntegerParam PARAM_TURN_TIMEOUT = new IntegerParam("TurnTimeout", 1000);
     public static final FileParam PARAM_MAP = new FileParam("Map", null, ".*\\.map");
     public static final BooleanParam PARAM_SHOW_DEBUG_UI = new BooleanParam("ShowDebugUI", true);
 
@@ -42,6 +42,10 @@ public class SwarmGameLogic implements GameLogic {
     int[] colLeftDir = new int[]{1, -1, -1, 1};
     int[] rowRightDir = new int[]{1, -1, -1, 1};
     int[] colRightDir = new int[]{1, 1, -1, -1};
+
+    int[] detMoveLimit;
+
+    int[] changeColorLimit;
 
     private boolean[][][] newBorn;
     private int[][][] mark;
@@ -71,6 +75,10 @@ public class SwarmGameLogic implements GameLogic {
     Set<Integer> fishesChanged;
     HashSet<Integer> fishAlters;
     HashSet<Integer> teleportChecked;
+
+    private double[][] foodProbs;
+    private double[][] trashProbs;
+    private double[][] netProbs;
 
     private Message uiMessage;
 
@@ -104,7 +112,13 @@ public class SwarmGameLogic implements GameLogic {
         this.W = this.map.getW();
         this.gc = this.map.getConstants();
 
-        PARAM_TURN_TIMEOUT = new IntegerParam("TurnTimeout", (int)this.gc.getTurnTimeout());
+        this.foodProbs = new double[H][W];
+        this.trashProbs = new double[H][W];
+        this.netProbs = new double[H][W];
+
+        probabilityMaker();
+
+        PARAM_TURN_TIMEOUT = new IntegerParam("TurnTimeout", (int) this.gc.getTurnTimeout());
 
         this.fishes = this.map.getFishes();
         this.tempObjects = this.map.getTempObjects();
@@ -113,6 +127,7 @@ public class SwarmGameLogic implements GameLogic {
         this.cells = this.map.getCells();
         this.idCounter = this.map.getIdCounter();
         this.moveChanges = new ArrayList<>();
+
 
         initialize();
 
@@ -179,6 +194,14 @@ public class SwarmGameLogic implements GameLogic {
         }
 
         firstTurn = true;
+
+        detMoveLimit = new int[2];
+        detMoveLimit[0] = this.gc.getDetMovLimit();
+        detMoveLimit[1] = this.gc.getDetMovLimit();
+
+        changeColorLimit = new int[2];
+        changeColorLimit[0] = this.gc.getChangeColorLimit();
+        changeColorLimit[1] = this.gc.getChangeColorLimit();
     }
 
 
@@ -210,7 +233,6 @@ public class SwarmGameLogic implements GameLogic {
         msg[1] = new Message(name1, args1);
         return msg;
     }
-
 
 
     @Override
@@ -259,7 +281,8 @@ public class SwarmGameLogic implements GameLogic {
         // get arguments from client
         for (int ind = 0; ind < gc.getTeamNum(); ind++) {
 
-          loop:  for (int i = 0; i < clientsEvent[ind].length; i++) {
+            loop:
+            for (int i = 0; i < clientsEvent[ind].length; i++) {
 
                 if (clientsEvent[ind][i].getType().equals("s")) {
 
@@ -270,20 +293,23 @@ public class SwarmGameLogic implements GameLogic {
                     for (int j = 0; j < 5; j++) {
                         try {
                             t[j] = Integer.parseInt(clientsEvent[ind][i].getArgs()[j]);
-                        }catch (NumberFormatException e){
+                        } catch (NumberFormatException e) {
                             continue loop;
                         }
                     }
-                    if(!(t[0] == 0 || t[0] == 1) || !(t[1] == 0 || t[1] == 1 || t[1] == 2) || !(t[2] == 0 || t[2] == 1) ||
-                            !(t[3] == 0 || t[3] == 1 || t[3] == 2) || !(t[4] == 0 || t[4] == 1 || t[4] == 2)){
+                    if (!(t[0] == 0 || t[0] == 1) || !(t[1] == 0 || t[1] == 1 || t[1] == 2) || !(t[2] == 0 || t[2] == 1) ||
+                            !(t[3] == 0 || t[3] == 1 || t[3] == 2) || !(t[4] == 0 || t[4] == 1 || t[4] == 2)) {
                         continue;
                     }
 
-                    update[ind][t[0]][t[1]][t[2]][t[3]] = t[4];
+                    if (update[ind][t[0]][t[1]][t[2]][t[3]] != t[4]) {
 
-                    changeScores(ind, gc.getUpdateCost());
+                        update[ind][t[0]][t[1]][t[2]][t[3]] = t[4];
+                        changeScores(ind, gc.getUpdateCost());
 
-                } else if (clientsEvent[ind][i].getType().equals("m")) {
+                    }
+
+                } else if (clientsEvent[ind][i].getType().equals("m") && detMoveLimit[ind] > 0) {
 
                     if (clientsEvent[ind][i].getArgs().length != 2) continue;
 
@@ -291,42 +317,43 @@ public class SwarmGameLogic implements GameLogic {
                     for (int j = 0; j < 2; j++) {
                         try {
                             t[j] = Integer.parseInt(clientsEvent[ind][i].getArgs()[j]);
-                        }catch (NumberFormatException e){
+                        } catch (NumberFormatException e) {
                             continue loop;
                         }
                     }
 
                     int flag = 0;
                     for (int j = 0; j < fishes[ind].size(); j++) {
-                        if(fishes[ind].get(j).getId() == t[0]){
+                        if (fishes[ind].get(j).getId() == t[0]) {
                             flag = 1;
                         }
                     }
 
-                    if(flag == 0){
+                    if (flag == 0) {
                         continue;
                     }
 
-                    if(!(t[1] == 0 || t[1] == 1 || t[1] == 2)){
+                    if (!(t[1] == 0 || t[1] == 1 || t[1] == 2)) {
                         continue;
                     }
 
                     detMoves[ind].add(clientsEvent[ind][i]);
+                    detMoveLimit[ind]--;
                     changeScores(ind, gc.getDetMoveCost());
 
-                } else if (clientsEvent[ind][i].getType().equals("c")) {
+                } else if (clientsEvent[ind][i].getType().equals("c") && changeColorLimit[ind] > 0) {
                     if (clientsEvent[ind][i].getArgs().length != 2) continue;
 
                     int[] t = new int[2];
                     for (int j = 0; j < 2; j++) {
                         try {
                             t[j] = Integer.parseInt(clientsEvent[ind][i].getArgs()[j]);
-                        }catch (NumberFormatException e){
+                        } catch (NumberFormatException e) {
                             continue loop;
                         }
                     }
 
-                    if(!(t[1] == 0 || t[1] == 1)){
+                    if (!(t[1] == 0 || t[1] == 1)) {
                         continue;
                     }
 
@@ -335,8 +362,9 @@ public class SwarmGameLogic implements GameLogic {
                         if (fishes[ind].get(j).getTeamNumber() == ind && fishes[ind].get(j).getId() == t[0] &&
                                 !fishAlters.contains(fishes[ind].get(j).getId())) {
                             fishes[ind].get(j).setColorNumber(t[1]);
-                            changeScores(ind, gc.getColorCost());
+//                            changeScores(ind, gc.getColorCost());
                             fishAlters.add(fishes[ind].get(j).getId());
+                            changeColorLimit[ind]--;
                         }
                     }
                 }
@@ -370,6 +398,17 @@ public class SwarmGameLogic implements GameLogic {
         stageSwitchTeleports();
 
         stageAlters();
+
+//        int[] finalScore = new int[2];
+//        finalScore[0] = map.getScore()[0];
+//        finalScore[1] = map.getScore()[1];
+//        if (numberOfQueens[0] == 0 && numberOfQueens[1] > 0) {
+//            finalScore[0] = 0;
+//            } else if (numberOfQueens[1] == 0 && numberOfQueens[0] > 0) {
+//            finalScore[1] = 0;
+//
+//        }
+//        map.setScore(finalScore);
 
     }
 
@@ -644,6 +683,11 @@ public class SwarmGameLogic implements GameLogic {
                         deletedFishes.add(fish.getId());
                         fishesChanged.add(fish.getId());
                         deleteFish(fish, fishes[fish.getTeamNumber()].indexOf(fish));
+                        if (fish.isQueen()) {
+                            changeScores(fish.getTeamNumber(), (int) (0.5 * gc.getKillQueenScore()));
+                        } else {
+                            changeScores(fish.getTeamNumber(), (int) (0.5 * gc.getKillFishScore()));
+                        }
                     }
 
                 }
@@ -717,12 +761,10 @@ public class SwarmGameLogic implements GameLogic {
                 if (tempObject.getDeadTime() == map.getTurn()) {
                     diff.del(tempObject.getId());
                     Cell cell = cells[tempObject.getPosition().getRow()][tempObject.getPosition().getColumn()];
-                    if(tempObject != null) {
-                        if (tempObject instanceof Net) {
-                            cell.setNet(null);
-                        } else {
-                            cell.setContent(null);
-                        }
+                    if (tempObject instanceof Net) {
+                        cell.setNet(null);
+                    } else {
+                        cell.setContent(null);
                     }
                     tempObjects.remove(i);
                 }
@@ -736,15 +778,12 @@ public class SwarmGameLogic implements GameLogic {
         int netValidTime = this.map.getConstants().getNetValidTime();
 
         int turn = this.map.getTurn();
-
         for (int i = 0; i < this.H; i++) {
             for (int j = 0; j < this.W; j++) {
 
                 if (cells[i][j].getContent() == null && cells[i][j].getTeleport() == null) {
-
-
                     double r0 = Math.random();
-                    if (r0 < this.map.getConstants().getFoodProb()) {
+                    if (r0 < gc.getFoodProb()) {
                         Food food;
                         food = new Food(idCounter++, cells[i][j]);
                         food.setDeadTime(foodValidTime + turn);
@@ -753,7 +792,7 @@ public class SwarmGameLogic implements GameLogic {
                         diff.add(food.getId(), 1, i, j);
                     } else if (cells[i][j].getContent() == null) {
                         double r1 = Math.random();
-                        if (r1 < this.map.getConstants().getTrashProb()) {
+                        if (r1 < gc.getTrashProb()) {
                             Trash trash;
                             trash = new Trash(idCounter++, cells[i][j]);
                             trash.setDeadTime(trashValidTime + turn);
@@ -765,7 +804,7 @@ public class SwarmGameLogic implements GameLogic {
                 }
                 if (cells[i][j].getNet() == null) {
                     double r2 = Math.random();
-                    if (r2 < this.map.getConstants().getNetProb()) {
+                    if (r2 < gc.getNetProb()) {
                         Net net;
                         net = new Net(idCounter++, cells[i][j]);
                         net.setDeadTime(netValidTime + turn);
@@ -780,13 +819,12 @@ public class SwarmGameLogic implements GameLogic {
     }
 
 
-
     private void stageSwitchTeleports() {
 
         teleportChecked.clear();
 
         for (int i = 0; i < teleports.size(); i++) {
-            Teleport teleport ;
+            Teleport teleport;
             teleport = teleports.get(i);
             Teleport pairTeleport = teleport.getPair().getTeleport(); // todo: fix it if you have extra time and energy!
             Cell cell = teleport.getPosition();
@@ -818,7 +856,7 @@ public class SwarmGameLogic implements GameLogic {
             for (int i = 0; i < fishes[ind].size(); i++) {
                 Fish fish = fishes[ind].get(i);
                 int bsick = 0;
-                if(fish.isSick()) {
+                if (fish.isSick()) {
                     bsick = 1;
                 }
                 if (fishAlters.contains(fish.getId())) {
@@ -899,7 +937,7 @@ public class SwarmGameLogic implements GameLogic {
         fish.setPosition(nxtCell);
         ////// define changes after fish moved
         // set sick & deadtime & fishAlters & trash remove & diff trash
-        if(nxtCell.getContent() != null) {
+        if (nxtCell.getContent() != null) {
             if (nxtCell.getContent() instanceof Trash) {
                 Trash trash;
                 trash = (Trash) nxtCell.getContent();
@@ -920,7 +958,7 @@ public class SwarmGameLogic implements GameLogic {
                     tempA[fish.getTeamNumber()] = map.getScore()[fish.getTeamNumber()] + gc.getQueenFoodScore();
                     tempA[1 - fish.getTeamNumber()] = map.getScore()[1 - fish.getTeamNumber()];
                     map.setScore(tempA);
-                } else if(!fish.isQueen()) {
+                } else if (!fish.isQueen()) {
                     int tempA[] = new int[2];
                     tempA[fish.getTeamNumber()] = map.getScore()[fish.getTeamNumber()] + gc.getFishFoodScore();
                     tempA[1 - fish.getTeamNumber()] = map.getScore()[1 - fish.getTeamNumber()];
@@ -1035,7 +1073,7 @@ public class SwarmGameLogic implements GameLogic {
             try {
                 int id = Integer.parseInt(args[0]);
                 int mov = Integer.parseInt(args[1]);
-                if ( id == fish.getId()) {
+                if (id == fish.getId()) {
                     mv = mov;
 
                 }
@@ -1064,8 +1102,6 @@ public class SwarmGameLogic implements GameLogic {
 //                mv = rand.nextInt(3);
             }
         }
-
-
 
 
         return getNextCellViaMove(fish, mv);
@@ -1122,8 +1158,7 @@ public class SwarmGameLogic implements GameLogic {
                 return 0;
             else
                 return 1;
-        }
-        else {
+        } else {
             return 2;
         }
     }
@@ -1175,15 +1210,7 @@ public class SwarmGameLogic implements GameLogic {
 
     @Override
     public boolean isGameFinished() {
-        int[] finalScore = new int[2];
-        finalScore[0] = map.getScore()[0];
-        finalScore[1] = map.getScore()[1];
-        if (numberOfQueens[0] == 0 && numberOfQueens[1] > 0) {
-            finalScore[0] = 0;
-        } else if (numberOfQueens[1] == 0 && numberOfQueens[0] > 0) {
-            finalScore[1] = 0;
-        }
-        map.setScore(finalScore);
+
         int population = fishes[0].size() + fishes[1].size();
         if (((float) population) / (this.map.getH() * this.map.getW()) >= this.map.getConstants().getEndRatio()) {
             return true;
@@ -1199,9 +1226,30 @@ public class SwarmGameLogic implements GameLogic {
 
     @Override
     public void terminate() {
-        if (PARAM_SHOW_DEBUG_UI.getValue())
+
+        if (PARAM_SHOW_DEBUG_UI.getValue()) {
             this.debugUI.setMap(this.map);
             this.debugUI.gameOver();
+        }
+    }
+
+    private void probabilityMaker() {
+        for (int i = 0; i < this.H; i++) {
+            for (int j = 0; j < this.W; j++) {
+                double xi = -5 + (i * 10) / H;
+                double yi = -5 + (j * 10) / W;
+                this.foodProbs[i][j] = (1 / (2 * Math.PI)) * Math.exp(-(xi * xi + yi * yi) / (2)) * gc.getFoodProb();
+                this.trashProbs[i][j] = (1 / (2 * Math.PI)) * Math.exp(-(xi * xi + yi * yi) / (2)) * gc.getTrashProb();
+                this.netProbs[i][j] = (1 / (2 * Math.PI)) * Math.exp(-(xi * xi + yi * yi) / (2)) * gc.getNetProb();
+            }
+
+        }
+//        for (int i = 0; i < H; i++) {
+//            for (int j = 0; j < W; j++) {
+//                System.out.printf(" %.12f ",(double)(foodProbs[i][j]));
+//            }
+//            System.out.println("");
+//        }
     }
 }
 

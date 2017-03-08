@@ -202,36 +202,6 @@ public class GameServer {
                 mOutputController.putMessage(mGameLogic.getUIMessage());
                 mOutputController.putMessage(mGameLogic.getStatusMessage());
 
-                if (mGameLogic.isGameFinished()) {
-                    try {
-                        mGameLogic.terminate();
-                        Message shutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
-                        for (int i = 0; i < mClientsNum; i++) {
-                            mClientNetwork.queue(i, shutdown);
-                        }
-                        mClientNetwork.sendAllBlocking();
-                        mClientNetwork.shutdownAll();
-                        mClientNetwork.terminate();
-                        Message uiShutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
-                        mOutputController.putMessage(uiShutdown);
-                        mOutputController.waitToSend();
-                        mLoop.shutdown();
-                        mOutputController.shutdown();
-                        mUINetwork.terminate();
-                    } catch (Exception e) {
-                        err("Finishing game", e);
-                    }
-                    try {
-                        Thread.sleep(30000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    if(SwarmGameLogic.PARAM_SHOW_DEBUG_UI.equals(false)) {
-                        System.exit(0);
-                    }
-                    return;
-                }
-
                 Message[] output = mGameLogic.getClientMessages();
                 for (int i = 0; i < output.length; ++i) {
                     mClientNetwork.queue(i, output[i]);
@@ -265,6 +235,36 @@ public class GameServer {
                 for (int i = 0; i < mClientsNum; ++i) {
                     Event[] events = mClientNetwork.getReceivedEvents(i);
                     clientEvents[i] = events;
+                }
+
+                if (mGameLogic.isGameFinished()) {
+                    try {
+                        mGameLogic.terminate();
+                        Message shutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
+                        for (int i = 0; i < mClientsNum; i++) {
+                            mClientNetwork.queue(i, shutdown);
+                        }
+                        mClientNetwork.sendAllBlocking();
+                        mClientNetwork.shutdownAll();
+                        mClientNetwork.terminate();
+                        Message uiShutdown = new Message(Message.NAME_SHUTDOWN, new Object[]{});
+                        mOutputController.putMessage(uiShutdown);
+                        mOutputController.waitToSend();
+                        mLoop.shutdown();
+                        mOutputController.shutdown();
+                        mUINetwork.terminate();
+                    } catch (Exception e) {
+                        err("Finishing game", e);
+                    }
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if(SwarmGameLogic.PARAM_SHOW_DEBUG_UI.equals(false)) {
+                        System.exit(0);
+                    }
+                    return;
                 }
             };
 

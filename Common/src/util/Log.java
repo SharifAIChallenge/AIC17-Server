@@ -72,7 +72,6 @@ public final class Log {
         tr.printStackTrace(pw);
         return sw.toString();
     }
-
     public static void log(int priority, String tag, String msg) {
         if (priority < LOG_LEVEL)
             return;

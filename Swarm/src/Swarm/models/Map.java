@@ -113,6 +113,16 @@ public class Map implements Serializable {
         gameConstants.setTrashValidTime((int) constants[20]);
         if (constants.length > 21) {
             gameConstants.setTotalTurn((int) constants[21]);
+            if(constants.length > 22) {
+                gameConstants.setDetMovLimit((int) constants[22]);
+                if(constants.length > 23) {
+                    gameConstants.setChangeColorLimit((int) constants[23]);
+                } else {
+                    gameConstants.setChangeColorLimit(50);
+                }
+            } else {
+                gameConstants.setDetMovLimit(50);
+            }
         } else {
             gameConstants.setTotalTurn(10000);
         }

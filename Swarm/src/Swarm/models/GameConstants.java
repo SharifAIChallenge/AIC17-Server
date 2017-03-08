@@ -45,6 +45,8 @@ public class GameConstants implements Serializable{
     private int disobeyNum;
 
     private int totalTurn = 1000;
+    private int detMovLimit;
+    private int changeColorLimit;
 
     public GameConstants(){}
 
@@ -269,4 +271,19 @@ public class GameConstants implements Serializable{
     }
 
 
+    public void setDetMovLimit(int detMovLimit) {
+        this.detMovLimit = detMovLimit;
+    }
+
+    public void setChangeColorLimit(int changeColorLimit) {
+        this.changeColorLimit = changeColorLimit;
+    }
+
+    public int getDetMovLimit() {
+        return detMovLimit;
+    }
+
+    public int getChangeColorLimit() {
+        return changeColorLimit;
+    }
 }

@@ -88,7 +88,10 @@ public class Map implements Serializable {
 
 
     private void makeConstants(double[] constants) {
-        initialConstants = constants;
+        initialConstants = new double[24];
+        for (int i = 0; i < 21; i++) {
+            initialConstants[i] = constants[i];
+        }
         GameConstants gameConstants = new GameConstants();
         gameConstants.setTurnTimeout((int) constants[0]);
         gameConstants.setFoodProb(constants[1]);
@@ -111,21 +114,39 @@ public class Map implements Serializable {
         gameConstants.setDisobeyNum((int) constants[18]);
         gameConstants.setFoodValidTime((int) constants[19]);
         gameConstants.setTrashValidTime((int) constants[20]);
-        if (constants.length > 21) {
-            gameConstants.setTotalTurn((int) constants[21]);
-            if(constants.length > 22) {
-                gameConstants.setDetMovLimit((int) constants[22]);
-                if(constants.length > 23) {
-                    gameConstants.setChangeColorLimit((int) constants[23]);
-                } else {
-                    gameConstants.setChangeColorLimit(50);
-                }
-            } else {
-                gameConstants.setDetMovLimit(50);
-            }
-        } else {
-            gameConstants.setTotalTurn(10000);
+        if(constants.length == 21) {
+            gameConstants.setTotalTurn(600);
+            initialConstants[21] = 600;
+            gameConstants.setDetMovLimit(50);
+            initialConstants[22] = 50;
+            gameConstants.setChangeColorLimit(50);
+            initialConstants[23] = 50;
         }
+        if(constants.length == 22) {
+            gameConstants.setTotalTurn((int) constants[21]);
+            initialConstants[21] = constants[21];
+            gameConstants.setDetMovLimit(50);
+            initialConstants[22] = 50;
+            gameConstants.setChangeColorLimit(50);
+            initialConstants[23] = 50;
+        }
+        if(constants.length == 23) {
+            gameConstants.setTotalTurn((int) constants[21]);
+            initialConstants[21] = constants[21];
+            gameConstants.setDetMovLimit((int) constants[22]);
+            initialConstants[22] = constants[22];
+            gameConstants.setChangeColorLimit(50);
+            initialConstants[23] = 50;
+        }
+        if(constants.length == 24) {
+            gameConstants.setTotalTurn((int) constants[21]);
+            initialConstants[21] = constants[21];
+            gameConstants.setDetMovLimit((int) constants[22]);
+            initialConstants[22] = constants[22];
+            gameConstants.setChangeColorLimit((int) constants[23]);
+            initialConstants[23] = constants[23];
+        }
+
         this.constants = gameConstants;
 
     }
